@@ -1,15 +1,15 @@
 module.exports = {
   parserPreset: {
     parserOpts: {
-      headerPattern: /^([\u{1F300}-\u{1F6FF}])\s(\w+)(.*)$/u,
-      headerCorrespondence: ['emoji', 'type', 'rawSubject'],
+      headerPattern: /^(✨|💊|♻️|🎨|⚙️|🔧|📝)\s(\w+)(?::\s)?\s*(.*)$/u,
+      headerCorrespondence: ['emoji', 'type', 'subject'],
     },
   },
   plugins: [
     {
       rules: {
         'strict-bvtrots-logic': (parsed) => {
-          const { emoji, type, rawSubject, body } = parsed;
+          const { emoji, type, subject, body } = parsed;
           const emojiMap = {
             feat: '✨',
             fix: '💊',
@@ -21,7 +21,8 @@ module.exports = {
           };
 
           const validTypes = [...Object.keys(emojiMap), 'merge'];
-          if (!validTypes.includes(type)) {
+
+          if (!type || !validTypes.includes(type)) {
             return [false, `Type must be one of: ${validTypes.join(', ')}` ];
           }
           if (type !== type.toLowerCase()) {
@@ -41,19 +42,14 @@ module.exports = {
             if (trimmedBody.length < 50) {
               return [false, `Merge body must be at least 50 chars (current: ${trimmedBody.length})` ];
             }
-
-            if (!/^\s[^#]+(\s#\d+)?$/.test(rawSubject)) {
-              return [false, 'Merge format: "✨ merge subject" (PR) or "✨ merge subject #42" (Commit)'];
-            }
             return [true];
           }
 
-          if (!rawSubject.startsWith(': ')) {
-            return [false, `Standard format: "${emoji} ${type}: subject"`];
+          if (!subject || subject.trim().length === 0) {
+            return [false, 'Subject is mandatory'];
           }
 
-          const subjectText = rawSubject.replace(': ', '').trim();
-          if (!/^[a-z]/.test(subjectText)) {
+          if (!/^[a-z]/.test(subject)) {
             return [false, `Subject must start with a lowercase letter`];
           }
 
@@ -62,7 +58,7 @@ module.exports = {
 
           let lastPriority = -1;
           for (const line of lines) {
-            const lineMatch = line.match(/^- ([\u{1F300}-\u{1F6FF}])\s(.+)\.$/u);
+            const lineMatch = line.match(/^- (✨|💊|♻️|🎨|⚙️|🔧|📝)\s(.+)\.$/u);
 
             if (!lineMatch) {
               return [false, `Line format error: "- [emoji] [text]." (Check emoji, space, and trailing dot) in: "${line}"` ];
