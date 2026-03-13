@@ -1,0 +1,24 @@
+{
+  "name": "bvtrots-commitlint-config",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bvtrots/bvtrots-commitlint-config.git"
+  },
+  "keywords": [],
+  "author": "bvtrots",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bvtrots/bvtrots-commitlint-config/issues"
+  },
+  "homepage": "https://github.com/bvtrots/bvtrots-commitlint-config#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^20.4.4",
+    "husky": "^9.1.7"
+  }
+}
