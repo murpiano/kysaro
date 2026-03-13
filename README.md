@@ -1,0 +1,1 @@
+# ⚙️ bvtrots-commitlint-config
