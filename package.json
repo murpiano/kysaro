@@ -1,25 +1,24 @@
 {
   "name": "bvtrots-commitlint-config",
   "version": "2.0.0",
-  "description": "",
+  "description": "Strict emoji-based commitlint configuration with hierarchy logic",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky install"
+  "bin": {
+    "bvtrots-init": "./cli.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bvtrots/bvtrots-commitlint-config.git"
   },
-  "keywords": [],
   "author": "bvtrots",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/bvtrots/bvtrots-commitlint-config/issues"
+  "license": "MIT",
+  "dependencies": {
+    "@commitlint/cli": "^20.0.0"
   },
-  "homepage": "https://github.com/bvtrots/bvtrots-commitlint-config#readme",
-  "devDependencies": {
-    "@commitlint/cli": "^20.4.4",
-    "husky": "^9.1.7"
+  "peerDependencies": {
+    "husky": "^9.0.0"
+  },
+  "scripts": {
+    "prepare": "husky"
   }
 }

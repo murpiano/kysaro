@@ -184,32 +184,26 @@ bvtrots-commitlint-config/
 ## ⚙️ Installation & Usage
 ###### This package is recommended to be used with a Git hooks mechanism (like Husky) that automatically triggers validation scripts during Git interactions. This ensures that every commit message follows the rules before it enters your repository history.
 
-1. Install dependencies
+1. Install 
 
-       npm install --save-dev @commitlint/cli bvtrots-commitlint-config husky
+       npm install -D @commitlint/cli bvtrots-commitlint-config
 
-2. Configure commitlint
+2. Quick Setup (Recommended for beginners)
 
-    Create a commitlint.config.js file in your project root and add the following:
+    ###### Simply run this command to automatically configure Husky, hooks, and GitHub Actions:
 
-       module.exports = {
-         extends: ['bvtrots-commitlint-config'],
-       };
+       npx bvtrots-init
 
-3. Initialize Husky
+3. Manual Setup (For advanced users)
 
-       npx husky init
+   - Add extends: ['bvtrots-commitlint-config'] to your commitlint config.
+   - Manually configure your Husky hooks as needed.
+   - (Optional) Copy our CI workflow from the package.
 
-4. Create the commit-msg hook
 
-    Run the following command to create a robust, two-line hook. This format is specifically designed to be compatible with Git Bash on Windows:
-
-       echo -e "#!/bin/sh\nnpx --no -- commitlint --edit \"\$1\"" > .husky/commit-msg
-
-5. Verify the setup
+4. Verify the setup
 
    From now on, every time you try to create a commit, Husky will automatically trigger commitlint. If your message is invalid, the commit will be rejected, and you will see a list of errors in your terminal.
-
 
 ---
 
