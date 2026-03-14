@@ -1,8 +1,47 @@
 const fs = require('fs');
 const path = require('path');
 
+
+const validExamples = `
+---
+
+## ✅ Valid Examples
+
+### Stage 1: Standard Commit
+###### Made in your local branch feat/auth-logic.
+\`\`\`text
+✨ feat (auth): implement secure password hashing
+
+- ✨ add bcryptjs for password encryption before saving.
+- ✨ implement salt generation logic in the user service.
+- ✨ update user model to handle encrypted strings.
+\`\`\`
+
+### Stage 2: Pull Request
+###### When you open the PR on GitHub. Title matches Merge format (no #), Description is > 50 chars.
+\`\`\`text
+✨ merge (auth): secure password hashing and encryption logic
+
+This pull request integrates bcryptjs for secure password management. It ensures
+that all user passwords are encrypted with a unique salt before being stored in
+the database, significantly improving security.
+\`\`\`
+
+### Stage 3: Merge Commit
+###### The result in main after clicking the "Merge" button. GitHub adds the #Number.
+\`\`\`text
+✨ merge (auth): secure password hashing and encryption logic #42
+
+This pull request integrates bcryptjs for secure password management. It ensures
+that all user passwords are encrypted with a unique salt before being stored in
+the database, significantly improving security.
+\`\`\`
+
+---
+`;
+
 const projectRoot = process.cwd();
-const rulesDir = path.join(projectRoot, 'src/', 'rules');
+const rulesDir = path.join(projectRoot, '.bvtrots-dx', 'rules');
 const loadJSON = (file) => JSON.parse(fs.readFileSync(path.join(rulesDir, file), 'utf8'));
 
 try {
@@ -10,9 +49,10 @@ try {
   const scopes = loadJSON('scopes.json');
   const settings = loadJSON('settings.json');
 
-  let content = '# 📜 Bvtrots Commit Protocol\n\n';
+  let content = '# 📃 Whitelist bvtrots-dx \n\n';
 
-  content += '## ⚙️ 1. Validation Rules\n\n';
+  content += `${validExamples}`;
+  content += '## 1. Validation Rules\n\n';
   content += '| Category | Rule | Standard | Pull Request | Merge |\n';
   content += '| :--- | :--- | :---: | :---: | :---: |\n';
 
@@ -27,7 +67,7 @@ try {
   content += `| | Min Length | ${st.bodyMinLength} | ${pr.bodyMinLength} | ${mg.bodyMinLength} |\n`;
   content += `| | Max Line Length | ${st.bodyLineMaxLength} | ❌ | ❌ |\n\n`;
 
-  content += '## 🏷️ 2. Allowed Types\n\n';
+  content += '## 2. Allowed Types\n\n';
   content += '| Emoji | Type | Description |\n';
   content += '| :---: | :--- | :--- |\n';
   Object.entries(types).forEach(([key, val]) => {
@@ -35,14 +75,15 @@ try {
   });
   content += '\n';
 
-  content += '## 🎯 3. Allowed Scopes\n\n';
+  content += '## 3. Allowed Scopes\n\n';
   content += '| Scope | Description |\n';
   content += '| :--- | :--- |\n';
   Object.entries(scopes).forEach(([key, val]) => {
     content += `| \`${key}\` | ${val.description} |\n`;
   });
 
-  fs.writeFileSync(path.join(rulesDir, 'whitelist.md'), content);
+
+  fs.writeFileSync(path.join(`${rulesDir}/../`, 'whitelist.md'), content);
   console.log('✅ whitelist.md updated strictly by JSON files.');
 } catch (err) {
   console.error('❌ Error:', err.message);

@@ -1,6 +1,42 @@
-# 📜 Bvtrots Commit Protocol
+# 📃 Whitelist bvtrots-dx 
 
-## ⚙️ 1. Validation Rules
+
+---
+
+## ✅ Valid Examples
+
+### Stage 1: Standard Commit
+###### Made in your local branch feat/auth-logic.
+```text
+✨ feat (auth): implement secure password hashing
+
+- ✨ add bcryptjs for password encryption before saving.
+- ✨ implement salt generation logic in the user service.
+- ✨ update user model to handle encrypted strings.
+```
+
+### Stage 2: Pull Request
+###### When you open the PR on GitHub. Title matches Merge format (no #), Description is > 50 chars.
+```text
+✨ merge (auth): secure password hashing and encryption logic
+
+This pull request integrates bcryptjs for secure password management. It ensures
+that all user passwords are encrypted with a unique salt before being stored in
+the database, significantly improving security.
+```
+
+### Stage 3: Merge Commit
+###### The result in main after clicking the "Merge" button. GitHub adds the #Number.
+```text
+✨ merge (auth): secure password hashing and encryption logic #42
+
+This pull request integrates bcryptjs for secure password management. It ensures
+that all user passwords are encrypted with a unique salt before being stored in
+the database, significantly improving security.
+```
+
+---
+## 1. Validation Rules
 
 | Category | Rule | Standard | Pull Request | Merge |
 | :--- | :--- | :---: | :---: | :---: |
@@ -11,7 +47,7 @@
 | | Min Length | 20 | 50 | 50 |
 | | Max Line Length | 100 | ❌ | ❌ |
 
-## 🏷️ 2. Allowed Types
+## 2. Allowed Types
 
 | Emoji | Type | Description |
 | :---: | :--- | :--- |
@@ -27,7 +63,7 @@
 | 🚀 | ci | CI/CD |
 | ↩ | revert | Revert |
 
-## 🎯 3. Allowed Scopes
+## 3. Allowed Scopes
 
 | Scope | Description |
 | :--- | :--- |

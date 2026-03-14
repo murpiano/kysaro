@@ -1,6 +1,6 @@
 {
   "name": "bvtrots-dx",
-  "version": "3.0.0",
+  "version": "1.0.0",
   "description": "Bvtrots Developer Experience: Strict commit protocol",
   "main": "src/index.js",
   "bin": {

@@ -1,2 +1,2 @@
 node scripts/generate-whitelist.js
-git add .bvtrots-dx/rules/whitelist.md
+git add .bvtrots-dx/whitelist.md

@@ -54,7 +54,7 @@ try {
   log('⚓', 'Configured Husky commit-msg hook');
 
   const huskyPrePath = path.join(projectRoot, '.husky', 'pre-commit');
-  const preCommitContent = 'npm run sync-docs && git add .bvtrots-dx/rules/whitelist.md\n';
+  const preCommitContent = 'npm run sync-docs && git add .bvtrots-dx/whitelist.md\n';
   fs.writeFileSync(huskyPrePath, preCommitContent);
   log('⚓', 'Configured Husky pre-commit hook');
 
@@ -83,7 +83,7 @@ jobs:
   log('🤖', 'GitHub Action added');
 
   log('📊', 'Generating initial White-list table...');
-  execSync(`node ${path.join(__dirname, 'sync.js')}`, { stdio: 'inherit' });
+  execSync(`node "${path.join(__dirname, 'sync.js')}"`, { stdio: 'inherit' });
 
   console.log('\n🎉 All set! Your project is now bvtrots-dx-compliant.');
   console.log('👉 Rules location: .bvtrots-dx/rules/');
