@@ -1,0 +1,26 @@
+{
+  "standard_commit": {
+    "headerMinLength": 20,
+    "headerMaxLength": 72,
+    "bodyRequired": true,
+    "subjectFirstLetterLowerCase": true,
+    "bodyLineRequireDot": true,
+    "bodyMinLength": 20,
+    "bodyLineMaxLength": 100
+  },
+  "pull_request": {
+    "headerMinLength": 15,
+    "headerMaxLength": 72,
+    "bodyRequired": true,
+    "subjectFirstLetterLowerCase": false,
+    "bodyMinLength": 50
+  },
+  "merge_commit": {
+    "headerMinLength": 15,
+    "headerMaxLength": 80,
+    "requireHashtagWithNumber": true,
+    "subjectFirstLetterLowerCase": false,
+    "bodyRequired": true,
+    "bodyMinLength": 50
+  }
+}

@@ -31,3 +31,5 @@ out/
 *.swp
 *.sublime-project
 *.sublime-workspace
+
+tests/*

@@ -1,24 +1,35 @@
 {
-  "name": "bvtrots-commitlint-config",
-  "version": "2.0.0",
-  "description": "Strict emoji-based commitlint configuration with hierarchy logic",
-  "main": "index.js",
+  "name": "bvtrots-dx",
+  "version": "3.0.0",
+  "description": "Bvtrots Developer Experience: Strict commit protocol",
+  "main": "src/index.js",
   "bin": {
-    "bvtrots-init": "./cli.js"
+    "bvtrots-init": "bin/cli.js",
+    "bvtrots-sync": "bin/sync.js"
   },
+  "files": [
+    "src",
+    "bin",
+    "scripts",
+    "README.md"
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bvtrots/bvtrots-commitlint-config.git"
+    "url": "git+https://github.com/bvtrots/bvtrots-dx.git"
   },
   "author": "bvtrots",
   "license": "MIT",
   "dependencies": {
-    "@commitlint/cli": "^20.0.0"
-  },
-  "peerDependencies": {
+    "@commitlint/cli": "^20.0.0",
     "husky": "^9.0.0"
   },
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "sync-docs": "node scripts/generate-whitelist.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.0"
   }
 }

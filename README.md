@@ -1,4 +1,4 @@
-# ⚙️ bvtrots-commitlint-config
+# ⚙️ bvtrots-dx - Developer Experience
 
 ---
 
@@ -20,27 +20,33 @@ Personal **commitlint** configuration that enforces strict Conventional Commits 
 
 
 ## 🕵️‍♂️ Strict Validation Rules
-This configuration is opinionated and enforces a rigorous commit structure.
+This configuration is opinionated and enforces a rigorous commit structure based on architectural discipline and atomic changes.
 
 1. ###### Standard Commits
    Every standard commit must strictly follow these rules:
-- **Header Format**:
-  Emoji (whitelist table) -> Space -> Type (whitelist table) -> Colon -> Space -> Subject (see examples ⏬).
-- **Case Sensitivity**: The subject must strictly start with a lowercase letter.
+- **Header Format**:emoji_type_(scope):_subject (see examples ⏬).
+  - **Emoji**: allowed to use strictly from the whitelist. 
+  - **Type**: allowed to use strictly from the whitelist in lowercase.
+  - **Scope (Strictly Mandatory)**: Must be wrapped in parentheses, and allowed to use strictly from the whitelist in lowercase.
+  - **Subject**: The subject must strictly start with a lowercase letter.
+  - **Header Limit**: Maximum 72 characters.
 - **Empty Line**: A mandatory blank line must separate the header from the body.
-- **Body (Strictly Mandatory)**: You must provide a description for every commit.
-- **Minimum Requirement**: At least one valid description line is required.
-- **Line Format**: Each line must strictly follow:
-  `-` -> Space -> Emoji (whitelist table) -> Space -> Text -> `.` (see examples ⏬).
-- **Content**: Text must start with a lowercase letter and end with a period (`.`).
-- **Hierarchy**: Lines must follow the priority order from the whitelist table (e.g., `- ✨` before `- ♻️`).
+- **Body (Strictly Mandatory)**: You must provide a description for every commit:
+  - **Minimum Requirement**: At least one valid description line is required. 
+  - **Atomic Rule**: Every line in the body must use the same Emoji as the header. Mixing different types (e.g., a fix inside a feat commit) is strictly forbidden.
+  - **Line Format**: Each line must strictly follow:
+    -_emoji_text. (see examples ⏬).
+    - Text: Text must start with a lowercase letter and end with a period (.).
 
 2. ###### Merge Commits
    If a commit is a merge (created via terminal or GitHub merge button), it follows a different strict format:
-- **Header Format**:
-  Emoji (whitelist table) -> Space -> `merge` -> Space -> Subject -> Space -> `#Number` (see examples ⏬).
-- **Keyword**: The word `merge` must be strictly lowercase.
-- **PR Number**: The header must end with a hash symbol and the PR number (automatically handled by GitHub).
+- **Header Format**: emoji_merge_(scope):_subject\_#NumberPR (see examples ⏬).
+  - **Emoji**: allowed to use strictly from the whitelist.
+  - **Merge Keyword (Strictly Mandatory)**: The word `merge` must be strictly lowercase.
+  - **Scope (Strictly Mandatory)**: Must be wrapped in parentheses, and allowed to use strictly from the whitelist in lowercase.
+  - **Subject**: The subject must strictly start with a lowercase letter.
+  - **PR Number**: The header must end with a hash symbol and the PR number (automatically handled by GitHub).
+  - **Header Limit**: Maximum 80 characters.
 - **Empty Line**: A mandatory blank line must separate the header from the body.
 - **Body (Strictly Mandatory)**:
   - **Minimum Length**: The body text must contain at least 50 characters.
@@ -49,12 +55,13 @@ This configuration is opinionated and enforces a rigorous commit structure.
 3. ###### Pull Request (PR) Requirements
    To ensure clean history, GitHub Pull Requests must be prepared as follows:
 - **PR Title**: Must follow the Merge Commit header format but WITHOUT the PR number at the end (see examples ⏬). GitHub will append the `#Number` automatically upon merging.
+- **Header Limit**: Maximum 72 characters.
 - **PR Description**: This text will become the Body of your merge commit. It is strictly mandatory and must be at least 50 characters long.
 - **Strict Enforcement**: If the PR Title or Description violates these rules, the GitHub Actions check will fail, and merging will be blocked.
 
 4. ###### General Limits
-- **Header Limit**: The header length must not exceed 72 characters.
-- **Language**: All commit messages must be in English.
+- Language: All messages must be in English.
+- Validation: All Types, Emojis, and Scopes are strictly validated against the whitelist in src/rules/.
 
 ---
 
@@ -78,31 +85,31 @@ This configuration is opinionated and enforces a rigorous commit structure.
 Stage 1: Standard Commit
 ###### Made in your local branch feat/auth-logic.
 ```text
-✨ feat: implement secure password hashing
+✨ feat (auth): implement secure password hashing
 
 - ✨ add bcryptjs for password encryption before saving.
 - ✨ implement salt generation logic in the user service.
-- 💊 fix edge case where empty password could be processed.
+- ✨ update user model to handle encrypted strings.
 ```
 
 Stage 2: Pull Request
 ###### When you open the PR on GitHub. Title matches Merge format (no #), Description is > 50 chars.
 ```text
-✨ merge secure password hashing and encryption logic
+✨ merge (auth): secure password hashing and encryption logic
 
-This pull request integrates bcryptjs for secure password management. 
-It ensures that all user passwords are encrypted with a unique salt 
-before being stored in the database, significantly improving security.
+This pull request integrates bcryptjs for secure password management. It ensures
+that all user passwords are encrypted with a unique salt before being stored in
+the database, significantly improving security.
 ```
 
 Stage 3: Merge Commit
 ###### The result in main after clicking the "Merge" button. GitHub adds the #Number.
 ```text
-✨ merge secure password hashing and encryption logic #42
+✨ merge (auth): secure password hashing and encryption logic #42
 
-This pull request integrates bcryptjs for secure password management. 
-It ensures that all user passwords are encrypted with a unique salt 
-before being stored in the database, significantly improving security.
+This pull request integrates bcryptjs for secure password management. It ensures
+that all user passwords are encrypted with a unique salt before being stored in
+the database, significantly improving security.
 ```
 
 ---
@@ -110,57 +117,72 @@ before being stored in the database, significantly improving security.
 
 ## ❌ Invalid Examples
 
-Example 1: Uppercase in Header
+Example 1: Missing or Invalid Scope
 ```text
-# Error: Subject must start with a lowercase letter ("Add" -> "add").
-✨ feat: Add user login
+# Error: Scope "(auth)" is missing or not from the whitelist.
+✨ feat: add user login
+
+---------------------------------------------------------------------
+
+# Error: Scope must be in parentheses and lowercase.
+✨ feat [AUTH]: add user login
 ```
 
-Example 2: Broken Header Format
+Example 2: Case & Format Errors
 ```text
-# Error: Missing emoji at the beginning
-feat: add user authentication
+# Error: Subject must start with a lowercase letter ("Add" -> "add").
+✨ feat (auth): Add user login
 
-# Error: Missing space after emoji or colon
-✨feat: add user authentication
-✨ feat:add user authentication
+---------------------------------------------------------------------
+
+# Error: Missing space after emoji.
+✨feat (auth): add user authentication
+
+---------------------------------------------------------------------
+
+# Error: Missing space after colon.
+✨ feat (auth):add user authentication
 ```
 
 Example 3: Missing Mandatory Body (Standard Commit)
 ```text
-# Error: Standard commits MUST have a blank line and a body description.
-✨ feat: add user login logic
+# Error: Body is strictly mandatory. You must add a blank line and description.
+✨ feat (auth): add user login logic
 ```
 
-Example 4: Invalid Body Format
+Example 4: Invalid Body Format (Standard Commit)
 ```text
-✨ feat: integrate maps and location services
+✨ feat (maps): integrate location services
 
-# Error: Description line must start with a lowercase letter.
-- ✨ Added Leaflet maps integration. 
+# Error: Line must start with lowercase letter ("Add" -> "add").
+- ✨ Add Leaflet maps integration. 
 
-# Error: Missing trailing period ".".
-- 💊 fix marker positioning issue
+# Error: Missing trailing period "." at the end of the line.
+- ✨ fix marker positioning issue
 
-# Error: Missing dash and emoji "- ✨".
+# Error: Atomic Rule violation. Body emoji (💊) must match header emoji (✨).
+- 💊 fix marker positioning issue.
+
+# Error: Missing dash and emoji prefix "- ✨".
 implement popup tooltips for pins.
 ```
 
 Example 5: Invalid Merge / PR Format
 ```text
-# Error: Missing PR number with hash at the end (for Merge Commits)
-✨ merge core components and shared types
+# Error: Missing PR number with hash at the end (mandatory for Merge in Git history).
+✨ merge (core): integrate shared types
 
-# Error: Uppercase "Merge" keyword
-✨ Merge core components #2
+---------------------------------------------------------------------
 
-# Error: Body/Description is too short (less than 50 characters)
-✨ merge core components #2
+# Error: Body/Description is too short (must be > 50 characters).
+✨ merge (core): integrate shared types #42
 
-Updated the base components.
+Done some refactoring here.
 
-# Error: PR Title should not manually include #Number
-✨ merge analytics module #45
+---------------------------------------------------------------------
+
+# Error: PR Title should NOT manually include #Number (GitHub adds it automatically).
+✨ merge(analytics): update module #45
 ```
 
 ---
@@ -168,7 +190,7 @@ Updated the base components.
 
 ## 📂 Project Structure
 ```text
-bvtrots-commitlint-config/
+bvtrots-dx/
 ├── .idea/              # IDE configuration
 ├── node_modules/       # Dependencies
 ├── .npmignore          # NPM publish filters
@@ -184,26 +206,62 @@ bvtrots-commitlint-config/
 ## ⚙️ Installation & Usage
 ###### This package is recommended to be used with a Git hooks mechanism (like Husky) that automatically triggers validation scripts during Git interactions. This ensures that every commit message follows the rules before it enters your repository history.
 
-1. Install 
+### 1. Install 
 
-       npm install -D @commitlint/cli bvtrots-commitlint-config
+       npm install -D @commitlint/cli bvtrots-dx
 
-2. Quick Setup (Recommended for beginners)
+### 2. Quick Setup (Recommended)
 
-    ###### Simply run this command to automatically configure Husky, hooks, and GitHub Actions:
+###### Simply run this command to automatically configure everything (Husky, Hooks, GitHub Actions, and Rules):
 
        npx bvtrots-init
 
-3. Manual Setup (For advanced users)
 
-   - Add extends: ['bvtrots-commitlint-config'] to your commitlint config.
-   - Manually configure your Husky hooks as needed.
-   - (Optional) Copy our CI workflow from the package.
+   What this command does:
+   - Creates `.commitlintrc.js` in your root.
+   - Sets up Husky with `commit-msg` (validation) and `pre-commit` (auto-sync) hooks in `.husky/`. 
+   - Creates a `.bvtrots-dx/rules/` directory with `types.json` and `scopes.json` templates. 
+   - Generates a visual `whitelist.md` for your team in `.bvtrots-dx/rules/`. 
+   - Adds a GitHub Action for CI/CD commit validation.
 
 
-4. Verify the setup
+### 3. Manual Setup (For Advanced Users)
 
-   From now on, every time you try to create a commit, Husky will automatically trigger commitlint. If your message is invalid, the commit will be rejected, and you will see a list of errors in your terminal.
+###### If you prefer to manage your configuration manually:
+
+  1. Configure Commitlint: Create `.commitlintrc.js` and add:
+
+          module.exports = { extends: ['bvtrots-dx'] };
+
+
+  2. Initialize Rules: Create a `.bvtrots-dx/rules/` folder in your root. You can copy `types.json` and `scopes.json` from the package's `src/rules` folder as a starting point.
+   
+                      
+  3. Hooks: Add a `commit-msg` hook to trigger `commitlint`.
+   
+
+  4. Documentation: Run `npx bvtrots-sync` to generate the rules table.
+
+
+### 4. Customizing Rules
+
+   ###### The "Bvtrots Protocol" follows a specific hierarchy. You can change allowed types or scopes at any time:
+
+  1. Modify `types.json`, `scopes.json` or `settings.json` inside the `.bvtrots-dx/rules/` directory. 
+
+  2. The linter will instantly apply these changes. 
+
+  3. On your next commit, the `whitelist.md` will be automatically updated via the `pre-commit` hook to reflect your changes.
+
+
+### 5. Verify the Setup
+
+  ###### Try to create a test commit:
+
+    git commit -m "🚀 feat(ui): add new button"
+
+  If your message is invalid (e.g., missing emoji, wrong scope, or no body), Husky will reject the commit and show a detailed error list in your terminal.
+
 
 ---
 
@@ -217,4 +275,4 @@ MIT
 
 <p align="center">
 Developed with ❤️ by <strong><a href="https://github.com/bvtrots">bvtrots</a></strong>
-</p> bvtrots-commitlint-config
+</p>
