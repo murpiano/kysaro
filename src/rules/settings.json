@@ -9,14 +9,14 @@
     "bodyLineMaxLength": 100
   },
   "pull_request": {
-    "headerMinLength": 15,
+    "headerMinLength": 20,
     "headerMaxLength": 72,
     "bodyRequired": true,
     "subjectFirstLetterLowerCase": false,
     "bodyMinLength": 50
   },
   "merge_commit": {
-    "headerMinLength": 15,
+    "headerMinLength": 20,
     "headerMaxLength": 80,
     "requireHashtagWithNumber": true,
     "subjectFirstLetterLowerCase": false,

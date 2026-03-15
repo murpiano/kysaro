@@ -10,15 +10,15 @@ try {
   console.log('\n🚀  Starting bvtrots-dx setup...\n');
   const projectRoot = process.cwd();
 
-  const bvtrotsDxDir = path.join(projectRoot, '.bvtrots-dx', 'rules');
+  const bvtrotsDXDir = path.join(projectRoot, '.bvtrots-dx', 'rules');
   const sourceRulesDir = path.join(__dirname, '../src/rules');
 
-  if (!fs.existsSync(bvtrotsDxDir)) {
-    fs.mkdirSync(bvtrotsDxDir, { recursive: true });
+  if (!fs.existsSync(bvtrotsDXDir)) {
+    fs.mkdirSync(bvtrotsDXDir, { recursive: true });
 
     ['types.json', 'scopes.json', 'settings.json'].forEach(file => {
       const src = path.join(sourceRulesDir, file);
-      const dest = path.join(bvtrotsDxDir, file);
+      const dest = path.join(bvtrotsDXDir, file);
       if (fs.existsSync(src)) {
         fs.copyFileSync(src, dest);
       }
