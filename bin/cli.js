@@ -7,7 +7,7 @@ const { execSync } = require('child_process');
 const log = (emoji, msg) => console.log(`${emoji} ${msg}`);
 
 try {
-  console.log('\n🚀 Starting bvtrots-dx setup...\n');
+  console.log('\n🚀  Starting bvtrots-dx setup...\n');
   const projectRoot = process.cwd();
 
   const bvtrotsDxDir = path.join(projectRoot, '.bvtrots-dx', 'rules');
@@ -23,7 +23,7 @@ try {
         fs.copyFileSync(src, dest);
       }
     });
-    log('📁', 'Created .bvtrots-dx/rules with default templates');
+    log('🟢 ', 'Created .bvtrots-dx/rules with default templates');
   }
 
   const userPkgPath = path.join(projectRoot, 'package.json');
@@ -34,16 +34,16 @@ try {
     userPkg.scripts['sync-docs'] = 'bvtrots-sync';
 
     fs.writeFileSync(userPkgPath, JSON.stringify(userPkg, null, 2));
-    log('📝', 'Added "sync-docs" script to package.json');
+    log('🟢🟢 ', 'Added "sync-docs" script to package.json');
   }
 
   const configPath = path.join(projectRoot, '.commitlintrc.js');
   if (!fs.existsSync(configPath)) {
     fs.writeFileSync(configPath, "module.exports = { extends: ['bvtrots-dx'] };\n");
-    log('✅', 'Created .commitlintrc.js');
+    log('🟢🟢🟢 ', 'Created .commitlintrc.js');
   }
 
-  log('🐶', 'Setting up Husky...');
+  log('🟢🟢🟢🟢 ', 'Setting up Husky...');
   try {
     execSync('npx husky init', { stdio: 'inherit' });
   } catch (e) {
@@ -51,12 +51,12 @@ try {
 
   const huskyMsgPath = path.join(projectRoot, '.husky', 'commit-msg');
   fs.writeFileSync(huskyMsgPath, 'npx --no -- commitlint --edit "$1"\n');
-  log('⚓', 'Configured Husky commit-msg hook');
+  log('🟢🟢🟢🟢🟢 ', 'Configured Husky commit-msg hook');
 
   const huskyPrePath = path.join(projectRoot, '.husky', 'pre-commit');
   const preCommitContent = 'npm run sync-docs && git add .bvtrots-dx/whitelist.md\n';
   fs.writeFileSync(huskyPrePath, preCommitContent);
-  log('⚓', 'Configured Husky pre-commit hook');
+  log('🟢🟢🟢🟢🟢🟢 ', 'Configured Husky pre-commit hook');
 
   const workflowDir = path.join(projectRoot, '.github', 'workflows');
   if (!fs.existsSync(workflowDir)) {
@@ -80,14 +80,14 @@ jobs:
       - run: npx commitlint --from \${{ github.event.pull_request.base.sha || 'HEAD~1' }} --to \${{ github.event.pull_request.head.sha || 'HEAD' }} --verbose
 `;
   fs.writeFileSync(path.join(workflowDir, 'commitlint.yml'), yamlContent);
-  log('🤖', 'GitHub Action added');
+  log('🟢🟢🟢🟢🟢🟢🟢 ', 'GitHub Action added');
 
-  log('📊', 'Generating initial White-list table...');
+  log('🟢🟢🟢🟢🟢🟢🟢🟢 ', 'Generating initial Whitelist...');
   execSync(`node "${path.join(__dirname, 'sync.js')}"`, { stdio: 'inherit' });
 
-  console.log('\n🎉 All set! Your project is now bvtrots-dx-compliant.');
-  console.log('👉 Rules location: .bvtrots-dx/rules/');
-  console.log('👉 Table location: .bvtrots-dx/rules/whitelist.md\n');
+  console.log('\n ✅ All set! Your project is now bvtrots-dx-compliant.');
+  console.log('👉  Rules     location: .bvtrots-dx/rules/');
+  console.log('👉  Whitelist location: .bvtrots-dx/whitelist.md\n');
 
 } catch (err) {
   console.error('\n❌ Setup failed:', err.message);

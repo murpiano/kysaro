@@ -84,7 +84,7 @@ try {
 
 
   fs.writeFileSync(path.join(`${rulesDir}/../`, 'whitelist.md'), content);
-  console.log('✅ whitelist.md updated strictly by JSON files.');
+  console.log('🟢🟢🟢🟢🟢🟢🟢🟢🟢  whitelist.md updated strictly by JSON files.');
 } catch (err) {
   console.error('❌ Error:', err.message);
 }
