@@ -6,7 +6,7 @@
     "subjectFirstLetterLowerCase": true,
     "bodyLineRequireDot": true,
     "bodyMinLength": 20,
-    "bodyLineMaxLength": 100
+    "bodyMaxLength": 100
   },
   "pull_request": {
     "headerMinLength": 20,

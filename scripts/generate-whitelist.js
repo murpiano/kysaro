@@ -65,7 +65,7 @@ try {
   content += `| **Body** | Body Required | ${st.bodyRequired ? '✅' : '❌'} | ${pr.bodyRequired ? '✅' : '❌'} | ${mg.bodyRequired ? '✅' : '❌'} |\n`;
   content += `| | First letter lowercase | ${st.subjectFirstLetterLowerCase ? '✅' : '❌'} | ${pr.subjectFirstLetterLowerCase ? '✅' : '❌'} | ${mg.subjectFirstLetterLowerCase ? '✅' : '❌'} |\n`;
   content += `| | Min Length | ${st.bodyMinLength} | ${pr.bodyMinLength} | ${mg.bodyMinLength} |\n`;
-  content += `| | Max Line Length | ${st.bodyLineMaxLength} | ❌ | ❌ |\n\n`;
+  content += `| | Max Line Length | ${st.bodyMaxLength} | ❌ | ❌ |\n\n`;
 
   content += '## 2. Allowed Types\n\n';
   content += '| Emoji | Type | Description |\n';
