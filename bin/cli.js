@@ -31,7 +31,7 @@ try {
     const userPkg = JSON.parse(fs.readFileSync(userPkgPath, 'utf8'));
     userPkg.scripts = userPkg.scripts || {};
 
-    userPkg.scripts['sync-docs'] = 'bvtrots-sync';
+    userPkg.scripts['sync-docs'] = 'npx bvtrots-sync';
 
     fs.writeFileSync(userPkgPath, JSON.stringify(userPkg, null, 2));
     log('🟢🟢 ', 'Added "sync-docs" script to package.json');
@@ -39,7 +39,9 @@ try {
 
   const configPath = path.join(projectRoot, '.commitlintrc.js');
   if (!fs.existsSync(configPath)) {
-    fs.writeFileSync(configPath, "module.exports = { extends: ['bvtrots-dx'] };\n");
+    fs.writeFileSync(configPath, "module.exports = {\n" +
+      "  extends: ['module:bvtrots-dx']\n" +
+      "};");
     log('🟢🟢🟢 ', 'Created .commitlintrc.js');
   }
 
