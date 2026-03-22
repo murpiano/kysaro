@@ -20,7 +20,6 @@
   "author": "bvtrots",
   "license": "MIT",
   "dependencies": {
-    "@commitlint/cli": "^20.0.0",
     "husky": "^9.0.0"
   },
   "scripts": {
