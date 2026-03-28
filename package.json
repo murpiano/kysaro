@@ -26,9 +26,10 @@
     "prepare": "husky",
     "sync-docs": "node scripts/generate-whitelist.js",
     "test": "vitest run",
-    "test:watch": "vitest"
   },
   "devDependencies": {
+    "@types/node": "^25.5.0",
+    "typescript": "^5.9.3",
     "vitest": "^4.1.0"
   }
 }
