@@ -1,0 +1,14 @@
+{
+  "feat":     { "emoji": "✨",  "description": "New feature"   },
+  "fix":      { "emoji": "💊",  "description": "Bug fix"       },
+  "refactor": { "emoji": "♻️",  "description": "Refactoring"   },
+  "style":    { "emoji": "🎨",  "description": "Styles/UI"     },
+  "build":    { "emoji": "⚙️",  "description": "Build/Deps"    },
+  "chore":    { "emoji": "🔧",  "description": "Maintenance"   },
+  "docs":     { "emoji": "📝",  "description": "Documentation" },
+  "test":     { "emoji": "👀",  "description": "Tests"         },
+  "perf":     { "emoji": "⚡",   "description": "Performance"   },
+  "ci":       { "emoji": "🚀",  "description": "CI/CD"         },
+  "revert":   { "emoji": "↩",   "description": "Revert"        },
+  "merge":    { "emoji": "🔀",  "description": "Merge"         }
+}
