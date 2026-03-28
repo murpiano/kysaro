@@ -75,5 +75,5 @@ the database, significantly improving security.
 | `deps` | Dependency management and package updates |
 | `tests` | Unit, integration, and end-to-end testing |
 | `docs` | Technical documentation, README, and JSDoc |
-| `db` | Database validators, migrations, and query logic |
+| `db` | Database schemas, migrations, and query logic |
 | `build` | Build scripts, bundler settings, and deployment tools |
