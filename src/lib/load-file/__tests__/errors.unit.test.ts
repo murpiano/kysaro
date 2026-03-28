@@ -41,6 +41,7 @@ describe( 'LoadFileError Classes', () => {
     } );
   } );
 
+
   describe( 'EmptyFileError', () => {
     it( 'should handle non-critical empty file', () => {
       const error = new EmptyFileError( 'settings.json', '/tmp/settings.json', false );
@@ -55,11 +56,11 @@ describe( 'LoadFileError Classes', () => {
     } );
   } );
 
+
   describe( 'JsonParseError', () => {
     it( 'should include original error message', () => {
       const original = new Error( 'Unexpected token Z in JSON' );
       const error = new JsonParseError( '/path/config.json', original, false );
-
       expect( error.name ).toBe( ERROR_NAMES.JsonParseError );
       expect( error.message ).toContain( 'Invalid JSON in user settings' );
       expect( error.message ).toContain( original.message );
@@ -67,6 +68,7 @@ describe( 'LoadFileError Classes', () => {
       expect( error.meta.code ).toBe( ERROR_CODES.INVALID_JSON );
     } );
   } );
+
 
   describe( 'EmptyObjectError', () => {
     it( 'should report user file as empty object', () => {
@@ -82,6 +84,7 @@ describe( 'LoadFileError Classes', () => {
     } );
   } );
 
+
   describe( 'DuplicatePathError', () => {
     it( 'should have fixed message and code', () => {
       const path = '/same/path.json';
@@ -91,6 +94,7 @@ describe( 'LoadFileError Classes', () => {
       expect( error.meta.code ).toBe( ERROR_CODES.DUPLICATE_PATH );
     } );
   } );
+
 
   describe( 'MissingPathError', () => {
     it( 'should handle missing user path', () => {
@@ -106,6 +110,7 @@ describe( 'LoadFileError Classes', () => {
     } );
   } );
 
+
   describe( 'FatalLoadError', () => {
     it( 'should be critical by default', () => {
       const error = new FatalLoadError( 'config.json', 'Unexpected crash' );
@@ -114,5 +119,6 @@ describe( 'LoadFileError Classes', () => {
       expect( error.meta.code ).toBe( ERROR_CODES.FATAL_LOAD );
     } );
   } );
+
 
 } );
