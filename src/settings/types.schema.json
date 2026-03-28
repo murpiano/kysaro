@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "additionalProperties": {
+    "$ref": "#/definitions/Type"
+  },
+  "definitions": {
+    "Type": {
+      "type": "object",
+      "properties": {
+        "emoji": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "emoji"
+      ]
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

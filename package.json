@@ -26,6 +26,7 @@
   "scripts": {
     "prepare": "husky",
     "sync-docs": "node scripts/generate-whitelist.js",
+    "build:schemas": "node scripts/build-schemas.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui --coverage"

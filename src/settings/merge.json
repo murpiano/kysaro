@@ -1,4 +1,5 @@
 {
+  "$schema": "./merge.schema.json",
   "header": {
     "minLength": 20,
     "maxLength": 80,

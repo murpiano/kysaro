@@ -1,0 +1,276 @@
+{
+  "type": "object",
+  "properties": {
+    "header": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "minLength": {
+          "type": "number"
+        },
+        "maxLength": {
+          "type": "number"
+        },
+        "emoji": {
+          "$ref": "#/definitions/Rule"
+        },
+        "type": {
+          "$ref": "#/definitions/MergeRule"
+        },
+        "scope": {
+          "$ref": "#/definitions/TextRule"
+        },
+        "colon": {
+          "$ref": "#/definitions/Rule"
+        },
+        "subject": {
+          "$ref": "#/definitions/TextRule"
+        },
+        "endSymbol": {
+          "$ref": "#/definitions/EndSymbolRule"
+        },
+        "#PRNumber": {
+          "$ref": "#/definitions/Rule"
+        }
+      },
+      "required": [
+        "#PRNumber",
+        "colon",
+        "emoji",
+        "endSymbol",
+        "maxLength",
+        "minLength",
+        "scope",
+        "subject",
+        "type"
+      ]
+    },
+    "body": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "minLength": {
+          "type": "number"
+        },
+        "maxLength": {
+          "type": "number"
+        },
+        "eachItem": {
+          "type": "object",
+          "properties": {
+            "maxLength": {
+              "type": "number"
+            },
+            "startDash": {
+              "$ref": "#/definitions/Rule"
+            },
+            "emoji": {
+              "$ref": "#/definitions/BodyRule"
+            },
+            "type": {
+              "$ref": "#/definitions/BodyTextRule"
+            },
+            "scope": {
+              "$ref": "#/definitions/BodyTextRule"
+            },
+            "colon": {
+              "$ref": "#/definitions/Rule"
+            },
+            "text": {
+              "$ref": "#/definitions/TextRule"
+            },
+            "endSymbol": {
+              "$ref": "#/definitions/EndSymbolRule"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "colon",
+            "emoji",
+            "endSymbol",
+            "maxLength",
+            "scope",
+            "startDash",
+            "text",
+            "type"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "eachItem",
+        "maxLength",
+        "minLength",
+        "required"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "body",
+    "header"
+  ],
+  "definitions": {
+    "Rule": {
+      "type": "object",
+      "properties": {
+        "use": {
+          "$ref": "#/definitions/Status"
+        },
+        "spaceAfter": {
+          "$ref": "#/definitions/Status"
+        },
+        "index": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "spaceAfter",
+        "use"
+      ]
+    },
+    "Status": {
+      "enum": [
+        "forbidden",
+        "optional",
+        "required"
+      ],
+      "type": "string"
+    },
+    "TextRule": {
+      "type": "object",
+      "properties": {
+        "case": {
+          "$ref": "#/definitions/CaseType"
+        },
+        "use": {
+          "$ref": "#/definitions/Status"
+        },
+        "spaceAfter": {
+          "$ref": "#/definitions/Status"
+        },
+        "index": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "case",
+        "index",
+        "spaceAfter",
+        "use"
+      ]
+    },
+    "CaseType": {
+      "enum": [
+        "any",
+        "firstWordLower",
+        "lower",
+        "sentence",
+        "upper"
+      ],
+      "type": "string"
+    },
+    "EndSymbolRule": {
+      "type": "object",
+      "properties": {
+        "typeSymbol": {
+          "type": "string"
+        },
+        "use": {
+          "$ref": "#/definitions/Status"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "typeSymbol",
+        "use"
+      ]
+    },
+    "MergeRule": {
+      "type": "object",
+      "properties": {
+        "useOnlyMerge": {
+          "$ref": "#/definitions/Status"
+        },
+        "case": {
+          "$ref": "#/definitions/CaseType"
+        },
+        "use": {
+          "$ref": "#/definitions/Status"
+        },
+        "spaceAfter": {
+          "$ref": "#/definitions/Status"
+        },
+        "index": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "case",
+        "index",
+        "spaceAfter",
+        "use",
+        "useOnlyMerge"
+      ]
+    },
+    "BodyRule": {
+      "type": "object",
+      "properties": {
+        "matchHeader": {
+          "$ref": "#/definitions/Status"
+        },
+        "use": {
+          "$ref": "#/definitions/Status"
+        },
+        "spaceAfter": {
+          "$ref": "#/definitions/Status"
+        },
+        "index": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "matchHeader",
+        "spaceAfter",
+        "use"
+      ]
+    },
+    "BodyTextRule": {
+      "type": "object",
+      "properties": {
+        "matchHeader": {
+          "$ref": "#/definitions/Status"
+        },
+        "case": {
+          "$ref": "#/definitions/CaseType"
+        },
+        "use": {
+          "$ref": "#/definitions/Status"
+        },
+        "spaceAfter": {
+          "$ref": "#/definitions/Status"
+        },
+        "index": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "case",
+        "index",
+        "matchHeader",
+        "spaceAfter",
+        "use"
+      ]
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
