@@ -26,9 +26,13 @@
     "prepare": "husky",
     "sync-docs": "node scripts/generate-whitelist.js",
     "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui --coverage"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
+    "@vitest/coverage-v8": "^4.1.0",
+    "@vitest/ui": "^4.1.0",
     "typescript": "^5.9.3",
     "vitest": "^4.1.0"
   }
