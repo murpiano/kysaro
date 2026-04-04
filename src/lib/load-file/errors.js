@@ -24,7 +24,7 @@
  *   - originalError (for parsing errors)
  */
 
-const { ERROR_NAMES, ERROR_CODES } = require('./const');
+const { ERROR_NAMES, ERROR_CODES } = require('./errors-const');
 
 
 /**
@@ -55,7 +55,7 @@ class LoadFileError extends Error {
  */
 class MissingArgumentsError extends LoadFileError {
   constructor(args, isCritical = true) {
-    super(`Critical: missing required arguments: "${args.join(',')}".`, {
+    super(`Critical: missing required arguments: "${args.join(',')}"`, {
       code: ERROR_CODES.MISSING_ARGUMENTS,
       isCritical,
       args
@@ -80,8 +80,8 @@ class FileNotFoundError extends LoadFileError {
   constructor(fileName, path, isCritical = false) {
     super(
       isCritical
-        ? `Critical: default ${fileName} not found: ${path}.`
-        : `User ${fileName} not found: ${path}.`,
+        ? `Critical: default ${fileName} not found`
+        : `User ${fileName} not found`,
       {
         code: isCritical
           ? ERROR_CODES.DEFAULT_NOT_FOUND
@@ -106,8 +106,8 @@ class EmptyFileError extends LoadFileError {
   constructor(fileName, path, isCritical = false) {
     super(
       isCritical
-        ? `Critical: default ${fileName} is empty: ${path}.`
-        : `User ${fileName} is empty: ${path}.`,
+        ? `Critical: default ${fileName} is empty`
+        : `User ${fileName} is empty`,
       {
         code: isCritical
           ? ERROR_CODES.EMPTY_DEFAULT_FILE
@@ -136,8 +136,8 @@ class JsonParseError extends LoadFileError {
   constructor(path, originalError, isCritical = false) {
     super(
       isCritical
-        ? `Invalid JSON in default settings: ${path}.`
-        : `Invalid JSON in user settings: ${path}.`,
+        ? `Invalid JSON in default settings`
+        : `Invalid JSON in user settings`,
       {
         code: ERROR_CODES.INVALID_JSON,
         path,
@@ -164,8 +164,8 @@ class EmptyObjectError extends LoadFileError {
   constructor(path, isCritical = false) {
     super(
       isCritical
-        ? `Critical: default config is empty object: ${path}.`
-        : `User config is empty object: ${path}.`,
+        ? `Critical: default config is empty object`
+        : `User config is empty object`,
       {
         code: isCritical
           ? ERROR_CODES.EMPTY_DEFAULT_OBJECT
@@ -186,7 +186,7 @@ class EmptyObjectError extends LoadFileError {
  */
 class DuplicatePathError extends LoadFileError {
   constructor(path) {
-    super(`User and default paths are identical: ${path}.`, {
+    super(`User and default paths are identical`, {
       code: ERROR_CODES.DUPLICATE_PATH,
       path
     });
@@ -205,8 +205,8 @@ class MissingPathError extends LoadFileError {
   constructor(fileName, isCritical = false) {
     super(
       isCritical
-        ? `Critical: default settings path is missing for: ${fileName}.`
-        : `User settings path is missing for: ${fileName}.`,
+        ? `Critical: default settings path is missing for: ${fileName}`
+        : `User settings path is missing for: ${fileName}`,
       {
         code: isCritical
           ? ERROR_CODES.MISSING_DEFAULT_PATH

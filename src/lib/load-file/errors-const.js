@@ -1,3 +1,14 @@
+/**
+ * @file Errors constants.
+ *
+ * @description
+ * Defines characteristics  errors:
+ * - errors names
+ * - errors codes
+ *
+ * Used across of file loading and reading errors.
+ */
+
 const ERROR_NAMES = {
                     DuplicatePathError     : 'DuplicatePathError'   ,
                     EmptyFileError         : 'EmptyFileError'       ,

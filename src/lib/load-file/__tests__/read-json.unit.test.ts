@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import readJson from '../read-json';
-import {ERROR_CODES, ERROR_NAMES} from '../const';
+import {ERROR_CODES, ERROR_NAMES} from '../errors-const';
 import {expect} from "vitest";
 
 

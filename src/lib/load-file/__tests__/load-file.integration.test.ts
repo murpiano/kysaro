@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import loadFile from '../load-file';
-import {ERROR_CODES, ERROR_NAMES} from "../const";
+import {ERROR_CODES, ERROR_NAMES} from "../errors-const";
 
 describe('load-file/core.js', () => {
   describe('loadFile (integration)', () => {
