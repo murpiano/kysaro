@@ -1,3 +1,33 @@
+/**
+ * @file Settings report generator.
+ *
+ * @description
+ * Generates a markdown report section for configuration loading results.
+ *
+ * Includes:
+ * - table showing user/default config usage
+ * - visual status indicators (✅ ⚠️ ❌ ➖)
+ * - detailed diagnostics for loading issues (errors & warnings)
+ *
+ * @responsibility
+ * Focuses on configuration loading stage:
+ * - file existence
+ * - JSON parsing
+ * - empty file/object checks
+ *
+ * @architecture
+ * - Builds section content (table + diagnostics)
+ * - Delegates file update to updateReport()
+ * - Does NOT mutate input data
+ *
+ * @diagnostics
+ * - Displays both warnings and errors
+ * - Includes file path if available (meta.path)
+ * - Uses error.toString() for consistent formatting
+ *
+ * @returns {boolean}
+ * Returns true if any issues (warnings or errors) were found
+ */
 
 const path                                  = require('path');
 const updateReport                          = require('./update-report');
@@ -11,6 +41,21 @@ const {
         isDefaultConfigUsed,
         buildTableHeader, formatDisplayPath, getBasePath,
       }                                     = require('./utils');
+
+/**
+ * Builds diagnostic block for a specific config key.
+ *
+ * @param {string} key - Configuration key
+ * @param {{
+ * errors: Array<any>,
+ * warnings: Array<any>
+ * }} config
+ * @returns {string} Markdown formatted diagnostics block
+ *
+ * @description
+ * Generates a detailed section with errors and warnings
+ * for inclusion in the report.
+ */
 
 const buildDiagnostics = (key, config) => {
   const {errors, warnings} = config;
@@ -36,6 +81,26 @@ const buildDiagnostics = (key, config) => {
   return block + '\n';
 };
 
+/**
+ * Generates and writes settings report section.
+ *
+ * @param {Object} settings - Loaded configuration map
+ * @param {string[]} keys - Configuration keys
+ * @param {string} extension - File extension (e.g. ".json")
+ * @param {string} defaultPath - Path to default configs
+ * @param {string|false} [userPath=false] - Path to user configs (optional)
+ * @param {string} [section] - Report section key
+ * @param {boolean} [hideIfValid=false] - Hide section if no issues
+ *
+ * @returns {boolean} hasIssues - Whether any issues were found
+ *
+ * @description
+ * - Builds status table for settings
+ * - Marks config source (user/default)
+ * - Adds visual clickable indicators (success, warning, error)
+ * - Appends diagnostic details if issues exist
+ * - Delegates writing to updateReport()
+ */
 module.exports = (
   settings,
   keys,
@@ -51,6 +116,7 @@ module.exports = (
 
   const createTableHeader = () => {
 
+    // Highlight keys where config failed to load
     const coloredKeys = keys.map(key => {
       const isLoaded = settings[key].info.some(msg =>
                                                  msg.includes('settings are used')
@@ -98,6 +164,7 @@ module.exports = (
         defaultCells.push(` ${ICON.EMPTY} `);
       }
 
+      // Collect detailed diagnostics for problematic configs
       if (hasErrors || hasWarnings) {
         diagnosticDetails += buildDiagnostics(key, config);
       }

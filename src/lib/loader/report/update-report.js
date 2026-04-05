@@ -1,6 +1,34 @@
+/**
+ * @file Markdown report generator with section management.
+ *
+ * @description
+ * Updates a report file by inserting, replacing, or removing sections.
+ * Sections are tracked using special HTML comments:
+ *
+ * <!-- SECTION:<id> ORDER:<number> -->
+ *
+ * Ensures:
+ * - stable ordering of sections
+ * - id-based replacement (no duplicates)
+ * - optional hiding of sections without issues
+ */
+
 const fs = require('fs');
 
-
+/**
+ * Extracts report sections from markdown content.
+ *
+ * @param {string} content - Full markdown content
+ * @returns {Array<{
+ *   id: string,
+ *   order: number,
+ *   content: string
+ * }>}
+ *
+ * @description
+ * Parses sections marked with:
+ * <!-- SECTION:<id> ORDER:<number> -->
+ */
 function extractSections(content) {
   const sections = [];
 
@@ -19,15 +47,48 @@ function extractSections(content) {
   return sections;
 }
 
-
+/**
+ * @file Markdown report updater.
+ *
+ * @description
+ * Manages report sections inside a markdown file.
+ *
+ * Sections are identified using markers:
+ * <!-- SECTION:<id> ORDER:<number> -->
+ *
+ * Responsibilities:
+ * - insert or replace sections by id
+ * - preserve deterministic order
+ * - optionally hide sections without issues
+ * - update report header with timestamp
+ *
+ * @architecture
+ * 1. Read existing report (if exists)
+ * 2. Extract sections using markers
+ * 3. Remove previous section with same id
+ * 4. Optionally add new section
+ * 5. Sort sections by order
+ * 6. Rebuild full report
+ *
+ * @param {Object} params
+ * @param {string} params.reportPath
+ * @param {string} params.section
+ * @param {string} params.reportSection
+ * @param {boolean} params.hideIfValid
+ * @param {boolean} params.hasIssues
+ * @param {number} params.order
+ *
+ * @sideEffects
+ * - Reads and writes markdown file
+ */
 module.exports = ({
-  reportPath,
-  section,
-  reportSection,
-  hideIfValid,
-  hasIssues,
-  order,
-}) => {
+                    reportPath,
+                    section,
+                    reportSection,
+                    hideIfValid,
+                    hasIssues,
+                    order,
+                  }) => {
 
   let content = fs.existsSync(reportPath)
     ? fs.readFileSync(reportPath, 'utf8')
