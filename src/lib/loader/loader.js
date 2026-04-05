@@ -1,8 +1,12 @@
+
 const loadFile                               = require('../load-file');
 const {greenColor, errorIcon, warnIcon}      = require('../../utils/utils');
+const generateSettingsReport                 = require('./report/settings');
+const generateValidatorsReport               = require('./report/validators');
+const generateValidationReport               = require('./report/validation');
 const {hasAnyIssues}                         = require('./report/utils');
-const {EXTENSION} = require('./const');
-const {generateValidator, validateConfig}    = require('./validate-config');
+const {REPORT_KEYS, EXTENSION, DISPLAY_MODE} = require('./const');
+const {generateValidator, validateConfig}        = require('./validate-config');
 
 const loadConfig = (state, keys, paths) => {
   keys.forEach(key => {
@@ -13,26 +17,35 @@ const loadConfig = (state, keys, paths) => {
   });
 }
 
+const generateLoadingReport = (state, keys, paths, reportPath) => {
+  generateSettingsReport(state.settings, keys, EXTENSION.JSON, paths.default, paths.user, reportPath, REPORT_KEYS.SETTINGS, DISPLAY_MODE.ALWAYS);
+  generateSettingsReport(state.schemas, keys, EXTENSION.SCHEMA, paths.default, false, reportPath, REPORT_KEYS.SCHEMAS, DISPLAY_MODE.ALWAYS);
+  generateValidatorsReport(state.validators, state.settings, keys, EXTENSION.SCHEMA, paths.default, paths.user, reportPath, REPORT_KEYS.VALIDATORS, DISPLAY_MODE.ALWAYS);
+  generateValidationReport(state.validations, state.settings, keys, EXTENSION.JSON, paths.default, paths.user, reportPath, REPORT_KEYS.VALIDATIONS, DISPLAY_MODE.ALWAYS);
+}
 
-const isConfigValid = (state, keys) => {
+const isConfigValid  = (state, keys) => {
   const hasIssues   = Object.values(state).some(source => hasAnyIssues(source, keys));
   const hasCritical = Object.values(state).some(source => keys.some(key =>
                                                                       source[key]?.errors?.some(e => e.meta?.isCritical)));
 
   if (hasIssues) {
+    const getHelp = () => console.log(greenColor(' ⓘ'), '[bvtrots-dx] Get help: file:///.bvtrots-dx/REPORT.md');
 
     if (hasCritical) {
       console.log(` ${errorIcon} [bvtrots-dx] Critical configuration error detected. Please fix to proceed.`);
+      getHelp();
       return false;
     }
 
     console.log(` ${warnIcon} [bvtrots-dx] Warning configuration detected.`);
+    getHelp();
   }
 
   return true;
 }
 
-const runLoader = (keys, paths) => {
+const runLoader = (keys, paths, reportPath) => {
   const state = {
     settings: {},
     schemas: {},
@@ -41,6 +54,7 @@ const runLoader = (keys, paths) => {
   };
 
   loadConfig(state, keys, paths);
+  generateLoadingReport(state, keys, paths, reportPath);
   const isValid = isConfigValid(state, keys);
 
   return {
@@ -49,4 +63,13 @@ const runLoader = (keys, paths) => {
   };
 };
 
-module.exports = {runLoader};
+module.exports = { runLoader };
+
+if (require.main === module) {
+  const { ConfigPaths, reportPath } = require('../../config');
+  const { keys } = require('../../settings');
+
+  if (!runLoader(keys, ConfigPaths, reportPath).ok) {
+    process.exit(1);
+  }
+}
