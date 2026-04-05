@@ -11,7 +11,7 @@ describe('loader/core.js', () => {
 
   beforeEach(() => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bvtrots-dx-'));
-    tempReportPath = path.join(tempDir, 'REPORT.md');
+    tempReportPath = path.join(tempDir, 'LoaderReport.md');
 
     vi.setSystemTime(new Date('2024-01-01'));
     vi.spyOn(console, 'log').mockImplementation(() => {
