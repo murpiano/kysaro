@@ -35,7 +35,6 @@ const {
         JsonParseError
       }  = require('./errors');
 
-
 /**
  * Reads and parses a JSON file.
  *
@@ -104,14 +103,14 @@ module.exports = (fileName, filePath, options = {}) => {
     const data = JSON.parse(content);
 
     if (Object.keys(data).length === 0) {
-      const err = new EmptyObjectError(filePath, isCritical);
+      const err = new EmptyObjectError(fileName, filePath, isCritical);
       isCritical ? errors.push(err) : warnings.push(err);
     }
 
     return data;
 
   } catch (e) {
-    const err = new JsonParseError(filePath, e, isCritical);
+    const err = new JsonParseError(fileName, filePath, e, isCritical);
     isCritical ? errors.push(err) : warnings.push(err);
     return null;
   }

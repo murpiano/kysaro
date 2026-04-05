@@ -47,7 +47,6 @@ const {
         MissingPathError
       }        = require('./errors');
 
-
 /**
  * Loads configuration file with fallback strategy.
  *
@@ -115,7 +114,7 @@ const loadFile = (fileName, defaultSettingsDir, userSettingsDir = false) => {
               userPath && defaultPath && userPath === defaultPath;
 
       if (pathsAreEqual) {
-        warnings.push(new DuplicatePathError(userPath));
+        warnings.push(new DuplicatePathError(fileName, userPath));
       }
 
       const userData = readJson(fileName, userPath, {
@@ -140,8 +139,6 @@ const loadFile = (fileName, defaultSettingsDir, userSettingsDir = false) => {
       }
     }
   }
-
-
 
   if (!defaultPath) {
     errors.push(new MissingPathError(fileName, true));

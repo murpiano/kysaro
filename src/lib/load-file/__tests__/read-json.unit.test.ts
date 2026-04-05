@@ -5,7 +5,6 @@ import readJson from '../read-json';
 import {ERROR_CODES, ERROR_NAMES} from '../errors-const';
 import {expect} from "vitest";
 
-
 describe('read-json.js', () => {
   describe('readJson (unit)', () => {
     let dir: string;
@@ -33,7 +32,6 @@ describe('read-json.js', () => {
 
       return {data, errors, warnings};
     };
-
 
     it('returns null when user file path is missing', () => {
       const data = readJson(fileName, null, {errors: [], warnings: []});
@@ -110,6 +108,5 @@ describe('read-json.js', () => {
       const data = readJson('test.json', '/fake/path', {});
       expect(data).toBeNull();
     });
-
   });
 })
