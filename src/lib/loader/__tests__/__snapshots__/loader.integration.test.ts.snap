@@ -8,7 +8,7 @@ exports[`loader/core.js > Loader report snapshots > should generate correct mark
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| User | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-valid/.bvtrots-dx/settings/test.json) |
+| User | [✅](./src/lib/loader/__tests__/fixtures/project-valid/.bvtrots-dx/settings/test.json) |
 | Default |  ➖  |
 
 ________________________________
@@ -18,7 +18,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-valid/test.schema.json) |
+| Default | [✅](./src/lib/loader/__tests__/fixtures/project-valid/test.schema.json) |
 
 ________________________________
 
@@ -27,7 +27,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| Schema + Ajv.compile | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-valid/test.schema.json) |
+| Schema + Ajv.compile | [✅](./src/lib/loader/__tests__/fixtures/project-valid/test.schema.json) |
 
 ________________________________
 
@@ -36,7 +36,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| Validator | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-valid/.bvtrots-dx/settings/test.json) |
+| Validator | [✅](./src/lib/loader/__tests__/fixtures/project-valid/.bvtrots-dx/settings/test.json) |
 
 ________________________________
 "
@@ -50,7 +50,7 @@ exports[`loader/core.js > Loader report snapshots > should generate correct mark
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| User | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-warning-only/.bvtrots-dx/settings/test.json) |
+| User | [✅](./src/lib/loader/__tests__/fixtures/project-warning-only/.bvtrots-dx/settings/test.json) |
 | Default |  ➖  |
 
 ________________________________
@@ -60,7 +60,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-warning-only/test.schema.json) |
+| Default | [✅](./src/lib/loader/__tests__/fixtures/project-warning-only/test.schema.json) |
 
 ________________________________
 
@@ -69,7 +69,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| Schema + Ajv.compile | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-warning-only/test.schema.json) |
+| Schema + Ajv.compile | [✅](./src/lib/loader/__tests__/fixtures/project-warning-only/test.schema.json) |
 
 ________________________________
 
@@ -78,7 +78,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| Validator | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-warning-only/.bvtrots-dx/settings/test.json) |
+| Validator | [✅](./src/lib/loader/__tests__/fixtures/project-warning-only/.bvtrots-dx/settings/test.json) |
 
 ________________________________
 "
@@ -92,8 +92,8 @@ exports[`loader/core.js > Loader report snapshots > should generate correct mark
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| User | [⚠️](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/.bvtrots-dx/settings) |
-| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.json) |
+| User | [⚠️](./src/lib/loader/__tests__/fixtures/project-invalid-config/.bvtrots-dx/settings) |
+| Default | [✅](./src/lib/loader/__tests__/fixtures/project-invalid-config/test.json) |
 
 ### 🔍 Diagnostic Details
 #### 🟡 WARNING [test]
@@ -108,7 +108,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.schema.json) |
+| Default | [✅](./src/lib/loader/__tests__/fixtures/project-invalid-config/test.schema.json) |
 
 ________________________________
 
@@ -117,7 +117,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| Schema + Ajv.compile | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.schema.json) |
+| Schema + Ajv.compile | [✅](./src/lib/loader/__tests__/fixtures/project-invalid-config/test.schema.json) |
 
 ________________________________
 
@@ -126,7 +126,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | <span style="color:#ff0000"><b>test</b></span> |
 | :--- | :---: |
-| Validator | [❌](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.json) |
+| Validator | [❌](./src/lib/loader/__tests__/fixtures/project-invalid-config/test.json) |
 
 ### 🔍 Diagnostic Details
 #### 🔴 CRITICAL [test]
@@ -147,8 +147,8 @@ exports[`loader/core.js > Loader report snapshots > should generate correct mark
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| User | [⚠️](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/.bvtrots-dx/settings) |
-| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.json) |
+| User | [⚠️](./src/lib/loader/__tests__/fixtures/project-invalid-config/.bvtrots-dx/settings) |
+| Default | [✅](./src/lib/loader/__tests__/fixtures/project-invalid-config/test.json) |
 
 ### 🔍 Diagnostic Details
 #### 🟡 WARNING [test]
@@ -163,7 +163,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.schema.json) |
+| Default | [✅](./src/lib/loader/__tests__/fixtures/project-invalid-config/test.schema.json) |
 
 ________________________________
 
@@ -172,7 +172,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| Schema + Ajv.compile | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.schema.json) |
+| Schema + Ajv.compile | [✅](./src/lib/loader/__tests__/fixtures/project-invalid-config/test.schema.json) |
 
 ________________________________
 
@@ -181,7 +181,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | <span style="color:#ff0000"><b>test</b></span> |
 | :--- | :---: |
-| Validator | [❌](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.json) |
+| Validator | [❌](./src/lib/loader/__tests__/fixtures/project-invalid-config/test.json) |
 
 ### 🔍 Diagnostic Details
 #### 🔴 CRITICAL [test]
@@ -202,8 +202,8 @@ exports[`loader/core.js > Loader report snapshots > should generate correct mark
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| User | [⚠️](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-empty-user/.bvtrots-dx/settings) |
-| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-empty-user/test.json) |
+| User | [⚠️](./src/lib/loader/__tests__/fixtures/project-empty-user/.bvtrots-dx/settings) |
+| Default | [✅](./src/lib/loader/__tests__/fixtures/project-empty-user/test.json) |
 
 ### 🔍 Diagnostic Details
 #### 🟡 WARNING [test]
@@ -218,7 +218,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-empty-user/test.schema.json) |
+| Default | [✅](./src/lib/loader/__tests__/fixtures/project-empty-user/test.schema.json) |
 
 ________________________________
 
@@ -227,7 +227,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| Schema + Ajv.compile | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-empty-user/test.schema.json) |
+| Schema + Ajv.compile | [✅](./src/lib/loader/__tests__/fixtures/project-empty-user/test.schema.json) |
 
 ________________________________
 
@@ -236,7 +236,7 @@ ________________________________
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
 | :--- | :---: |
-| Validator | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-empty-user/test.json) |
+| Validator | [✅](./src/lib/loader/__tests__/fixtures/project-empty-user/test.json) |
 
 ________________________________
 "

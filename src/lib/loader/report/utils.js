@@ -9,7 +9,13 @@ const getBasePath = ({ userUsed, userPath, defaultPath }) =>
 
 const getRelativePath = (from, to) => {
   if (!to) return null;
-  let rel = path.relative(path.dirname(from), to).replace(/\\/g, '/');
+  const projectRoot = process.cwd();
+  let rel = path.relative(projectRoot, to).replace(/\\/g, '/');
+
+  if (!rel.startsWith('.') && !rel.startsWith('/')) {
+    rel = './' + rel;
+  }
+
   return rel.replace(/ /g, '%20');
 };
 

@@ -1,12 +1,13 @@
-
 const loadFile                               = require('../load-file');
-const {greenColor, errorIcon, warnIcon}      = require('../../utils/utils');
+const {
+        CONSOLE_ICON, logMessageHelper
+      }                                      = require('../../utils/utils');
 const generateSettingsReport                 = require('./report/settings');
 const generateValidatorsReport               = require('./report/validators');
 const generateValidationReport               = require('./report/validation');
-const {hasAnyIssues}                         = require('./report/utils');
+const {hasAnyIssues, formatDisplayPath}      = require('./report/utils');
 const {REPORT_KEYS, EXTENSION, DISPLAY_MODE} = require('./const');
-const {generateValidator, validateConfig}        = require('./validate-config');
+const {generateValidator, validateConfig}    = require('./validate-config');
 
 const loadConfig = (state, keys, paths) => {
   keys.forEach(key => {
@@ -24,21 +25,21 @@ const generateLoadingReport = (state, keys, paths, reportPath) => {
   generateValidationReport(state.validations, state.settings, keys, EXTENSION.JSON, paths.default, paths.user, reportPath, REPORT_KEYS.VALIDATIONS, DISPLAY_MODE.ALWAYS);
 }
 
-const isConfigValid  = (state, keys) => {
+const isConfigValid = (state, keys, reportPath) => {
   const hasIssues   = Object.values(state).some(source => hasAnyIssues(source, keys));
   const hasCritical = Object.values(state).some(source => keys.some(key =>
                                                                       source[key]?.errors?.some(e => e.meta?.isCritical)));
 
   if (hasIssues) {
-    const getHelp = () => console.log(greenColor(' ⓘ'), '[bvtrots-dx] Get help: file:///.bvtrots-dx/REPORT.md');
+    const getHelp = () => console.log(logMessageHelper(CONSOLE_ICON.INFO, false, true, formatDisplayPath(reportPath)));
 
     if (hasCritical) {
-      console.log(` ${errorIcon} [bvtrots-dx] Critical configuration error detected. Please fix to proceed.`);
+      console.log(logMessageHelper(CONSOLE_ICON.ERROR, 'Critical configuration error detected. Please fix to proceed.',));
       getHelp();
       return false;
     }
 
-    console.log(` ${warnIcon} [bvtrots-dx] Warning configuration detected.`);
+    console.log(logMessageHelper(CONSOLE_ICON.WARN, 'Warning configuration detected.',));
     getHelp();
   }
 
@@ -55,7 +56,7 @@ const runLoader = (keys, paths, reportPath) => {
 
   loadConfig(state, keys, paths);
   generateLoadingReport(state, keys, paths, reportPath);
-  const isValid = isConfigValid(state, keys);
+  const isValid = isConfigValid(state, keys, reportPath);
 
   return {
     ok: isValid,
@@ -63,11 +64,11 @@ const runLoader = (keys, paths, reportPath) => {
   };
 };
 
-module.exports = { runLoader };
+module.exports = {runLoader};
 
 if (require.main === module) {
-  const { ConfigPaths, reportPath } = require('../../config');
-  const { keys } = require('../../settings');
+  const { ConfigPaths, reportPath } = require('./config');
+  const { keys } = require('./settings');
 
   if (!runLoader(keys, ConfigPaths, reportPath).ok) {
     process.exit(1);

@@ -35,6 +35,7 @@ const ICON = {
   ERROR: '❌',
   WARN: '⚠️',
   EMPTY: '➖'
+}
 
 
   module.exports = {REPORT_REGISTRY, REPORT_KEYS, DISPLAY_MODE, EXTENSION, ICON}
