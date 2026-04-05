@@ -28,6 +28,7 @@ describe('loader/core.js', () => {
 
     return runLoader(keys, paths, tempReportPath);
   };
+
   describe('Configuration Pipeline (integration)', () => {
 
     it('should return ok:true for valid configuration', () => {
@@ -87,5 +88,56 @@ describe('loader/core.js', () => {
     });
 
   });
+
+  describe('Loader report snapshots', ()=>{
+    const normalizedReport = (report: string) => report
+      .replace(/\/tmp\/bvtrots-dx-[^/]+/g, '/tmp/test-dir')
+      .replace(/Last update:.*/g, 'Last update: FIXED_DATE');
+
+    it('should generate correct markdown report', () => {
+      const key = 'test';
+      vi.setSystemTime(new Date('2024-01-01'));
+      executeTest([key], 'project-valid');
+      const report = fs.readFileSync(tempReportPath, 'utf8');
+      const result = normalizedReport(report);
+      expect(result).toMatchSnapshot();
+    });
+
+    it('should generate correct markdown report, when user settings is missing', () => {
+      const key = 'test';
+      vi.setSystemTime(new Date('2024-01-01'));
+      executeTest([key], 'project-empty-user');
+      const report = fs.readFileSync(tempReportPath, 'utf8');
+      const result = normalizedReport(report);
+      expect(result).toMatchSnapshot();
+    });
+
+    it('should generate correct markdown report, when project invalid config', () => {
+      const key = 'test';
+      vi.setSystemTime(new Date('2024-01-01'));
+      executeTest([key], 'project-invalid-config');
+      const report = fs.readFileSync(tempReportPath, 'utf8');
+      const result = normalizedReport(report);
+      expect(result).toMatchSnapshot();
+    });
+
+    it('should generate correct markdown report, when user settings and schema are missing', () => {
+      const key = 'test';
+      vi.setSystemTime(new Date('2024-01-01'));
+      executeTest([key], 'project-invalid-config');
+      const report = fs.readFileSync(tempReportPath, 'utf8');
+      const result = normalizedReport(report);
+      expect(result).toMatchSnapshot();
+    });
+
+    it('should generate correct markdown report with warning errors only', () => {
+      const key = 'test';
+      vi.setSystemTime(new Date('2024-01-01'));
+      executeTest([key], 'project-warning-only');
+      const report = fs.readFileSync(tempReportPath, 'utf8');
+      const result = normalizedReport(report);
+      expect(result).toMatchSnapshot();
+    });
+  })
 
 });

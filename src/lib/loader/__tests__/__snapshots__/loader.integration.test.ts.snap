@@ -1,0 +1,243 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`loader/core.js > Loader report snapshots > should generate correct markdown report 1`] = `
+"## 🛠 bvtrots-dx: System Status Report <span style="color: #6a737d; font-size: 12px; font-weight: bold;">&nbsp;Last update: FIXED_DATE
+
+<!-- SECTION:settings ORDER:0 -->
+### 🔧 Current Settings
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| User | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-valid/.bvtrots-dx/settings/test.json) |
+| Default |  ➖  |
+
+________________________________
+
+<!-- SECTION:schemas ORDER:1 -->
+### 💾 Settings Schemas
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-valid/test.schema.json) |
+
+________________________________
+
+<!-- SECTION:validators ORDER:2 -->
+### 👮‍♂️ Validators
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| Schema + Ajv.compile | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-valid/test.schema.json) |
+
+________________________________
+
+<!-- SECTION:validations ORDER:3 -->
+### 🕵️‍♂️ Validation
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| Validator | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-valid/.bvtrots-dx/settings/test.json) |
+
+________________________________
+"
+`;
+
+exports[`loader/core.js > Loader report snapshots > should generate correct markdown report with warning errors only 1`] = `
+"## 🛠 bvtrots-dx: System Status Report <span style="color: #6a737d; font-size: 12px; font-weight: bold;">&nbsp;Last update: FIXED_DATE
+
+<!-- SECTION:settings ORDER:0 -->
+### 🔧 Current Settings
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| User | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-warning-only/.bvtrots-dx/settings/test.json) |
+| Default |  ➖  |
+
+________________________________
+
+<!-- SECTION:schemas ORDER:1 -->
+### 💾 Settings Schemas
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-warning-only/test.schema.json) |
+
+________________________________
+
+<!-- SECTION:validators ORDER:2 -->
+### 👮‍♂️ Validators
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| Schema + Ajv.compile | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-warning-only/test.schema.json) |
+
+________________________________
+
+<!-- SECTION:validations ORDER:3 -->
+### 🕵️‍♂️ Validation
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| Validator | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-warning-only/.bvtrots-dx/settings/test.json) |
+
+________________________________
+"
+`;
+
+exports[`loader/core.js > Loader report snapshots > should generate correct markdown report, when project invalid config 1`] = `
+"## 🛠 bvtrots-dx: System Status Report <span style="color: #6a737d; font-size: 12px; font-weight: bold;">&nbsp;Last update: FIXED_DATE
+
+<!-- SECTION:settings ORDER:0 -->
+### 🔧 Current Settings
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| User | [⚠️](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/.bvtrots-dx/settings) |
+| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.json) |
+
+### 🔍 Diagnostic Details
+#### 🟡 WARNING [test]
+**Warnings:**
+* FileNotFoundError: user settings "test.json" not found in \`./src/lib/loader/__tests__/fixtures/project-invalid-config/.bvtrots-dx/settings/test.json\`
+
+
+________________________________
+
+<!-- SECTION:schemas ORDER:1 -->
+### 💾 Settings Schemas
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.schema.json) |
+
+________________________________
+
+<!-- SECTION:validators ORDER:2 -->
+### 👮‍♂️ Validators
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| Schema + Ajv.compile | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.schema.json) |
+
+________________________________
+
+<!-- SECTION:validations ORDER:3 -->
+### 🕵️‍♂️ Validation
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | <span style="color:#ff0000"><b>test</b></span> |
+| :--- | :---: |
+| Validator | [❌](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.json) |
+
+### 🔍 Diagnostic Details
+#### 🔴 CRITICAL [test]
+**Errors:**
+* Expected type: 'string' (/header) in \`./src/lib/loader/__tests__/fixtures/project-invalid-config/test.json\`
+ > **💡 Recommendation:** Ensure syntax errors in file or reinstall the package: npm install bvtrots-dx@latest
+
+
+________________________________
+"
+`;
+
+exports[`loader/core.js > Loader report snapshots > should generate correct markdown report, when user settings and schema are missing 1`] = `
+"## 🛠 bvtrots-dx: System Status Report <span style="color: #6a737d; font-size: 12px; font-weight: bold;">&nbsp;Last update: FIXED_DATE
+
+<!-- SECTION:settings ORDER:0 -->
+### 🔧 Current Settings
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| User | [⚠️](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/.bvtrots-dx/settings) |
+| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.json) |
+
+### 🔍 Diagnostic Details
+#### 🟡 WARNING [test]
+**Warnings:**
+* FileNotFoundError: user settings "test.json" not found in \`./src/lib/loader/__tests__/fixtures/project-invalid-config/.bvtrots-dx/settings/test.json\`
+
+
+________________________________
+
+<!-- SECTION:schemas ORDER:1 -->
+### 💾 Settings Schemas
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.schema.json) |
+
+________________________________
+
+<!-- SECTION:validators ORDER:2 -->
+### 👮‍♂️ Validators
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| Schema + Ajv.compile | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.schema.json) |
+
+________________________________
+
+<!-- SECTION:validations ORDER:3 -->
+### 🕵️‍♂️ Validation
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | <span style="color:#ff0000"><b>test</b></span> |
+| :--- | :---: |
+| Validator | [❌](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-invalid-config/test.json) |
+
+### 🔍 Diagnostic Details
+#### 🔴 CRITICAL [test]
+**Errors:**
+* Expected type: 'string' (/header) in \`./src/lib/loader/__tests__/fixtures/project-invalid-config/test.json\`
+ > **💡 Recommendation:** Ensure syntax errors in file or reinstall the package: npm install bvtrots-dx@latest
+
+
+________________________________
+"
+`;
+
+exports[`loader/core.js > Loader report snapshots > should generate correct markdown report, when user settings is missing 1`] = `
+"## 🛠 bvtrots-dx: System Status Report <span style="color: #6a737d; font-size: 12px; font-weight: bold;">&nbsp;Last update: FIXED_DATE
+
+<!-- SECTION:settings ORDER:0 -->
+### 🔧 Current Settings
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| User | [⚠️](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-empty-user/.bvtrots-dx/settings) |
+| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-empty-user/test.json) |
+
+### 🔍 Diagnostic Details
+#### 🟡 WARNING [test]
+**Warnings:**
+* FileNotFoundError: user settings "test.json" not found in \`./src/lib/loader/__tests__/fixtures/project-empty-user/.bvtrots-dx/settings/test.json\`
+
+
+________________________________
+
+<!-- SECTION:schemas ORDER:1 -->
+### 💾 Settings Schemas
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| Default | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-empty-user/test.schema.json) |
+
+________________________________
+
+<!-- SECTION:validators ORDER:2 -->
+### 👮‍♂️ Validators
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| Schema + Ajv.compile | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-empty-user/test.schema.json) |
+
+________________________________
+
+<!-- SECTION:validations ORDER:3 -->
+### 🕵️‍♂️ Validation
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | test |
+| :--- | :---: |
+| Validator | [✅](D:/Богдан/Учеба/Программирование/3.%20work/3.%20utils/bvtrots-developer-experience/src/lib/loader/__tests__/fixtures/project-empty-user/test.json) |
+
+________________________________
+"
+`;
