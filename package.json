@@ -21,9 +21,11 @@
   "author": "bvtrots",
   "license": "MIT",
   "dependencies": {
+    "ajv": "^8.18.0",
     "husky": "^9.0.0"
   },
   "scripts": {
+    "start": "node src/index.js",
     "prepare": "husky",
     "sync-docs": "node scripts/generate-whitelist.js",
     "build:schemas": "node scripts/build-schemas.js",
