@@ -1,4 +1,5 @@
 {
+  "$schema": "./scopes.schema.json",
   "auth":   { "description": "Authentication and authorization flows" },
   "ui":     { "description": "User interface components, design system, and layouts" },
   "api":    { "description": "Data fetching logic, API clients, and endpoints" },
