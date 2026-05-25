@@ -1,1 +1,5 @@
-module.exports = require('./loader');
+const {_runLoader: runLoader} = require('./loader');
+
+module.exports = {
+  runLoader
+};

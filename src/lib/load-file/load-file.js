@@ -1,163 +1,291 @@
-/**
- * @file Core logic for loading configuration files.
- *
- * @description
- * Implements full file loading strategy with fallback:
- *
- * 1. Attempts to load user configuration (if provided)
- * 2. Falls back to default configuration
- * 3. Handles edge cases:
- *    - missing paths
- *    - duplicate paths
- *    - invalid JSON
- *    - critical failures
- *
- * Ensures a consistent structured response without throwing exceptions.
- *
- * @architecture
- * Flow:
- * user → fallback → default → fail
- *
- * @returnsContract
- * Always returns an object:
- * {
- *   ok: boolean,
- *   data: Object|null,
- *   info: string[],
- *   warnings: Error[],
- *   errors: Error[]
- * }
- *
- * @sideEffects
- * - Reads files from filesystem via readJson
- * - Mutates warnings/errors arrays passed to readJson
- *
- * @note
- * - Does NOT throw exceptions
- * - Errors are collected and returned in structured form
- * - Distinguishes between critical and non-critical failures
- */
-
-const path     = require('path');
-const readJson = require('./read-json');
-const {
-        MissingArgumentsError,
-        DuplicatePathError,
-        FatalLoadError,
-        MissingPathError
-      }        = require('./errors');
-
-/**
- * Loads configuration file with fallback strategy.
- *
- * @param {string} fileName - Name of the configuration file (e.g. "config.json")
- * @param {string} defaultSettingsDir - Path to default configuration directory
- * @param {string|false} [userSettingsDir=false] - Path to user configuration directory
- *
- * @returns {{
- *   ok: boolean,
- *   data: Object|null,
- *   info: string[],
- *   warnings: Array<Error>,
- *   errors: Array<Error>
- * }}
- *
- * @description
- * Loading strategy:
- *
- * 1. If userSettingsDir is provided:
- *    - Attempts to load user config
- *    - If valid → returns user config
- *    - If invalid → falls back to default
- *
- * 2. If user config path equals default path:
- *    - Emits warning
- *    - May produce fatal error if user config is invalid
- *
- * 3. Loads default config:
- *    - If valid → returns default config
- *    - If invalid → returns critical failure
- *
- * 4. Handles missing arguments and paths
- *
- * @returns
- * - ok: true if config successfully loaded
- * - data: parsed JSON or null
- * - info: informational messages (e.g. which config was used)
- * - warnings: non-critical issues
- * - errors: critical or blocking issues
- *
- * @example
- * loadFile('config.json', './defaults', './user')
- */
-const loadFile = (fileName, defaultSettingsDir, userSettingsDir = false) => {
-  const info     = [];
-  const warnings = [];
-  const errors   = [];
+const {_loadFileBase} = require('./load-file-base');
+const {_validateLoadedWithResources} = require("./validate-loaded-with-resources");
+const {joinIfExists} = require('../../all/helpers/path');
+const path = require('path');
+const {ISSUE_SEVERITY} = require('../../all/const/issue');
+const {LOADER_ENTITY} = require("../../all/const/loader");
+const {LOAD_FILE_LOAD_SOURCE, LOAD_FILE_LOAD_STRATEGY, LOAD_FILE_ISSUE_CODE} = require("../../all/const/load-file");
+const {createLoaderIssue} = require('../issue');
 
 
-  if (!fileName) {
-    errors.push(new MissingArgumentsError(['fileName'], true));
-    return {ok: false, data: null, info, warnings, errors};
-  }
+function _createResult({name, strategy}) {
 
-  const defaultPath = defaultSettingsDir
-    ? path.resolve(defaultSettingsDir, fileName)
-    : null;
-
-  if (userSettingsDir !== false) {
-    if (!userSettingsDir) {
-      warnings.push(new MissingPathError(fileName));
-    } else {
-      const userPath      = path.resolve(userSettingsDir, fileName);
-      const pathsAreEqual =
-              userPath && defaultPath && userPath === defaultPath;
-
-      if (pathsAreEqual) {
-        warnings.push(new DuplicatePathError(fileName, userPath));
-      }
-
-      const userData = readJson(fileName, userPath, {
-        isCritical: false,
-        warnings,
-        errors
-      });
-
-      if (userData && Object.keys(userData).length !== 0) {
-        info.push('User settings are used');
-        return {ok: true, data: userData, info, warnings, errors};
-      }
-
-      if (pathsAreEqual) {
-        errors.push(
-          new FatalLoadError(
-            fileName,
-            'user settings are incorrect, paths to default settings and user settings are identical'
-          )
-        );
-        return {ok: false, data: null, info, warnings, errors};
-      }
+  return {
+    ok: false,
+    data: null,
+    resources: {},
+    issues: [],
+    meta: {
+      name,
+      strategy,
+      requestedPath: null,
+      resolvedPath: null,
+      basedir: null,
+      source: null
     }
-  }
-
-  if (!defaultPath) {
-    errors.push(new MissingPathError(fileName, true));
-    return {ok: false, data: null, info, warnings, errors};
-  }
-
-  const defaultData = readJson(fileName, defaultPath, {
-    isCritical: true,
-    warnings,
-    errors
-  });
-
-  if (defaultData) {
-    info.push('Default settings are used');
-    return {ok: true, data: defaultData, info, warnings, errors};
-  }
-
-  errors.push(new FatalLoadError(fileName));
-  return {ok: false, data: null, info, warnings, errors};
+  };
 }
 
-module.exports = loadFile;
+
+function _resolveFilePath(basePath, name) {
+
+  if (!basePath || !name) {
+    return null;
+  }
+
+  return joinIfExists(basePath, name);
+}
+
+
+function _applyLoaded(result, loaded, requestedPath) {
+
+  result.ok = loaded.ok;
+  result.data = loaded.data;
+  result.resources = loaded.resources || {};
+  result.issues.push(...(loaded.issues || []));
+  result.meta.source = loaded.source;
+  result.meta.requestedPath = requestedPath;
+  result.meta.resolvedPath = loaded.meta?.resolvedPath || null;
+
+  const actualPath = loaded.meta?.resolvedPath;
+
+  if (actualPath) {
+    result.meta.basedir = path.dirname(actualPath);
+  }
+
+  return result;
+}
+
+
+function _loadAndValidate({source, filePath, severity, entity}) {
+  const loaded = _loadFileBase({source, filePath, severity, entity});
+
+  if (!loaded.ok) {
+    return loaded;
+  }
+
+  if (entity !== LOADER_ENTITY.SETTINGS) {
+    return loaded;
+  }
+
+  return _validateLoadedWithResources(loaded);
+}
+
+
+function _loadFile(
+  {
+    name,
+    defaultPath,
+    userPath = null,
+    entity = LOADER_ENTITY.SETTINGS
+  },
+  strategy = LOAD_FILE_LOAD_STRATEGY.USER_FIRST
+) {
+
+  const result = _createResult({name, strategy});
+
+  /*
+  |------------------------------------------------------------------
+  | MISSING ARGUMENTS
+  |------------------------------------------------------------------
+  */
+
+  if (!name) {
+    result.issues.push(
+      createLoaderIssue({
+        code: LOAD_FILE_ISSUE_CODE.MISSING_ARGUMENTS,
+        severity: ISSUE_SEVERITY.ERROR,
+        meta: {
+          name,
+          args: ['name'],
+          entity
+        }
+      })
+    );
+
+    return result;
+  }
+
+
+  /*
+  |------------------------------------------------------------------
+  | BAD STRATEGY
+  |------------------------------------------------------------------
+  */
+
+  const validStrategies = Object.values(LOAD_FILE_LOAD_STRATEGY);
+
+  if (!validStrategies.includes(strategy)) {
+
+    result.issues.push(createLoaderIssue({
+        code: LOAD_FILE_ISSUE_CODE.INVALID_STRATEGY,
+        severity: ISSUE_SEVERITY.ERROR,
+        meta: {
+          name,
+          strategy,
+          available:
+          validStrategies,
+          entity
+        }
+      })
+    );
+
+    return result;
+  }
+
+  const defaultFilePath = _resolveFilePath(defaultPath, name);
+  const userFilePath = _resolveFilePath(userPath, name);
+
+  /*
+  |------------------------------------------------------------------
+  | DEFAULT ONLY
+  |------------------------------------------------------------------
+  */
+
+  if (strategy === LOAD_FILE_LOAD_STRATEGY.DEFAULT_ONLY) {
+
+    const loaded = _loadAndValidate({
+      source: LOAD_FILE_LOAD_SOURCE.DEFAULT,
+      filePath: defaultFilePath,
+      severity: ISSUE_SEVERITY.ERROR,
+      entity
+    });
+
+    _applyLoaded(result, loaded, defaultFilePath);
+
+    if (!loaded.ok) {
+      result.issues.push(createLoaderIssue({
+          code: LOAD_FILE_ISSUE_CODE.DEFAULT_FATAL_LOAD,
+          severity: ISSUE_SEVERITY.ERROR,
+          meta: {
+            name,
+            strategy,
+            path:
+            defaultFilePath,
+            source: LOAD_FILE_LOAD_SOURCE.DEFAULT,
+            entity
+          }
+        })
+      );
+    }
+
+    return result;
+  }
+
+  /*
+  |------------------------------------------------------------------
+  | USER ONLY
+  |------------------------------------------------------------------
+  */
+
+  if (strategy === LOAD_FILE_LOAD_STRATEGY.USER_ONLY) {
+    const loaded = _loadAndValidate({
+      source: LOAD_FILE_LOAD_STRATEGY.USER,
+      filePath: userFilePath,
+      severity: ISSUE_SEVERITY.ERROR,
+      entity
+    });
+
+    _applyLoaded(result, loaded, userFilePath);
+
+    if (!loaded.ok) {
+      result.issues.push(createLoaderIssue({
+          code: LOAD_FILE_ISSUE_CODE.USER_FATAL_LOAD,
+          severity: ISSUE_SEVERITY.ERROR,
+          meta: {
+            name,
+            strategy,
+            path: userFilePath,
+            source: LOAD_FILE_LOAD_SOURCE.USER,
+            entity
+          }
+        })
+      );
+    }
+
+    return result;
+  }
+
+  /*
+  |------------------------------------------------------------------
+  | USER FIRST
+  |------------------------------------------------------------------
+  */
+
+  const pathsAreEqual = userFilePath && defaultFilePath &&
+    path.normalize(userFilePath) === path.normalize(defaultFilePath);
+
+  if (pathsAreEqual) {
+    result.issues.push(createLoaderIssue({
+        code: LOAD_FILE_ISSUE_CODE.DUPLICATE_PATHS,
+        severity: ISSUE_SEVERITY.WARNING,
+        meta: {
+          name,
+          userPath:
+          userFilePath,
+          defaultPath: defaultFilePath,
+          entity
+        }
+      })
+    );
+  }
+
+  /*
+  |------------------------------------------------------------------
+  | USER
+  |------------------------------------------------------------------
+  */
+
+  if (userFilePath) {
+    const userLoaded = _loadAndValidate({
+      source: LOAD_FILE_LOAD_SOURCE.USER,
+      filePath: userFilePath,
+      severity: ISSUE_SEVERITY.WARNING,
+      entity
+    });
+
+    if (userLoaded.ok) {
+      return _applyLoaded(result, userLoaded, userFilePath);
+    }
+
+    result.issues.push(...(userLoaded.issues || []));
+  }
+
+  /*
+  |------------------------------------------------------------------
+  | DEFAULT
+  |------------------------------------------------------------------
+  */
+
+  const defaultLoaded = _loadAndValidate({
+    source: LOAD_FILE_LOAD_SOURCE.DEFAULT,
+    filePath: defaultFilePath,
+    severity: ISSUE_SEVERITY.ERROR,
+    entity
+  });
+
+  _applyLoaded(result, defaultLoaded, defaultFilePath);
+
+  if (!defaultLoaded.ok) {
+    result.issues.push(createLoaderIssue({
+        code: LOAD_FILE_ISSUE_CODE.DEFAULT_FATAL_LOAD,
+        severity: ISSUE_SEVERITY.ERROR,
+        meta: {
+          name,
+          strategy,
+          path:
+          defaultFilePath,
+          source: LOAD_FILE_LOAD_SOURCE.DEFAULT,
+          entity
+        }
+      })
+    );
+  }
+
+  return result;
+}
+
+
+module.exports = {
+  _loadFile
+};
