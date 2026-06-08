@@ -1,17 +1,35 @@
 const fs = require('fs');
 const path = require('path');
-
 const {LOAD_FILE_ISSUE_CODE} = require('../../all/const/load-file');
 
 
-function _createResult(filePath) {
+/**
+ * Resolves display name for metadata.
+ *
+ * @param {string|null} filePath
+ * @param {string|null} name
+ * @returns {string|null}
+ */
+function _resolveMetaName(filePath, name) {
+  return name || (filePath ? path.basename(filePath) : null);
+}
+
+
+/**
+ * Creates initial JSON read result.
+ *
+ * @param {string|null} filePath
+ * @param {string|null} name
+ * @returns {Object}
+ */
+function _createResult(filePath, name) {
 
   return {
     ok: true,
     data: null,
     issues: [],
     meta: {
-      name: filePath ? path.basename(filePath) : null,
+      name: _resolveMetaName(filePath, name),
       requestedPath: filePath || null,
       resolvedPath: filePath || null
     }
@@ -19,12 +37,22 @@ function _createResult(filePath) {
 }
 
 
-function _createIssue({code, filePath, error = null}) {
+/**
+ * Creates read-json issue object.
+ *
+ * @param {Object} params
+ * @param {string} params.code
+ * @param {string|null} params.filePath
+ * @param {Error|null} [params.error=null]
+ * @param {string|null} params.name
+ * @returns {Object}
+ */
+function _createIssue({code, filePath, error = null, name}) {
 
   return {
     code,
     meta: {
-      name: filePath ? path.basename(filePath) : null,
+      name: _resolveMetaName(filePath, name),
       requestedPath: filePath || null,
       resolvedPath: filePath || null,
       error
@@ -33,6 +61,13 @@ function _createIssue({code, filePath, error = null}) {
 }
 
 
+/**
+ * Marks result as failed and appends issue.
+ *
+ * @param {Object} result
+ * @param {Object} issue
+ * @returns {Object}
+ */
 function _fail(result, issue) {
   result.ok = false;
   result.issues.push(issue);
@@ -40,8 +75,23 @@ function _fail(result, issue) {
 }
 
 
-function _readJson(filePath) {
-  const result = _createResult(filePath);
+/**
+ * Reads and validates JSON file.
+ *
+ * Validation steps:
+ * - path exists
+ * - file exists
+ * - file is readable
+ * - file is not empty
+ * - JSON is valid
+ * - root value is a non-empty object
+ *
+ * @param {string|null} filePath
+ * @param {string|null} name
+ * @returns {Object}
+ */
+function _readJson(filePath = null, name = null) {
+  const result = _createResult(filePath, name);
 
   /*
   |------------------------------------------------------------------
@@ -52,7 +102,7 @@ function _readJson(filePath) {
   if (!filePath) {
     return _fail(
       result,
-      _createIssue({code: LOAD_FILE_ISSUE_CODE.PATH_MISSING, filePath})
+      _createIssue({code: LOAD_FILE_ISSUE_CODE.PATH_MISSING, filePath, name})
     );
   }
 
@@ -66,7 +116,7 @@ function _readJson(filePath) {
 
     return _fail(
       result,
-      _createIssue({code: LOAD_FILE_ISSUE_CODE.FILE_NOT_FOUND, filePath})
+      _createIssue({code: LOAD_FILE_ISSUE_CODE.FILE_NOT_FOUND, filePath, name})
     );
   }
 
@@ -85,7 +135,7 @@ function _readJson(filePath) {
 
     return _fail(
       result,
-      _createIssue({code: LOAD_FILE_ISSUE_CODE.FATAL_LOAD, filePath, error})
+      _createIssue({code: LOAD_FILE_ISSUE_CODE.FATAL_LOAD, filePath, error, name})
     );
   }
 
@@ -99,7 +149,7 @@ function _readJson(filePath) {
 
     return _fail(
       result,
-      _createIssue({code: LOAD_FILE_ISSUE_CODE.EMPTY_FILE, filePath})
+      _createIssue({code: LOAD_FILE_ISSUE_CODE.EMPTY_FILE, filePath, name})
     );
   }
 
@@ -116,7 +166,7 @@ function _readJson(filePath) {
 
     return _fail(
       result,
-      _createIssue({code: LOAD_FILE_ISSUE_CODE.INVALID_JSON, filePath, error})
+      _createIssue({code: LOAD_FILE_ISSUE_CODE.INVALID_JSON, filePath, error, name})
     );
   }
 
@@ -134,7 +184,7 @@ function _readJson(filePath) {
 
     return _fail(
       result,
-      _createIssue({code: LOAD_FILE_ISSUE_CODE.EMPTY_OBJECT, filePath})
+      _createIssue({code: LOAD_FILE_ISSUE_CODE.EMPTY_OBJECT, filePath, name})
     );
   }
 
@@ -148,7 +198,7 @@ function _readJson(filePath) {
 
     return _fail(
       result,
-      _createIssue({code: LOAD_FILE_ISSUE_CODE.EMPTY_OBJECT, filePath})
+      _createIssue({code: LOAD_FILE_ISSUE_CODE.EMPTY_OBJECT, filePath, name})
     );
   }
 

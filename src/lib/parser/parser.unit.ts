@@ -64,7 +64,6 @@ describe('parser.js (unit)', () => {
 
     it('should return error for empty message', () => {
       const res = parseCommit('   ');
-      console.log(res)
       expect(res.success).toBe(false);
       expect(res.errors).toContain('Commit message is empty or contains only whitespace');
     });

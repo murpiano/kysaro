@@ -1,29 +1,44 @@
-const {_resolveResources} = require("./resolve-resources");
+const resolveResourcesModule = require('./resolve-resources');
 
-function _validateLoadedWithResources(loaded) {
+/**
+ * Validates loaded configuration together with all referenced resources.
+ *
+ * Appends dependency issues, resolves resources and recalculates final
+ * status based on fatal dependency errors.
+ *
+ * @param {Object} loaded
+ * @param {string} strategy
+ * @param {string} entity
+ * @returns {Object}
+ */
+function _validateLoadedWithResources(
+  loaded,
+  strategy,
+  entity
+) {
+  const result = {...loaded};
 
-  if (!loaded.ok) {
-    return loaded;
-  }
-
-  const resolved = _resolveResources({
+  const resolved = resolveResourcesModule._resolveResources({
     config: loaded.data,
-    meta: loaded.meta
+    meta: loaded.meta,
+    strategy,
+    entity
   });
 
-  loaded.issues.push(
+  result.resources = resolved.resources;
+
+  result.issues.push(
     ...(resolved.issues || [])
   );
 
-  if (!resolved.ok) {
-    loaded.ok = false;
-    loaded.data = null;
-    return loaded;
-  }
+  const hasFatalDependencyErrors =
+    resolved.issues.some(
+      issue => issue.severity === 'error'
+    );
 
-  loaded.resources = resolved.resources;
+  result.ok = !hasFatalDependencyErrors;
 
-  return loaded;
+  return result;
 }
 
 

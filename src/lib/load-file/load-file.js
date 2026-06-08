@@ -1,13 +1,27 @@
-const {_loadFileBase} = require('./load-file-base');
-const {_validateLoadedWithResources} = require("./validate-loaded-with-resources");
-const {joinIfExists} = require('../../all/helpers/path');
 const path = require('path');
 const {ISSUE_SEVERITY} = require('../../all/const/issue');
-const {LOADER_ENTITY} = require("../../all/const/loader");
-const {LOAD_FILE_LOAD_SOURCE, LOAD_FILE_LOAD_STRATEGY, LOAD_FILE_ISSUE_CODE} = require("../../all/const/load-file");
-const {createLoaderIssue} = require('../issue');
+const {LOADER_ENTITY} = require('../../all/const/loader');
+const {
+  LOAD_FILE_LOAD_SOURCE,
+  LOAD_FILE_LOAD_STRATEGY,
+  LOAD_FILE_ISSUE_CODE,
+  LOAD_FILE_INFO_MESSAGE,
+  LOAD_FILE_RECOMMENDATION_MESSAGE } = require('../../all/const/load-file');
+const {createLoadFileIssue} = require("../issue");
+const {joinIfExists} = require('../../all/helpers/path');
+const loadFileBaseModule = require('./load-file-base');
+const validateLoadedWithResourcesModule = require('./validate-loaded-with-resources');
 
 
+
+/**
+ * Creates initial load result structure.
+ *
+ * @param {Object} params
+ * @param {string} params.name
+ * @param {string} params.strategy
+ * @returns {Object}
+ */
 function _createResult({name, strategy}) {
 
   return {
@@ -27,6 +41,13 @@ function _createResult({name, strategy}) {
 }
 
 
+/**
+ * Resolves file path from base directory and file name.
+ *
+ * @param {string|null} basePath
+ * @param {string|null} name
+ * @returns {string|null}
+ */
 function _resolveFilePath(basePath, name) {
 
   if (!basePath || !name) {
@@ -37,8 +58,15 @@ function _resolveFilePath(basePath, name) {
 }
 
 
+/**
+ * Copies loaded result into final result object and updates metadata.
+ *
+ * @param {Object} result
+ * @param {Object} loaded
+ * @param {string|null} requestedPath
+ * @returns {Object}
+ */
 function _applyLoaded(result, loaded, requestedPath) {
-
   result.ok = loaded.ok;
   result.data = loaded.data;
   result.resources = loaded.resources || {};
@@ -57,8 +85,36 @@ function _applyLoaded(result, loaded, requestedPath) {
 }
 
 
-function _loadAndValidate({source, filePath, severity, entity}) {
-  const loaded = _loadFileBase({source, filePath, severity, entity});
+/**
+ * Loads file and validates referenced resources when required.
+ *
+ * Resource validation is performed only for SETTINGS entities.
+ *
+ * @param {Object} params
+ * @param {string} params.source
+ * @param {string|null} params.filePath
+ * @param {string} params.severity
+ * @param {string} params.entity
+ * @param {string} params.strategy
+ * @param {string} params.name
+ * @returns {Object}
+ */
+function _loadAndValidate({
+  source,
+  filePath,
+  severity,
+  entity,
+  strategy,
+  name
+}) {
+
+  const loaded = loadFileBaseModule._loadFileBase({
+    source,
+    filePath,
+    severity,
+    entity,
+    name
+  });
 
   if (!loaded.ok) {
     return loaded;
@@ -68,10 +124,28 @@ function _loadAndValidate({source, filePath, severity, entity}) {
     return loaded;
   }
 
-  return _validateLoadedWithResources(loaded);
+  return validateLoadedWithResourcesModule._validateLoadedWithResources(loaded, strategy, entity);
 }
 
 
+/**
+ * Loads configuration file according to selected strategy.
+ *
+ * Supports:
+ * - DEFAULT_ONLY
+ * - USER_ONLY
+ * - USER_FIRST
+ *
+ * Performs resource validation for SETTINGS entities.
+ *
+ * @param {Object} options
+ * @param {string} options.name
+ * @param {string|null} options.defaultPath
+ * @param {string|null} [options.userPath=null]
+ * @param {string} [options.entity]
+ * @param {string} [strategy]
+ * @returns {Object}
+ */
 function _loadFile(
   {
     name,
@@ -91,13 +165,16 @@ function _loadFile(
   */
 
   if (!name) {
+
     result.issues.push(
-      createLoaderIssue({
+      createLoadFileIssue({
         code: LOAD_FILE_ISSUE_CODE.MISSING_ARGUMENTS,
         severity: ISSUE_SEVERITY.ERROR,
         meta: {
           name,
+          info: LOAD_FILE_INFO_MESSAGE.MISSING_ARGUMENTS,
           args: ['name'],
+          recommendation: LOAD_FILE_RECOMMENDATION_MESSAGE.MISSING_ARGUMENTS,
           entity
         }
       })
@@ -106,10 +183,9 @@ function _loadFile(
     return result;
   }
 
-
   /*
   |------------------------------------------------------------------
-  | BAD STRATEGY
+  | INVALID STRATEGY
   |------------------------------------------------------------------
   */
 
@@ -117,14 +193,17 @@ function _loadFile(
 
   if (!validStrategies.includes(strategy)) {
 
-    result.issues.push(createLoaderIssue({
+    result.issues.push(
+      createLoadFileIssue({
         code: LOAD_FILE_ISSUE_CODE.INVALID_STRATEGY,
         severity: ISSUE_SEVERITY.ERROR,
         meta: {
           name,
+          target: strategy,
           strategy,
-          available:
-          validStrategies,
+          info: LOAD_FILE_INFO_MESSAGE.INVALID_STRATEGY,
+          args: validStrategies,
+          recommendation: LOAD_FILE_RECOMMENDATION_MESSAGE.INVALID_STRATEGY,
           entity
         }
       })
@@ -135,6 +214,25 @@ function _loadFile(
 
   const defaultFilePath = _resolveFilePath(defaultPath, name);
   const userFilePath = _resolveFilePath(userPath, name);
+
+  if (
+    strategy === LOAD_FILE_LOAD_STRATEGY.USER_FIRST &&
+    userPath !== null &&
+    !userFilePath
+  ) {
+
+    result.issues.push(
+      createLoadFileIssue({
+        code: LOAD_FILE_ISSUE_CODE.USER_PATH_MISSING,
+        severity: ISSUE_SEVERITY.ERROR,
+        meta: {
+          name,
+          source: LOAD_FILE_LOAD_SOURCE.USER,
+          entity
+        }
+      })
+    );
+  }
 
   /*
   |------------------------------------------------------------------
@@ -148,28 +246,12 @@ function _loadFile(
       source: LOAD_FILE_LOAD_SOURCE.DEFAULT,
       filePath: defaultFilePath,
       severity: ISSUE_SEVERITY.ERROR,
-      entity
+      entity,
+      strategy,
+      name
     });
 
-    _applyLoaded(result, loaded, defaultFilePath);
-
-    if (!loaded.ok) {
-      result.issues.push(createLoaderIssue({
-          code: LOAD_FILE_ISSUE_CODE.DEFAULT_FATAL_LOAD,
-          severity: ISSUE_SEVERITY.ERROR,
-          meta: {
-            name,
-            strategy,
-            path:
-            defaultFilePath,
-            source: LOAD_FILE_LOAD_SOURCE.DEFAULT,
-            entity
-          }
-        })
-      );
-    }
-
-    return result;
+    return _applyLoaded(result, loaded, defaultFilePath);
   }
 
   /*
@@ -179,31 +261,17 @@ function _loadFile(
   */
 
   if (strategy === LOAD_FILE_LOAD_STRATEGY.USER_ONLY) {
+
     const loaded = _loadAndValidate({
-      source: LOAD_FILE_LOAD_STRATEGY.USER,
+      source: LOAD_FILE_LOAD_SOURCE.USER,
       filePath: userFilePath,
       severity: ISSUE_SEVERITY.ERROR,
-      entity
+      entity,
+      strategy,
+      name
     });
 
-    _applyLoaded(result, loaded, userFilePath);
-
-    if (!loaded.ok) {
-      result.issues.push(createLoaderIssue({
-          code: LOAD_FILE_ISSUE_CODE.USER_FATAL_LOAD,
-          severity: ISSUE_SEVERITY.ERROR,
-          meta: {
-            name,
-            strategy,
-            path: userFilePath,
-            source: LOAD_FILE_LOAD_SOURCE.USER,
-            entity
-          }
-        })
-      );
-    }
-
-    return result;
+    return _applyLoaded(result, loaded, userFilePath);
   }
 
   /*
@@ -212,36 +280,26 @@ function _loadFile(
   |------------------------------------------------------------------
   */
 
-  const pathsAreEqual = userFilePath && defaultFilePath &&
+  const pathsAreEqual =
+    userFilePath &&
+    defaultFilePath &&
     path.normalize(userFilePath) === path.normalize(defaultFilePath);
-
-  if (pathsAreEqual) {
-    result.issues.push(createLoaderIssue({
-        code: LOAD_FILE_ISSUE_CODE.DUPLICATE_PATHS,
-        severity: ISSUE_SEVERITY.WARNING,
-        meta: {
-          name,
-          userPath:
-          userFilePath,
-          defaultPath: defaultFilePath,
-          entity
-        }
-      })
-    );
-  }
 
   /*
   |------------------------------------------------------------------
-  | USER
+  | USER LOAD
   |------------------------------------------------------------------
   */
 
   if (userFilePath) {
+
     const userLoaded = _loadAndValidate({
       source: LOAD_FILE_LOAD_SOURCE.USER,
       filePath: userFilePath,
       severity: ISSUE_SEVERITY.WARNING,
-      entity
+      entity,
+      strategy,
+      name
     });
 
     if (userLoaded.ok) {
@@ -253,7 +311,34 @@ function _loadFile(
 
   /*
   |------------------------------------------------------------------
-  | DEFAULT
+  | DUPLICATE PATHS
+  |------------------------------------------------------------------
+  */
+
+  if (pathsAreEqual) {
+
+    result.issues.push(
+      createLoadFileIssue({
+        code: LOAD_FILE_ISSUE_CODE.DUPLICATE_PATHS,
+        severity: ISSUE_SEVERITY.ERROR,
+        meta: {
+          name,
+          source: LOAD_FILE_LOAD_SOURCE.DEFAULT,
+          entity,
+          requestedPath: defaultFilePath,
+          resolvedPath: defaultFilePath
+        }
+      })
+    );
+
+    result.ok = false;
+
+    return result;
+  }
+
+  /*
+  |------------------------------------------------------------------
+  | DEFAULT LOAD
   |------------------------------------------------------------------
   */
 
@@ -261,28 +346,12 @@ function _loadFile(
     source: LOAD_FILE_LOAD_SOURCE.DEFAULT,
     filePath: defaultFilePath,
     severity: ISSUE_SEVERITY.ERROR,
-    entity
+    entity,
+    strategy,
+    name
   });
 
-  _applyLoaded(result, defaultLoaded, defaultFilePath);
-
-  if (!defaultLoaded.ok) {
-    result.issues.push(createLoaderIssue({
-        code: LOAD_FILE_ISSUE_CODE.DEFAULT_FATAL_LOAD,
-        severity: ISSUE_SEVERITY.ERROR,
-        meta: {
-          name,
-          strategy,
-          path:
-          defaultFilePath,
-          source: LOAD_FILE_LOAD_SOURCE.DEFAULT,
-          entity
-        }
-      })
-    );
-  }
-
-  return result;
+  return _applyLoaded(result, defaultLoaded, defaultFilePath);
 }
 
 

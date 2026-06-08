@@ -2,8 +2,7 @@ const {resolveSourceValues} = require('./resolve-source-values');
 
 
 function createCommitContext(settings) {
-  const commitSettings = settings.commitSettings;
-
+  const commitSettings = settings?.commitSettings || {};
   const resources = commitSettings.resources || {};
 
   return {
