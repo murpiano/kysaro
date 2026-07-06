@@ -1,13 +1,23 @@
-const {_updateReport} = require('./update-report');
 const {LOADER_ISSUE_CODE} = require("../../../../all/const/loader");
-const {hasIssues, getErrors, getWarnings} = require('../../../../all/helpers/utils');
 const {toSentenceCase} = require('../../../../all/helpers/text');
+const {hasIssues, getErrors, getWarnings} = require('../../../../all/helpers/utils');
 const {  formatDisplayPath, getNearestExistingPath, resolveRelativePath
 } = require('../../../../all/helpers/path');
-const {_buildFileLink, _linkedIcon, _createReport, _normalizeRecommendations} = require("./utils");
 const {_REPORT_REGISTRY, _ICON, _DISPLAY_MODE} = require("../../const");
+const {_updateReport} = require('./update-report');
+const {_buildFileLink, _linkedIcon, _createReport, _normalizeRecommendations, _formatInternalPath,
+  _createArgsBlock,
+  _createInfoBlock
+} = require("./utils");
 
 
+/**
+ * Determines whether file links should be disabled
+ * for a validation result.
+ *
+ * @param {Object} validation
+ * @returns {boolean}
+ */
 function _shouldDisableLinks(validation) {
   return validation?.issues?.some(
     issue => issue.code === LOADER_ISSUE_CODE.VALIDATOR_NOT_AVAILABLE
@@ -15,11 +25,15 @@ function _shouldDisableLinks(validation) {
 }
 
 
-function _formatInternalPath(path) {
-  return path ? path : '';
-}
-
-
+/**
+ * Builds a diagnostics markdown block for a validation result.
+ *
+ * @param {string} key
+ * @param {Object} validation
+ * @param {Object} settings
+ * @param {string} reportPath
+ * @returns {string}
+ */
 function _buildDiagnostics(key, validation, settings, reportPath) {
   const errors = getErrors(validation);
   const warnings = getWarnings(validation);
@@ -28,34 +42,14 @@ function _buildDiagnostics(key, validation, settings, reportPath) {
 
   function _renderIssue(issue, icon){
     const disableLinks = issue.code === LOADER_ISSUE_CODE.VALIDATOR_NOT_AVAILABLE;
-
-    const targetPath = disableLinks
-      ? null : getNearestExistingPath(settings?.meta?.resolvedPath);
-
+    const targetPath = disableLinks ? null : getNearestExistingPath(settings?.meta?.resolvedPath);
     const displayPath = formatDisplayPath(targetPath);
-
-    const fileLink = targetPath
-      ? _buildFileLink(reportPath, targetPath, displayPath) : '';
-
+    const fileLink = targetPath ? _buildFileLink(reportPath, targetPath, displayPath) : '';
     const recommendation = _normalizeRecommendations(issue.meta?.recommendation)
+    const args = _createArgsBlock(issue);
+    const info = _createInfoBlock(issue, args);
 
-    const args =
-      Array.isArray(issue.meta?.args) &&
-      issue.meta.args.length > 0
-        ? ` ${issue.meta.args
-        .map(arg =>
-          `<span style="color:#589df6">${String(arg).replace(/^'|'$/g, '')}</span>`
-        )
-        .join(', ')}`
-        : '';
-
-    const info =
-      issue.meta?.info
-        ? `<br><sup style="color: #888;"> &nbsp; &nbsp; &nbsp; &nbsp; ${issue.meta.info} ${args}</sup>`
-        : '';
-
-    const issuePath =
-      issue.meta?.internalPath
+    const issuePath = issue.meta?.internalPath
         ? ` at <code>${_formatInternalPath(issue.meta.internalPath)}</code>`
         : '';
 
@@ -87,6 +81,19 @@ function _buildDiagnostics(key, validation, settings, reportPath) {
 }
 
 
+/**
+ * Creates the validation section of the markdown report.
+ *
+ * @param {Object} params
+ * @param {Object} params.validations
+ * @param {Object} params.allSettings
+ * @param {Array<Object>} params.files
+ * @param {string} params.reportPath
+ * @param {string} params.section
+ * @param {string} params.displayMode
+ * @param {string} params.reportTitle
+ * @returns {void}
+ */
 function _createFileValidationSection({
   validations,
   allSettings,
@@ -111,17 +118,12 @@ function _createFileValidationSection({
       const hasErrors = getErrors(validation).length > 0;
 
       if (hasIssues(validation)) {
-        diagnosticDetails +=
-          _buildDiagnostics(key, validation, settings, reportPath);
+        diagnosticDetails += _buildDiagnostics(key, validation, settings, reportPath);
       }
 
       const disableLinks = _shouldDisableLinks(validation);
-
-      const targetPath = disableLinks
-          ? null : getNearestExistingPath(settings?.meta?.resolvedPath);
-
-      const relPath = targetPath
-          ? resolveRelativePath(reportPath, targetPath) : null;
+      const targetPath = disableLinks ? null : getNearestExistingPath(settings?.meta?.resolvedPath);
+      const relPath = targetPath ? resolveRelativePath(reportPath, targetPath) : null;
 
       return _linkedIcon(hasErrors ? _ICON.ERROR : _ICON.OK, relPath);
 

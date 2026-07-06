@@ -28,6 +28,10 @@ function _buildFileLink(reportPath, targetPath, label) {
   return `[${label}](${relative})`;
 }
 
+function _formatInternalPath(path) {
+  return path ? path : '';
+}
+
 
 /**
  * @description - пробелы сделаны чтобы визаульно все таблицы были одного размера
@@ -117,13 +121,32 @@ function _formatOriginalError( error){
   return ` (${error.name || 'Error'})`;
 }
 
+function _createArgsBlock(issue){
+  return Array.isArray(issue.meta?.args) &&
+  issue.meta.args.length > 0
+    ? ` ${issue.meta.args
+    .map(arg =>
+      `<span style="color:#589df6">${String(arg).replace(/^'|'$/g, '')}</span>`
+    )
+    .join(', ')}`
+    : '';
+}
+
+function _createInfoBlock(issue, args){
+  return issue.meta?.info
+    ? `<br><sup style="color: #888;"> &nbsp; &nbsp; &nbsp; &nbsp; ${issue.meta.info} ${args}</sup>`
+    : '';
+}
+
+
 module.exports = {
   _normalizeRecommendations,
-  _mdRed,
   _linkedIcon,
   _buildFileLink,
-  _buildTableHeader,
+  _formatInternalPath,
   _createReport,
   _createTableHeader,
-  _formatOriginalError
+  _formatOriginalError,
+  _createArgsBlock,
+  _createInfoBlock
 }

@@ -1,4 +1,11 @@
+const APP_SETTINGS = ['main'];
+const COMMIT_TYPES = ['commit', 'merge', 'request'];
+
+
 module.exports = {
-  keys: ['commit', 'merge', 'request', 'types', 'scopes', 'tokens'],
-  path: __dirname
+  filesGroups: {
+    main: APP_SETTINGS,
+    commits: COMMIT_TYPES,
+  },
+  dir: __dirname
 };

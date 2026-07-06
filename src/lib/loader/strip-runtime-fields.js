@@ -6,6 +6,16 @@ const _META_FIELD = {
 }
 
 
+/**
+ * Removes runtime-only metadata fields from configuration objects.
+ *
+ * Root-level metadata fields are removed recursively while preserving
+ * the remaining structure.
+ *
+ * @param {*} input Source value.
+ * @param {boolean} [isRoot=true] Indicates whether current object is root.
+ * @returns {*}
+ */
 function _stripRuntimeFields(input, isRoot = true) {
 
   if (!input || typeof input !== 'object') {

@@ -1,6 +1,12 @@
 const {_stripRuntimeFields} = require('./strip-runtime-fields');
 
 
+/**
+ * Removes runtime-only fields from resources.
+ *
+ * @param {Object} [resources={}] Resource collection.
+ * @returns {Object}
+ */
 function _normalizeResources(resources = {}) {
   const normalized = {};
 
@@ -12,6 +18,12 @@ function _normalizeResources(resources = {}) {
 }
 
 
+/**
+ * Produces final settings output without runtime metadata.
+ *
+ * @param {Object} state Loader state.
+ * @returns {Object}
+ */
 function _normalizeOutputSettings(state) {
   const settings = {};
 

@@ -1,14 +1,20 @@
 const {_createIssue} = require('../issue');
+
 const {ISSUE_SOURCE} = require('../../../all/const/issue');
-const {LOAD_FILE_ISSUE_MESSAGE} = require('../../../all/const/load-file');
+
+const {
+  LOAD_FILE_ISSUE_MESSAGE
+} = require('../../../all/const/load-file');
 
 
 function _resolveMessage(code) {
+
   const normalizedCode = code
   .replace(/^USER_/, '')
   .replace(/^DEFAULT_/, '');
 
-  let message = LOAD_FILE_ISSUE_MESSAGE[normalizedCode];
+  let message =
+    LOAD_FILE_ISSUE_MESSAGE[normalizedCode];
 
   if (!message) {
     return code;
@@ -26,7 +32,11 @@ function _resolveMessage(code) {
 }
 
 
-function _createLoadFileIssue({code, severity, meta = {}}) {
+function _createLoadFileIssue({
+  code,
+  severity,
+  meta = {}
+}) {
 
   return _createIssue({
     code,

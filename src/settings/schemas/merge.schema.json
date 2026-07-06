@@ -1,0 +1,284 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Commit Lint Config",
+  "description": "Конфигурация merge",
+  "type": "object",
+  "patternProperties": {
+    "^\\$schema$": {
+      "type": "string"
+    },
+    "^preset$": {
+      "type": "string"
+    }
+  },
+  "properties": {
+    "header": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^minLength$": {
+          "type": "number"
+        },
+        "^maxLength$": {
+          "type": "number"
+        },
+        "^type$": {
+          "$ref": "#/$defs/MergeRule"
+        }
+      },
+      "properties": {
+        "scope": {
+          "$ref": "#/$defs/TextRule"
+        },
+        "colon": {
+          "$ref": "#/$defs/Rule"
+        },
+        "subject": {
+          "$ref": "#/$defs/TextRule"
+        },
+        "endSymbol": {
+          "$ref": "#/$defs/EndSymbolRule"
+        },
+        "#PRNumber": {
+          "$ref": "#/$defs/Rule"
+        }
+      },
+      "required": [
+        "#PRNumber",
+        "colon",
+        "endSymbol",
+        "maxLength",
+        "minLength",
+        "scope",
+        "subject",
+        "type"
+      ]
+    },
+    "body": {
+      "type": "object",
+      "patternProperties": {
+        "^required$": {
+          "type": "boolean"
+        },
+        "^minLength$": {
+          "type": "number"
+        },
+        "^maxLength$": {
+          "type": "number"
+        }
+      },
+      "properties": {
+        "eachItem": {
+          "type": "object",
+          "patternProperties": {
+            "^maxLength$": {
+              "type": "number"
+            },
+            "^type$": {
+              "$ref": "#/$defs/BodyTextRule"
+            }
+          },
+          "properties": {
+            "startDash": {
+              "$ref": "#/$defs/Rule"
+            },
+            "scope": {
+              "$ref": "#/$defs/BodyTextRule"
+            },
+            "colon": {
+              "$ref": "#/$defs/Rule"
+            },
+            "text": {
+              "$ref": "#/$defs/TextRule"
+            },
+            "endSymbol": {
+              "$ref": "#/$defs/EndSymbolRule"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "colon",
+            "endSymbol",
+            "maxLength",
+            "scope",
+            "startDash",
+            "text",
+            "type"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "eachItem",
+        "maxLength",
+        "minLength",
+        "required"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "body",
+    "header"
+  ],
+  "$defs": {
+    "Rule": {
+      "type": "object",
+      "properties": {
+        "use": {
+          "$ref": "#/$defs/Status"
+        },
+        "spaceAfter": {
+          "$ref": "#/$defs/Status"
+        },
+        "index": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "spaceAfter",
+        "use"
+      ]
+    },
+    "Status": {
+      "type": "string",
+      "enum": [
+        "forbidden",
+        "optional",
+        "required"
+      ]
+    },
+    "TextRule": {
+      "type": "object",
+      "properties": {
+        "case": {
+          "$ref": "#/$defs/CaseType1"
+        },
+        "use": {
+          "$ref": "#/$defs/Status"
+        },
+        "spaceAfter": {
+          "$ref": "#/$defs/Status"
+        },
+        "index": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "case",
+        "index",
+        "spaceAfter",
+        "use"
+      ]
+    },
+    "CaseType1": {
+      "type": "string",
+      "enum": [
+        "any",
+        "firstWordLower",
+        "lower",
+        "sentence",
+        "upper"
+      ]
+    },
+    "EndSymbolRule": {
+      "type": "object",
+      "properties": {
+        "typeSymbol": {
+          "type": "string"
+        },
+        "use": {
+          "$ref": "#/$defs/Status"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "typeSymbol",
+        "use"
+      ]
+    },
+    "MergeRule": {
+      "type": "object",
+      "properties": {
+        "useOnlyMerge": {
+          "$ref": "#/$defs/Status"
+        },
+        "case": {
+          "$ref": "#/$defs/CaseType1"
+        },
+        "use": {
+          "$ref": "#/$defs/Status"
+        },
+        "spaceAfter": {
+          "$ref": "#/$defs/Status"
+        },
+        "index": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "case",
+        "index",
+        "spaceAfter",
+        "use",
+        "useOnlyMerge"
+      ]
+    },
+    "BodyRule": {
+      "type": "object",
+      "properties": {
+        "matchHeader": {
+          "$ref": "#/$defs/Status"
+        },
+        "use": {
+          "$ref": "#/$defs/Status"
+        },
+        "spaceAfter": {
+          "$ref": "#/$defs/Status"
+        },
+        "index": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "matchHeader",
+        "spaceAfter",
+        "use"
+      ]
+    },
+    "BodyTextRule": {
+      "type": "object",
+      "properties": {
+        "matchHeader": {
+          "$ref": "#/$defs/Status"
+        },
+        "case": {
+          "$ref": "#/$defs/CaseType1"
+        },
+        "use": {
+          "$ref": "#/$defs/Status"
+        },
+        "spaceAfter": {
+          "$ref": "#/$defs/Status"
+        },
+        "index": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "case",
+        "index",
+        "matchHeader",
+        "spaceAfter",
+        "use"
+      ]
+    }
+  }
+}

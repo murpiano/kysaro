@@ -1,18 +1,16 @@
-const {_updateReport} = require("./update-report");
+const path = require("path");
 const {hasIssues, getErrors, getWarnings} = require('../../../../all/helpers/utils');
 const {toSentenceCase} = require('../../../../all/helpers/text');
-const {
-  formatDisplayPath, getNearestExistingPath, resolvePath
-} = require('../../../../all/helpers/path');
+const {formatDisplayPath, getNearestExistingPath, resolvePath} = require('../../../../all/helpers/path');
+const {_ICON, _REPORT_REGISTRY, _DISPLAY_MODE} = require("../../const");
+const {_updateReport} = require("./update-report");
+const {_formatOriginalError} = require("./utils");
 const {
   _buildFileLink,
   _linkedIcon,
   _createReport,
   _normalizeRecommendations
 } = require("./utils");
-const path = require("path");
-const {_formatOriginalError} = require("./utils");
-const {_ICON, _REPORT_REGISTRY, _DISPLAY_MODE} = require("../../const");
 
 
 function _buildDiagnostics(key, validator, reportPath, file) {
@@ -27,9 +25,7 @@ function _buildDiagnostics(key, validator, reportPath, file) {
 
     const targetPath = getNearestExistingPath(absolutePath);
     const displayPath = formatDisplayPath(targetPath);
-
-    const fileLink = targetPath
-      ? _buildFileLink(reportPath, targetPath, displayPath) : '';
+    const fileLink = targetPath ? _buildFileLink(reportPath, targetPath, displayPath) : '';
 
     const info = issue.meta?.info
         ? `<br><sub>ℹ️ ${issue.meta.info}</sub>` : '';

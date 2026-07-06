@@ -1,0 +1,82 @@
+{
+  "$schema": "../schemas/merge.schema.json",
+  "header": {
+    "minLength": 20,
+    "maxLength": 80,
+    "type": {
+      "use": "required",
+      "useOnlyMerge": "required",
+      "case": "lower",
+      "spaceAfter": "required",
+      "index": 1
+    },
+    "scope": {
+      "use": "required",
+      "case": "lower",
+      "spaceAfter": "required",
+      "index": 2
+    },
+    "colon": {
+      "use": "required",
+      "spaceAfter": "required",
+      "index": 3
+    },
+    "subject": {
+      "use": "required",
+      "case": "lower",
+      "spaceAfter": "forbidden",
+      "index": 4
+    },
+    "#PRNumber": {
+      "use": "required",
+      "spaceAfter": "forbidden",
+      "index": 5
+    },
+    "endSymbol": {
+      "use": "forbidden",
+      "typeSymbol": "."
+    }
+  },
+  "body": {
+    "required": true,
+    "minLength": 50,
+    "maxLength": 200,
+    "eachItem": {
+      "maxLength": 200,
+      "startDash": {
+        "use": "optional",
+        "spaceAfter": "required",
+        "index": 0
+      },
+      "type": {
+        "use": "optional",
+        "case": "lower",
+        "matchHeader": "required",
+        "spaceAfter": "required",
+        "index": 1
+      },
+      "scope": {
+        "use": "optional",
+        "case": "lower",
+        "matchHeader": "required",
+        "spaceAfter": "required",
+        "index": 1
+      },
+      "colon": {
+        "use": "optional",
+        "spaceAfter": "required",
+        "index": 1
+      },
+      "text": {
+        "use": "required",
+        "case": "lower",
+        "spaceAfter": "forbidden",
+        "index": 1
+      },
+      "endSymbol": {
+        "use": "required",
+        "typeSymbol": "."
+      }
+    }
+  }
+}

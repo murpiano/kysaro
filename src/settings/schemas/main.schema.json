@@ -1,0 +1,345 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "title": "Файл конфигурации этапов пайплайна.",
+  "description": "Доступен автокомплит. Для дополнительной информации наведите мышку на конкретное свойство.",
+
+
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "generator",
+    "normalizer",
+    "validator",
+    "analyzer",
+    "fixer",
+    "output"
+  ],
+  "patternProperties": {
+    "^\\$schema$": {
+      "type": "string"
+    },
+    "^title$": {
+      "type": "string"
+    },
+    "^description$": {
+      "type": "string"
+    }
+  },
+  "properties": {
+    "generator": {
+      "type": "object",
+      "description": "Генератор сообщения.",
+      "additionalProperties": false,
+
+      "required": [
+        "enabled",
+        "priorityUse"
+      ],
+
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Включить функцию generator."
+        },
+
+        "priorityUse": {
+          "type": "string",
+
+          "enum": [
+            "input",
+            "generated"
+          ],
+
+          "description": "Приоритет источника сообщения."
+        }
+      }
+    },
+
+    "normalizer": {
+      "type": "object",
+      "description": "Нормализатор сообщения.",
+      "additionalProperties": false,
+
+      "required": [
+        "enabled",
+        "trimMessage",
+        "trimLines",
+        "blankLines",
+        "removeComments"
+      ],
+
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Включить функцию normalizer."
+        },
+
+        "trimMessage": {
+          "type": "boolean",
+          "description": "Удалить пробелы в начале и в конце всего сообщения."
+        },
+
+        "trimLines": {
+          "type": "boolean",
+          "description": "Удалить пробелы в начале и в конце каждой строки."
+        },
+
+        "blankLines": {
+          "type": "object",
+          "description": "Настройки пустых строк.",
+          "additionalProperties": false,
+
+          "required": [
+            "maxConsecutive",
+            "trimStart",
+            "trimEnd"
+          ],
+
+          "properties": {
+            "maxConsecutive": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Максимальное количество подряд идущих пустых строк."
+            },
+
+            "trimStart": {
+              "type": "boolean",
+              "description": "Удалить пустые строки в начале сообщения."
+            },
+
+            "trimEnd": {
+              "type": "boolean",
+              "description": "Удалить пустые строки в конце сообщения."
+            }
+          }
+        },
+
+        "removeComments": {
+          "type": "boolean",
+          "description": "Удалить комментарии из сообщения."
+        },
+
+        "ensureFinalNewline": {
+          "type": "boolean",
+          "description": "Добавить перевод строки в конец сообщения."
+        },
+
+        "eol": {
+          "type": "string",
+
+          "enum": [
+            "lf",
+            "crlf",
+            "auto"
+          ],
+
+          "description": "Настроить символ окончания строки."
+        }
+      }
+    },
+
+    "validator": {
+      "type": "object",
+      "description": "Валидатор сообщения.",
+      "additionalProperties": false,
+
+      "required": [
+        "enabled",
+        "severity"
+      ],
+
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Включить validator."
+        },
+
+        "severity": {
+          "type": "string",
+
+          "enum": [
+            "error",
+            "warning"
+          ],
+
+          "description": "Категория проблем валидации."
+        }
+      }
+    },
+
+    "analyzer": {
+      "type": "object",
+      "description": "Анализатор сообщения.",
+      "additionalProperties": false,
+
+      "required": [
+        "enabled",
+        "correction",
+        "semantic"
+      ],
+
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Включить analyzer."
+        },
+
+        "correction": {
+          "type": "object",
+          "description": "Correction analysis.",
+          "additionalProperties": false,
+
+          "required": [
+            "enabled",
+            "ai"
+          ],
+
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Включить correction mode."
+            },
+
+            "ai": {
+              "type": "object",
+              "description": "AI correction mode.",
+              "additionalProperties": false,
+
+              "required": [
+                "enabled"
+              ],
+
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Включить AI correction."
+                }
+              }
+            }
+          }
+        },
+
+        "semantic": {
+          "type": "object",
+          "description": "Semantic analysis.",
+          "additionalProperties": false,
+
+          "required": [
+            "enabled"
+          ],
+
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Включить semantic mode."
+            }
+          }
+        }
+      }
+    },
+
+    "fixer": {
+      "type": "object",
+      "description": "Функция исправления сообщения.",
+      "additionalProperties": false,
+
+      "required": [
+        "enabled",
+        "mode",
+        "confidenceThreshold"
+      ],
+
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Включить fixer."
+        },
+
+        "mode": {
+          "type": "string",
+
+          "enum": [
+            "apply",
+            "suggest"
+          ],
+
+          "description": "Режим fixer."
+        },
+
+        "confidenceThreshold": {
+          "type": "number",
+
+          "minimum": 0,
+          "maximum": 1,
+
+          "description": "Порог confidence."
+        }
+      }
+    },
+
+    "output": {
+      "type": "object",
+      "description": "Настройки выходных данных.",
+      "additionalProperties": false,
+
+      "required": [
+        "invalid"
+      ],
+
+      "properties": {
+        "invalid": {
+          "type": "string",
+
+          "enum": [
+            "return",
+            "throw"
+          ],
+
+          "description": "Поведение при invalid result."
+        }
+      }
+    },
+
+    "ignore": {
+      "type": "object",
+      "description": "Игнорируемые сообщения.",
+      "additionalProperties": false,
+
+      "minProperties": 1,
+
+      "properties": {
+        "kinds": {
+          "type": "array",
+
+          "description": "Виды игнорируемых сообщений.",
+
+          "minItems": 1,
+          "uniqueItems": true,
+
+          "items": {
+            "type": "string",
+
+            "enum": [
+              "merge",
+              "revert"
+            ]
+          }
+        },
+
+        "patterns": {
+          "type": "array",
+
+          "description": "Паттерны игнорируемых сообщений.",
+
+          "minItems": 1,
+
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

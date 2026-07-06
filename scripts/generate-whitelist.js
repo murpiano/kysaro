@@ -47,7 +47,7 @@ const loadJSON = (file) => JSON.parse(fs.readFileSync(path.join(rulesDir, file),
 try {
   const types = loadJSON('types.json');
   const scopes = loadJSON('scopes.json');
-  const settings = loadJSON('settings.json');
+  const settings = loadJSON('setti1111111ngs.json');
 
   let content = '# 📃 Whitelist bvtrots-dx \n\n';
 

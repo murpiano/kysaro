@@ -1,97 +1,98 @@
 #!/usr/bin/env node
+const {pipeline} = require("../src/lib/pipeline");
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
 
-const log = (emoji, msg) => console.log(`${emoji} ${msg}`);
+// const commitMsgFile = process.argv[2];
+// if (!commitMsgFile) {
+//   console.error('[bvtrots-dx] No commit message file provided');
+//   process.exit(1);
+// }
+// const raw = fs.readFileSync(commitMsgFile, 'utf-8').trim();
 
-try {
-  console.log('\n🚀  Starting bvtrots-dx setup...\n');
-  const projectRoot = process.cwd();
 
-  const bvtrotsDXDir = path.join(projectRoot, '.bvtrots-dx', 'rules');
-  const sourceRulesDir = path.join(__dirname, '../src/rules');
+const cliConfig = {
+    maxErrorsToShow: 3,
+    showDiff: true,
+    openReport: false
+};
 
-  if (!fs.existsSync(bvtrotsDXDir)) {
-    fs.mkdirSync(bvtrotsDXDir, { recursive: true });
 
-    ['types.json', 'scopes.json', 'settings.json'].forEach(file => {
-      const src = path.join(sourceRulesDir, file);
-      const dest = path.join(bvtrotsDXDir, file);
-      if (fs.existsSync(src)) {
-        fs.copyFileSync(src, dest);
-      }
-    });
-    log('🟢 ', 'Created .bvtrots-dx/rules with default templates');
-  }
+const cli = (raw) => {
+    const result = pipeline(raw)
+console.log('result: ', result)
 
-  const userPkgPath = path.join(projectRoot, 'package.json');
-  if (fs.existsSync(userPkgPath)) {
-    const userPkg = JSON.parse(fs.readFileSync(userPkgPath, 'utf8'));
-    userPkg.scripts = userPkg.scripts || {};
+//     const reportPath = generateReport({
+//         raw,
+//         fixed: result.commit,
+//         errors: result.initialErrors,
+//         appliedFixes: result.appliedFixes,
+//         originalAst: originalAst.ast,
+//         finalAst: result.ast,
+//         reportType: 'Standard Commit'
+//     });
+// console.log(reportPath)
+    // console.log('result.appliedFixes', result.appliedFixes)
 
-    userPkg.scripts['sync-docs'] = 'npx bvtrots-sync';
+    // if (result.isValid) {
+    //     process.exit(0);
+    // }
 
-    fs.writeFileSync(userPkgPath, JSON.stringify(userPkg, null, 2));
-    log('🟢🟢 ', 'Added "sync-docs" script to package.json');
-  }
+    // console.log('result.initialErrors', result.initialErrors)
+    // console.log('result.appliedFixes', result.appliedFixes)
+    //
+    //
+    //   console.log('originalAst: originalAst.ast,', originalAst.ast,)
+    //   console.log('finalAst: result.ast',  result.ast)
+    // logErrorTitle();
+    //
+    // const errorsToShow = result.initialErrors.slice(0, cliConfig.maxErrorsToShow);
+    //
+    // errorsToShow.forEach(logErrorItem);
+    //
+    // if (result.initialErrors.length > cliConfig.maxErrorsToShow) {
+    //     logMore(result.initialErrors.length - cliConfig.maxErrorsToShow);
+    // }
+    //
+    // logDetails(reportPath);
+    //
+    // logFix(result.commit);
+    //
+    // if (cliConfig.showDiff) {
+    //     const changes = buildSmartDiff(
+    //         result.appliedFixes,
+    //         originalAst.ast,
+    //         result.ast
+    //     );
+    //
+    //     logDiff(changes);
+    // }
 
-  const configPath = path.join(projectRoot, '.commitlintrc.js');
-  if (!fs.existsSync(configPath)) {
-    fs.writeFileSync(configPath, "module.exports = {\n" +
-      "  extends: ['module:bvtrots-dx']\n" +
-      "};");
-    log('🟢🟢🟢 ', 'Created .commitlintrc.js');
-  }
 
-  log('🟢🟢🟢🟢 ', 'Setting up Husky...');
-  try {
-    execSync('npx husky init', { stdio: 'inherit' });
-  } catch (e) {
-  }
+// let reportPath = null;
+// if (cliConfig.openReport) {
+//   reportPath = generateReport(...)
+//   logHelp(reportPath)
+// }
 
-  const huskyMsgPath = path.join(projectRoot, '.husky', 'commit-msg');
-  fs.writeFileSync(huskyMsgPath, 'npx --no -- commitlint --edit "$1"\n');
-  log('🟢🟢🟢🟢🟢 ', 'Configured Husky commit-msg hook');
 
-  const huskyPrePath = path.join(projectRoot, '.husky', 'pre-commit');
-  const preCommitContent = 'npm run sync-docs && git add .bvtrots-dx/whitelist.md\n';
-  fs.writeFileSync(huskyPrePath, preCommitContent);
-  log('🟢🟢🟢🟢🟢🟢 ', 'Configured Husky pre-commit hook');
+    // (async () => {
+    //   logQuestion();
+    //
+    //
+    //   const answer = await ask('Apply fixes? (y/n): ');
+    //
+    //
+    //   if (answer === 'y') {
+    //     console.log('применили')
+    //     console.log(result)
+    //     // fs.writeFileSync(commitMsgFile, result.commit);
+    //     process.exit(0);
+    //   }
+    //   console.log('отменили')
+    //   process.exit(1);
+    // })();
 
-  const workflowDir = path.join(projectRoot, '.github', 'workflows');
-  if (!fs.existsSync(workflowDir)) {
-    fs.mkdirSync(workflowDir, { recursive: true });
-  }
 
-  const yamlContent = `name: Lint Commit Messages
-on: [pull_request, push]
-
-jobs:
-  commitlint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm install
-      - run: npx commitlint --from \${{ github.event.pull_request.base.sha || 'HEAD~1' }} --to \${{ github.event.pull_request.head.sha || 'HEAD' }} --verbose
-`;
-  fs.writeFileSync(path.join(workflowDir, 'commitlint.yml'), yamlContent);
-  log('🟢🟢🟢🟢🟢🟢🟢 ', 'GitHub Action added');
-
-  log('🟢🟢🟢🟢🟢🟢🟢🟢 ', 'Generating initial Whitelist...');
-  execSync(`node "${path.join(__dirname, 'sync.js')}"`, { stdio: 'inherit' });
-
-  console.log('\n ✅ All set! Your project is now bvtrots-dx-compliant.');
-  console.log('👉  Rules     location: .bvtrots-dx/rules/');
-  console.log('👉  Whitelist location: .bvtrots-dx/whitelist.md\n');
-
-} catch (err) {
-  console.error('\n❌ Setup failed:', err.message);
-  process.exit(1);
 }
+
+module.exports = {cli}

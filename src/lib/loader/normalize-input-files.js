@@ -1,5 +1,15 @@
 const {joinIfExists} = require("../../all/helpers/path");
 
+
+/**
+ * Creates normalized file descriptors for a group.
+ *
+ * @param {string} group Group name.
+ * @param {string[]} names Entity names.
+ * @param {Object} configuration Configuration object.
+ * @param {Object} options Normalized options.
+ * @returns {Array<Object>}
+ */
 function _createGroupFiles(group, names, configuration, options) {
   const {settingsDir} = configuration;
 
@@ -23,6 +33,13 @@ function _createGroupFiles(group, names, configuration, options) {
 }
 
 
+/**
+ * Converts configuration groups into normalized file descriptors.
+ *
+ * @param {Object} configuration Configuration object.
+ * @param {Object} normalizedOptions Normalized options.
+ * @returns {Array<Object>}
+ */
 function _normalizeFiles(configuration, normalizedOptions) {
   const {settingsGroups} = configuration;
   const result = [];

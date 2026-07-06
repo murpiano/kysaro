@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "title": "Commit Lint Config",
+  "description": "Конфигурация Tokens ",
+
+  "type": "object",
+  "patternProperties": {
+    "^\\$schema$": {
+      "type": "string"
+    }
+  }
+  "additionalProperties": {
+    "$ref": "#/$defs/Description"
+  },
+  "$defs": {
+    "Description": {
+      "type": "object",
+      "patternProperties": {
+        "^description$": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "description"
+      ]
+    }
+  }
+}

@@ -1,20 +1,28 @@
-const path =require('path');
+const path = require('path');
 
 const defaultSettings = require('./settings');
 
-const ConfigPaths = {
-  user: path.join(process.cwd(), '.bvtrots-dx', 'settings'),
-  default: defaultSettings.path
-}
+const DIRECTORY = {
+  USER: '.bvtrots-dx',
+  USER_SETTINGS: ['.bvtrots-dx', 'settings'],
+  COMMITS: 'commits',
+  SCHEMAS: 'schemas'
+};
 
-const LoaderReport = {
-  dirName  : '.bvtrots-dx',
-  fileName : 'LoaderReport.md',
-}
+const settingsDir = {
+  user: path.resolve(process.cwd(), ...DIRECTORY.USER_SETTINGS),
+  default: defaultSettings.dir};
 
-const reportPath = path.join(process.cwd(), LoaderReport.dirName, LoaderReport.fileName);
+const settingsGroups =
+  Object.fromEntries(
+    Object.entries(defaultSettings.filesGroups)
+  );
 
-module.exports ={
-  ConfigPaths,
-  reportPath
-}
+const reportDir = path.resolve(process.cwd(), DIRECTORY.USER);
+
+module.exports = {
+  DIRECTORY,
+  settingsDir,
+  settingsGroups,
+  reportDir
+};

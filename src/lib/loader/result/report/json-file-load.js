@@ -3,7 +3,7 @@ const {
   LOAD_FILE_LOAD_SOURCE,
   LOAD_FILE_ISSUE_CODE
 } = require("../../../../all/const/load-file");
-const {LOADER_ENTITY, LOADER_ISSUE_CODE} = require("../../../../all/const/loader");
+const { LOADER_ISSUE_CODE} = require("../../../../all/const/loader");
 const {hasIssues, getErrors, getWarnings} = require('../../../../all/helpers/utils');
 const {toSentenceCase} = require('../../../../all/helpers/text');
 const {formatDisplayPath, resolvePath} = require('../../../../all/helpers/path');
@@ -17,6 +17,13 @@ const {
   _normalizeRecommendations, _createArgsBlock, _createInfoBlock,
 } = require("./utils");
 
+
+/**
+ * Checks whether the issue is related to a dependency.
+ *
+ * @param {Object} issue
+ * @returns {boolean}
+ */
 function isDependencyIssue(issue) {
   return (
     issue.code === LOADER_ISSUE_CODE.DEPENDENCY_LOAD_FAILED ||
@@ -24,6 +31,15 @@ function isDependencyIssue(issue) {
   );
 }
 
+
+/**
+ * Resolves the most relevant file path for an issue.
+ *
+ * @param {Object} issue
+ * @param {Object} settings
+ * @param {string} reportPath
+ * @returns {string|null}
+ */
 function _getTargetPath(issue, settings, reportPath) {
   if (isDependencyIssue(issue)) {
     return (issue.meta?.source === LOAD_FILE_LOAD_SOURCE.USER)
@@ -35,12 +51,28 @@ function _getTargetPath(issue, settings, reportPath) {
 }
 
 
+/**
+ * Checks whether the issue collection contains
+ * a missing arguments error.
+ *
+ * @param {Array<Object>} issues
+ * @returns {boolean}
+ */
 function hasMissingArguments(issues) {
   return issues.some(
     issue => issue.code === LOAD_FILE_ISSUE_CODE.MISSING_ARGUMENTS
   );
 }
 
+
+/**
+ * Builds a diagnostics markdown block for a file.
+ *
+ * @param {string} key
+ * @param {Object} settings
+ * @param {string} reportPath
+ * @returns {string}
+ */
 function _buildDiagnostics(key, settings, reportPath) {
   const errors = getErrors(settings);
   const warnings = getWarnings(settings);
@@ -109,7 +141,21 @@ function _buildDiagnostics(key, settings, reportPath) {
 }
 
 
-function _createJsonFileUploadSection({
+/**
+ * Creates a markdown report section describing
+ * file loading results.
+ *
+ * @param {Object} params
+ * @param {Object} params.allSettings
+ * @param {Array<Object>} params.files
+ * @param {string} params.targetType
+ * @param {string} params.reportPath
+ * @param {string} params.section
+ * @param {string} params.displayMode
+ * @param {string} params.reportTitle
+ * @returns {boolean}
+ */
+function _createJsonFileLoadSection({
   allSettings,
   files,
   targetType,
@@ -329,5 +375,5 @@ function _createJsonFileUploadSection({
 
 
 module.exports = {
-  _createJsonFileUploadSection
+_createJsonFileLoadSection
 };

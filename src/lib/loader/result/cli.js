@@ -1,6 +1,5 @@
-const {logDetails, logError, logWarn, logSuccess} = require("../../../all/helpers/logger");
-const {formatCliPath} = require("../../../all/helpers/path");
-
+const logger = require("../../../all/helpers/logger");
+const pathHelper = require("../../../all/helpers/path");
 
 const _CLI_MODE = {
   ALWAYS: 'always',
@@ -17,31 +16,43 @@ const _CLI_MESSAGE = {
 }
 
 
-function _cliShowResult(isValid, normalizedOptions) {
-  const {report, cli} = normalizedOptions.result;
-  const {hasIssues, hasCriticalIssues} = isValid;
+/**
+ * Outputs the test results to the CLI.
+ *
+ * @param {{
+ *   ok:boolean,
+ *   details:Object
+ * }} validation
+ * @param {Object} normalizedOptions
+ * @returns {void}
+ */
+function _cliShowResult(validation, normalizedOptions) {
+  const {cli} = normalizedOptions.result;
 
   if (!cli.enabled || cli.mode === _CLI_MODE.NEVER) return;
 
-  if (hasIssues) {
-    const getHelp = () => logDetails(formatCliPath(report.path))
+  Object.values(validation.details).forEach(fileGroup => {
+    const {hasIssues, hasCriticalIssues, reportPath} = fileGroup;
 
-    if (hasCriticalIssues) {
-      logError(`${_CLI_MESSAGE.SETTINGS_ERROR}. ${_CLI_MESSAGE.FIX_TO_PROCEED}`);
-      getHelp();
-      return;
+    if (hasIssues) {
+      const getHelp = () => logger.logDetails(pathHelper.formatCliPath(reportPath))
+
+      if (hasCriticalIssues) {
+        logger.logError(`${_CLI_MESSAGE.SETTINGS_ERROR}. ${_CLI_MESSAGE.FIX_TO_PROCEED}`);
+        getHelp();
+        return;
+      }
+
+      if (cli.mode !== _CLI_MODE.CRITICAL) {
+        logger.logWarn(_CLI_MESSAGE.SETTINGS_WARNING);
+        getHelp();
+      }
+
+    } else if (cli.mode === _CLI_MODE.ALWAYS) {
+
+      logger.logSuccess(_CLI_MESSAGE.SETTINGS_SUCCESS)
     }
-
-    if (cli.mode !== _CLI_MODE.CRITICAL) {
-
-      logWarn(_CLI_MESSAGE.SETTINGS_WARNING);
-      getHelp();
-    }
-
-  } else if (cli.mode === _CLI_MODE.ALWAYS) {
-
-    logSuccess(_CLI_MESSAGE.SETTINGS_SUCCESS)
-  }
+  })
 }
 
 module.exports = {

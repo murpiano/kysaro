@@ -2,6 +2,16 @@ const fs = require('fs');
 const path = require("path");
 
 
+/**
+ * Extracts report sections from a markdown file.
+ *
+ * @param {string} content
+ * @returns {Array<{
+ *   id:string,
+ *   order:number,
+ *   content:string
+ * }>}
+ */
 function _extractSections(content) {
   const sections = [];
   const regex =
@@ -23,6 +33,22 @@ function _extractSections(content) {
 }
 
 
+/**
+ * Creates or updates a Markdown report section.
+ *
+ * If the section already exists, the old version is deleted
+ * and replaced with the new one.
+ *
+ * @param {Object} params
+ * @param {string} params.reportPath
+ * @param {string} params.section
+ * @param {string} params.reportSection
+ * @param {boolean} params.hideIfValid
+ * @param {boolean} params.hasIssues
+ * @param {number} params.order
+ * @param {string} params.reportTitle
+ * @returns {void}
+ */
 function _updateReport({
   reportPath,
   section,

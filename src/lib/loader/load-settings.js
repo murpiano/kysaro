@@ -1,8 +1,17 @@
-const {isEmptyObj} = require("../../all/helpers/utils");
-const {loadFile} = require("../load-file");
 const {LOADER_ENTITY} = require("../../all/const/loader");
+const {isEmptyObj} = require("../../all/helpers/utils");
+const loadFileModule = require('../load-file');
+const path = require("path");
 
 
+/**
+ * Creates initial loader state.
+ *
+ * @returns {{
+ *   groups:Object,
+ *   issues:Array
+ * }}
+ */
 function _createState() {
 
   return {
@@ -12,6 +21,13 @@ function _createState() {
 }
 
 
+/**
+ * Ensures group container exists in state.
+ *
+ * @param {Object} state Loader state.
+ * @param {string} group Group name.
+ * @returns {void}
+ */
 function _ensureGroup(state, group) {
 
   if (state.groups[group]) {
@@ -28,6 +44,13 @@ function _ensureGroup(state, group) {
 }
 
 
+/**
+ * Appends issues from load result into global state.
+ *
+ * @param {Object} state Loader state.
+ * @param {Object} result File load result.
+ * @returns {void}
+ */
 function _pushIssues(state, result) {
 
   state.issues.push(
@@ -36,6 +59,13 @@ function _pushIssues(state, result) {
 }
 
 
+/**
+ * Loads settings and schemas into normalized state.
+ *
+ * @param {Array<Object>} normalizedFiles Normalized file descriptors.
+ * @param {Object} configuration Runtime configuration.
+ * @returns {Object}
+ */
 function _loadSettings(normalizedFiles, configuration) {
   const state = _createState();
 
@@ -48,7 +78,7 @@ function _loadSettings(normalizedFiles, configuration) {
     _ensureGroup(state, group);
 
 
-    const settings = loadFile(
+    const settings = loadFileModule.loadFile(
       {
         ...file.file,
         category: LOADER_ENTITY.SETTINGS
@@ -56,7 +86,7 @@ function _loadSettings(normalizedFiles, configuration) {
       configuration.files.strategy
     );
 
-    const schema = loadFile(
+    const schema = loadFileModule.loadFile(
       {
         ...file.schema,
         category: LOADER_ENTITY.SCHEMA
@@ -70,6 +100,14 @@ function _loadSettings(normalizedFiles, configuration) {
 
     _pushIssues(state, settings);
     _pushIssues(state, schema);
+
+    const reportDir =
+      configuration?.result?.report?.dir;
+
+    if (reportDir) {
+      state.groups[group].reportPath =
+        path.join(reportDir, `${group}.md`);
+    }
 
   });
 

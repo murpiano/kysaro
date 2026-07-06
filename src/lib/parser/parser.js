@@ -2,224 +2,246 @@
  * @file Commit message parser.
  *
  * @description
- * Parses raw git commit message into structured AST:
- *
- * 1. Normalizes input (removes comments, trims whitespace)
- * 2. Extracts header (first line)
- * 3. Splits remaining content into body and footer
- * 4. Parses footer into tokens
+ * Parses git commit message into structured AST.
  *
  * @architecture
- * normalize → header → body/footer split → footer parsing → AST
+ * header → body/footer split → footer parsing → AST
  *
  * @design
- * - No validation or business logic
- * - No dependency on configuration
+ * - No validation
+ * - No normalization
+ * - No configuration awareness
  * - Tolerant to malformed input
- * - Uses simple heuristics
+ * - Pure function
  *
  * @responsibility
  * Extracts structure only.
- * Does not validate or interpret input.
+ * Does not validate or mutate input.
  *
  * @ast
  * {
- *   header: { emoji, type, scope, subject },
- *   body: { raw, lines },
- *   footer: { raw, tokens[] }
+ *   header: {
+ *     raw,
+ *     emoji,
+ *     type,
+ *     scope,
+ *     subject
+ *   },
+ *   body: {
+ *     raw,
+ *     lines
+ *   },
+ *   footer: {
+ *     raw,
+ *     tokens[]
+ *   }
  * }
- *
- * @footerDetection
- * Footer is detected from bottom-up using heuristics:
- * - lines containing "#123"
- * - lines matching "key: value"
- *
- * Stops when a non-footer-like line is encountered.
- *
- * @errors
- * - Empty or whitespace-only message
- * - Missing header
- *
- * @sideEffects
- * None (pure function)
  */
 
-const NEWLINE = /\r?\n/;
+const NEWLINE = /\r?\n/u;
 
 const isEmoji = (char) => {
-  return /\p{Extended_Pictographic}/u.test(char);
-};
-
-const isEmptyMessage = (raw) => {
-  return !raw || raw.trim().length === 0;
-};
-
-const normalize = (raw) => {
-  return raw
-  .split(NEWLINE)
-   .filter(line => !line.trim().startsWith('#'))
-   .join('\n')
-   .trim();
+    return /\p{Extended_Pictographic}/u.test(char);
 };
 
 const parseHeader = (line) => {
-  let rest = line.trim();
-  let emoji = null;
-  let type = null;
-  let scope = null;
-  let subject = null;
+    let rest = line;
+    let emoji = null;
+    let type = null;
+    let scope = null;
+    let subject = null;
 
-  const firstChar = [...rest][0];
+    const firstChar = [...rest][0];
 
-  if (firstChar && isEmoji(firstChar)) {
-    emoji = firstChar;
-    rest = [...rest].slice(1).join('').trim();
-  }
-
-  const colonIndex = rest.indexOf(':');
-
-  if (colonIndex !== -1) {
-    const before = rest.slice(0, colonIndex).trim();
-    const after = rest.slice(colonIndex + 1).trim();
-
-    subject = after || null;
-
-    const open = before.indexOf('(');
-    const close = before.indexOf(')');
-
-    if (open !== -1 && close !== -1 && close > open) {
-      type = before.slice(0, open).trim() || null;
-      scope = before.slice(open + 1, close).trim() || null;
-    } else {
-      type = before || null;
+    if (firstChar && isEmoji(firstChar)) {
+        emoji = firstChar;
+        rest = [...rest].slice(1).join('').trimStart();
     }
-  } else {
-    subject = rest || null;
-  }
 
-  return {
-    raw: line,
-    emoji,
-    type,
-    scope,
-    subject
-  };
+    const colonIndex = rest.indexOf(':');
+
+    if (colonIndex !== -1) {
+        const before = rest.slice(0, colonIndex).trim();
+        const after = rest.slice(colonIndex + 1).trim();
+
+        subject = after || null;
+
+        const open = before.indexOf('(');
+        const close = before.indexOf(')');
+
+        if (open !== -1 && close !== -1 && close > open) {
+            type = before.slice(0, open).trim() || null;
+            scope = before.slice(open + 1, close).trim() || null;
+        } else {
+            type = before || null;
+        }
+    } else {
+        subject = rest.trim() || null;
+    }
+
+    return {
+        raw: line,
+        emoji,
+        type,
+        scope,
+        subject
+    };
 };
 
-
 const looksLikeFooterStart = (line) => {
-  const trimmed = line.trim();
+    const trimmed = line.trim();
 
-  if (!trimmed) return false;
-  if (/#\d+/.test(trimmed)) return true;
+    if (!trimmed) {
+        return false;
+    }
 
-  const colonIndex = trimmed.indexOf(':');
+    if (/^#\d+$/u.test(trimmed)) {
+        return true;
+    }
 
-  if (colonIndex === -1) return false;
+    const colonIndex = trimmed.indexOf(':');
 
-  const key = trimmed.slice(0, colonIndex).trim();
+    if (colonIndex === -1) {
+        return false;
+    }
 
-  if (!key) return false;
+    const key = trimmed.slice(0, colonIndex).trim();
 
-  if (key.length > 30) return false;
+    if (!key) {
+        return false;
+    }
 
-  return true;
+    if (key.length > 30) {
+        return false;
+    }
+
+    return true;
 };
 
 const parseFooter = (lines) => {
-  const tokens = [];
-  let current = null;
+    const tokens = [];
+    let current = null;
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const trimmed = line.trim();
+    for (const line of lines) {
+        const trimmed = line.trim();
 
-    if (looksLikeFooterStart(trimmed)) {
-      if (current) tokens.push(current);
+        if (looksLikeFooterStart(trimmed)) {
+            if (current) {
+                tokens.push(current);
+            }
 
-      const sepIndex = trimmed.indexOf(':');
+            const sepIndex = trimmed.indexOf(':');
 
-      if (sepIndex !== -1) {
-        const key = trimmed.slice(0, sepIndex).trim();
-        const value = trimmed.slice(sepIndex + 1).trim();
+            if (sepIndex !== -1) {
+                const key = trimmed.slice(0, sepIndex).trim();
+                const value = trimmed.slice(sepIndex + 1).trim();
 
-        current = { key, value };
-      } else {
-        current = { key: 'ref', value: trimmed };
-      }
-    } else if (current) {
-      current.value += '\n' + line;
+                current = { key, value };
+            } else {
+                current = {
+                    key: 'ref',
+                    value: trimmed
+                };
+            }
+
+            continue;
+        }
+
+        if (current) {
+            current.value += '\n' + line;
+        }
     }
-  }
 
-  if (current) tokens.push(current);
+    if (current) {
+        tokens.push(current);
+    }
 
-  return {
-    raw: lines.join('\n'),
-    tokens
-  };
+    return {
+        raw: lines.join('\n'),
+        tokens
+    };
 };
 
+const findFooterStart = (lines) => {
+    let footerStart = null;
 
-module.exports = function parseCommit(rawMessage) {
-  const result = {
-    success: true,
-    raw: rawMessage,
-    ast: {
-      header: null,
-      body: { raw: '', lines: [] },
-      footer: { raw: '', tokens: [] }
-    },
-    errors: [],
-    warnings: []
-  };
+    for (let i = lines.length - 1; i >= 0; i--) {
+        const line = lines[i];
 
-  if (isEmptyMessage(rawMessage)) {
-    result.success = false;
-    result.errors.push('Commit message is empty or contains only whitespace');
-    return result;
-  }
+        if (!line.trim()) {
+            continue;
+        }
 
-  const cleaned = normalize(rawMessage);
-  const lines = cleaned.split('\n');
+        if (looksLikeFooterStart(line)) {
+            footerStart = i;
+            continue;
+        }
 
-  if (!lines.length || !lines[0].trim()) {
-    result.success = false;
-    result.errors.push('Header is empty');
-    return result;
-  }
-
-  result.ast.header = parseHeader(lines[0]);
-
-  const rest = lines.slice(1);
-
-  if (!rest.length) return result;
-
-  let footerStart = null;
-
-  for (let i = rest.length - 1; i >= 0; i--) {
-    if (looksLikeFooterStart(rest[i])) {
-      footerStart = i;
-    } else {
-      break;
+        break;
     }
-  }
 
-  if (footerStart !== null) {
-    const footerLines = rest.slice(footerStart);
-    const bodyLines = rest.slice(0, footerStart);
+    return footerStart;
+};
 
-    result.ast.footer = parseFooter(footerLines);
-    result.ast.body = {
-      raw: bodyLines.join('\n').trim(),
-      lines: bodyLines
+const parseMessage = (rawMessage) => {
+    const lines = rawMessage.split(NEWLINE);
+
+    const ast = {
+        header: parseHeader(lines[0] ?? ''),
+
+        body: {
+            raw: '',
+            lines: []
+        },
+
+        footer: {
+            raw: '',
+            tokens: []
+        }
     };
-  } else {
-    result.ast.body = {
-      raw: rest.join('\n').trim(),
-      lines: rest
-    };
-  }
 
-  return result;
+    const rest = lines.slice(1);
+
+    if (!rest.length) {
+        return {
+            raw: rawMessage,
+            ast
+        };
+    }
+
+    const footerStart = findFooterStart(rest);
+
+    if (footerStart !== null) {
+        const footerLines = rest.slice(footerStart);
+        const bodyLines = rest.slice(0, footerStart);
+
+        ast.footer = parseFooter(footerLines);
+
+        ast.body = {
+            raw: bodyLines.join('\n'),
+            lines: bodyLines
+        };
+    } else {
+        ast.body = {
+            raw: rest.join('\n'),
+            lines: rest
+        };
+    }
+
+    return {
+        raw: rawMessage,
+        ast
+    };
+};
+
+function applyParser(result) {
+    return {
+        ...result,
+        parsed: parseMessage(result.final)
+    };
+}
+
+module.exports = {
+    parseMessage,
+    applyParser
 };

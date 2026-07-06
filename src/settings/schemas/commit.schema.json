@@ -1,0 +1,664 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "title": "Commit Lint Config",
+  "description": "Конфигурация commit ",
+
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "body",
+    "footer",
+    "header"
+  ],
+  "patternProperties": {
+    "^\\$schema$": {
+      "type": "string"
+    },
+    "^preset$": {
+      "type": "string"
+    },
+    "^header$": {
+      "$ref": "#/$defs/HeaderContract"
+    },
+    "^body$": {
+      "$ref": "#/$defs/BodyContract"
+    },
+    "^footer$": {
+      "$ref": "#/$defs/FooterContract"
+    },
+    "^breakingChange$": {
+      "$ref": "#/$defs/BreakingChangeContract"
+    }
+  },
+  "$defs": {
+    "HeaderContract": {
+      "type": "object",
+      "patternProperties": {
+        "^maxLength$": {
+          "type": "number"
+        },
+        "^format$": {
+          "type": "string"
+        },
+        "^type$": {
+          "$ref": "#/$defs/TypeContract"
+        },
+        "^scope$": {
+          "$ref": "#/$defs/ScopeContract"
+        },
+        "^subject$": {
+          "$ref": "#/$defs/SubjectContract"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "maxLength",
+        "scope",
+        "subject",
+        "type"
+      ]
+    },
+    "TypeContract": {
+      "type": "object",
+      "patternProperties": {
+        "^value$": {
+          "$ref": "#/$defs/TypesSourceContract"
+        },
+        "^case$": {
+          "type": "string",
+          "enum": [
+            "any",
+            "lower",
+            "match-source",
+            "sentence",
+            "upper"
+          ]
+        },
+        "^onUnknown$": {
+          "type": "string",
+          "enum": [
+            "error",
+            "ignore"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "case"
+      ]
+    },
+    "TypesSourceContract": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "fromFiles": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "types.json"
+                    ]
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "inline": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "feat",
+                      "fix",
+                      "docs",
+                      "style",
+                      "refactor",
+                      "perf",
+                      "test",
+                      "build",
+                      "ci",
+                      "chore",
+                      "revert",
+                      "deps",
+                      "release",
+                      "hotfix",
+                      "wip",
+                      "security",
+                      "ui",
+                      "api",
+                      "db",
+                      "i18n"
+                    ]
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false,
+          "minProperties": 1
+        },
+        {
+          "const": "any",
+          "type": "string"
+        }
+      ]
+    },
+    "ScopeContract": {
+      "type": "object",
+      "patternProperties": {
+        "^required$": {
+          "anyOf": [
+            {
+              "type": "object",
+              "patternProperties": {
+                "^when$": {
+                  "$ref": "#/$defs/WhenContract"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "when"
+              ]
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "^allowEmpty$": {
+          "type": "boolean"
+        },
+        "^source$": {
+          "$ref": "#/$defs/ScopesSourceContract"
+        },
+        "^onUnknown$": {
+          "type": "string",
+          "enum": [
+            "error",
+            "ignore"
+          ]
+        },
+        "^case$": {
+          "$ref": "#/$defs/CaseType"
+        },
+        "^multiple$": {
+          "$ref": "#/$defs/ScopeMultipleContract"
+        },
+        "^onMultiple$": {
+          "type": "string",
+          "enum": [
+            "error",
+            "first",
+            "join"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "case",
+        "onMultiple",
+        "required",
+        "source"
+      ]
+    },
+    "WhenContract": {
+      "type": "object",
+      "patternProperties": {
+        "^type$": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "^notType$": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "^tokens$": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "^mode$": {
+          "type": "string",
+          "enum": [
+            "and",
+            "or"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "ScopesSourceContract": {
+      "anyOf": [
+        {
+          "type": "object",
+          "patternProperties": {
+            "^fromFiles$": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "scopes.json"
+                    ]
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "^inline$": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false,
+          "minProperties": 1
+        },
+        {
+          "const": "any",
+          "type": "string"
+        }
+      ]
+    },
+    "CaseType": {
+      "type": "string",
+      "enum": [
+        "any",
+        "camel",
+        "kebab",
+        "lower",
+        "match-source",
+        "pascal",
+        "sentence",
+        "snake",
+        "upper"
+      ]
+    },
+    "ScopeMultipleContract": {
+      "type": "object",
+      "patternProperties": {
+        "^separator$": {
+          "type": "string"
+        },
+        "^separatorSpacing$": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "forbid",
+            "require"
+          ]
+        },
+        "^minItems$": {
+          "type": "number"
+        },
+        "^maxItems$": {
+          "type": "number"
+        },
+        "^trimItems$": {
+          "type": "boolean"
+        },
+        "^disallowEmpty$": {
+          "type": "boolean"
+        },
+        "^unique$": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "SubjectContract": {
+      "type": "object",
+      "patternProperties": {
+        "^minLength$": {
+          "type": "number"
+        },
+        "^case$": {
+          "type": "string",
+          "enum": [
+            "any",
+            "lower",
+            "sentence"
+          ]
+        },
+        "^trim$": {
+          "type": "boolean"
+        },
+        "^disallowTrailingPeriod$": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "case",
+        "minLength"
+      ]
+    },
+    "BodyContract": {
+      "type": "object",
+      "patternProperties": {
+        "^required$": {
+          "anyOf": [
+            {
+              "type": "object",
+              "patternProperties": {
+                "^when$": {
+                  "$ref": "#/$defs/WhenContract"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "when"
+              ]
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "^blankLineBefore$": {
+          "type": "boolean"
+        },
+        "^maxLineLength$": {
+          "type": "number"
+        },
+        "^trim$": {
+          "type": "boolean"
+        },
+        "^maxConsecutiveEmptyLines$": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "blankLineBefore",
+        "maxLineLength",
+        "required"
+      ]
+    },
+    "FooterContract": {
+      "type": "object",
+      "patternProperties": {
+        "^required$": {
+          "anyOf": [
+            {
+              "type": "object",
+              "patternProperties": {
+                "^when$": {
+                  "$ref": "#/$defs/WhenWithoutTokensContract"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "when"
+              ]
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "^blankLineBefore$": {
+          "type": "boolean"
+        },
+        "^maxLineLength$": {
+          "type": "number"
+        },
+        "^format$": {
+          "type": "string"
+        },
+        "^token$": {
+          "$ref": "#/$defs/FooterTokenContract"
+        },
+        "^value$": {
+          "$ref": "#/$defs/FooterValueContract"
+        },
+        "^multiple$": {
+          "$ref": "#/$defs/MultipleTokensContract"
+        },
+        "^uniqueTokens$": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "blankLineBefore",
+        "format",
+        "maxLineLength",
+        "required",
+        "token",
+        "value"
+      ]
+    },
+    "WhenWithoutTokensContract": {
+      "type": "object",
+      "patternProperties": {
+        "^type$": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "^notType$": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "^mode$": {
+          "type": "string",
+          "enum": [
+            "and",
+            "or"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "FooterTokenContract": {
+      "type": "object",
+      "patternProperties": {
+        "^source$": {
+          "$ref": "#/$defs/TokensSourceContract"
+        },
+        "^case$": {
+          "type": "string",
+          "enum": [
+            "any",
+            "lower",
+            "match-source",
+            "upper"
+          ]
+        },
+        "^onUnknown$": {
+          "type": "string",
+          "enum": [
+            "error",
+            "ignore"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "case",
+        "source"
+      ]
+    },
+    "TokensSourceContract": {
+      "anyOf": [
+        {
+          "type": "object",
+          "patternProperties": {
+            "^fromFiles$": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "tokens.json"
+                    ]
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "^inline$": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "BREAKING CHANGE",
+                      "Signed-off-by",
+                      "Co-authored-by",
+                      "Fixes",
+                      "Closes",
+                      "See-also"
+                    ]
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false,
+          "minProperties": 1
+        },
+        {
+          "const": "any",
+          "type": "string"
+        }
+      ]
+    },
+    "FooterValueContract": {
+      "type": "object",
+      "patternProperties": {
+        "^minLength$": {
+          "type": "number"
+        },
+        "^case$": {
+          "type": "string",
+          "enum": [
+            "any",
+            "lower",
+            "sentence",
+            "upper"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "case",
+        "minLength"
+      ]
+    },
+    "MultipleTokensContract": {
+      "type": "object",
+      "patternProperties": {
+        "^minItems$": {
+          "type": "number"
+        },
+        "^maxItems$": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "BreakingChangeContract": {
+      "type": "object",
+      "patternProperties": {
+        "^header$": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "forbid",
+            "require"
+          ]
+        },
+        "^footer$": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "forbid",
+            "require"
+          ]
+        },
+        "^requireFooterDescription$": {
+          "type": "boolean"
+        },
+        "^requireAtLeastOne$": {
+          "type": "boolean"
+        }
+      },
+      "if": {
+        "patternProperties": {
+          "^requireAtLeastOne$": {
+            "const": true
+          }
+        },
+        "required": [
+          "requireAtLeastOne"
+        ]
+      },
+      "then": {
+        "not": {
+          "allOf": [
+            {
+              "patternProperties": {
+                "^header$": {
+                  "const": "forbid"
+                }
+              }
+            },
+            {
+              "patternProperties": {
+                "^footer$": {
+                  "const": "forbid"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "footer",
+        "header"
+      ]
+    }
+  }
+}

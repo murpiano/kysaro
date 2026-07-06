@@ -1,19 +1,43 @@
 const path = require("path");
-const {_createFileValidationSection} = require("./file-validation");
-const {_createJsonFileUploadSection} = require("./json-file-upload");
-const {_createValidatorCreationSection} = require("./validator-creation");
 const {_REPORT_KEY, _FILE_KEY_NAME, _DISPLAY_MODE} = require("../../const");
+const createFileValidationModule = require("./file-validation");
+const createJsonFileLoadModule = require("./json-file-load");
+const createValidatorCreationModule = require("./validator-creation");
 
 
+/**
+ * Returns files from the specified group.
+ *
+ * @param {Array<Object>} files
+ * @param {string} groupName
+ * @returns {Array<Object>}
+ */
 function _normalizeGroupFiles(files, groupName) {
   return files.filter(file => file.group === groupName);
 }
 
+
+/**
+ * Returns the state of an entity within a group.
+ *
+ * @param {Object} state
+ * @param {string} groupName
+ * @param {string} entity
+ * @returns {Object}
+ */
 function _normalizeEntityState(state, groupName, entity) {
   return (state?.groups?.[groupName]?.[entity] || {});
 }
 
 
+/**
+ * Generates markdown reports for all groups.
+ *
+ * @param {Object} state
+ * @param {Array<Object>} files
+ * @param {Object} normalizedOptions
+ * @returns {void}
+ */
 function _createMdReport(state, files, normalizedOptions) {
   const {report} = normalizedOptions.result;
 
@@ -44,7 +68,7 @@ function _createMdReport(state, files, normalizedOptions) {
     | SETTINGS
     |----------------------------------------------------------------------
     */
-    _createJsonFileUploadSection({
+    createJsonFileLoadModule._createJsonFileLoadSection({
       allSettings: settings,
       files: groupFiles,
       targetType: _FILE_KEY_NAME.FILE,
@@ -59,7 +83,7 @@ function _createMdReport(state, files, normalizedOptions) {
     | SCHEMAS
     |----------------------------------------------------------------------
     */
-    _createJsonFileUploadSection({
+    createJsonFileLoadModule._createJsonFileLoadSection({
       allSettings: schemas,
       files: groupFiles,
       targetType: _FILE_KEY_NAME.SCHEMA,
@@ -74,7 +98,7 @@ function _createMdReport(state, files, normalizedOptions) {
     | VALIDATORS
     |----------------------------------------------------------------------
     */
-    _createValidatorCreationSection({
+    createValidatorCreationModule._createValidatorCreationSection({
       validators,
       files: groupFiles,
       reportPath,
@@ -88,7 +112,7 @@ function _createMdReport(state, files, normalizedOptions) {
     | VALIDATIONS
     |----------------------------------------------------------------------
     */
-    _createFileValidationSection({
+    createFileValidationModule._createFileValidationSection({
       validations,
       allSettings: settings,
       files: groupFiles,

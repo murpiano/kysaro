@@ -22,7 +22,8 @@ const _ICON = {
   OK: '✅',
   ERROR: '❌',
   WARN: '⚠️',
-  EMPTY: '➖'
+  EMPTY: '➖',
+  OFF: 'off'
 }
 
 const _REPORT_REGISTRY = {

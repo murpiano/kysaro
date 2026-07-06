@@ -1,27 +1,20 @@
-import {
-  beforeEach,
-  describe,
-  expect,
-  test,
-  vi
-} from 'vitest';
 
-vi.mock('../report/update-report', () => ({
-  _updateReport: vi.fn()
+jest.mock('../result/report/update-report', () => ({
+  _updateReport: jest.fn()
 }));
 
 const {
   _updateReport
-} = require('../report/update-report');
+} = require('../result/report/update-report');
 
 const {
   _createFileValidationSection
-} = require('../report/file-validation');
+} = require('../result/report/file-validation');
 
 describe('_createFileValidationSection', () => {
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   test('should call update report', () => {

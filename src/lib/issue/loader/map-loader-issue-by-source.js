@@ -9,17 +9,24 @@ function _mapLoaderIssueBySource({
   entity
 }) {
 
-  const prefixedCode = source ? `${source.toUpperCase()}_${issue.code}` : null;
+  const prefixedCode =
+    source
+      ? `${source.toUpperCase()}_${issue.code}`
+      : null;
 
-  const code = prefixedCode && LOAD_FILE_ISSUE_CODE[prefixedCode]
-    ? prefixedCode
-    : issue.code;
+  const resolvedCode =
+    prefixedCode &&
+    LOAD_FILE_ISSUE_CODE[prefixedCode]
+      ? prefixedCode
+      : issue.code;
 
   return _createLoadFileIssue({
-    code,
+    code: resolvedCode,
     severity,
+
     meta: {
       ...issue.meta,
+
       source,
       entity
     }

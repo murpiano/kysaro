@@ -1,87 +1,298 @@
-export type Status = 'required' | 'forbidden' | 'optional';
-export type CaseType = 'lower' | 'upper' | 'sentence' | 'firstWordLower' | 'any';
-
-interface Rule {
-  use: Status;
-  spaceAfter: Status;
-  index: number;
+export enum SourcePath {
+    TYPES = 'types.json',
+    SCOPES = 'scopes.json',
+    TOKENS = 'tokens.json',
 }
 
-interface TextRule extends Rule{
-  case: CaseType;
+export enum Case {
+    LOWER = 'lower',
+    UPPER = 'upper',
+    SENTENCE = 'sentence',
+    KEBAB = 'kebab',
+    CAMEL = 'camel',
+    PASCAL = 'pascal',
+    SNAKE = 'snake',
+    MATCH_SOURCE = 'match-source',
+    ANY = 'any'
 }
 
-interface EndSymbolRule extends Pick <Rule, "use"> {
-  typeSymbol:string;
+export enum Permission {
+    ALLOW = 'allow',
+    REQUIRE = 'require',
+    FORBID = 'forbid',
+    ANY = 'any'
 }
 
-interface BodyRule extends Rule {
-  matchHeader: Status;
+export enum CommitName {
+    STANDARD = 'standard',
+    MERGE = 'merge',
+    REVERT = 'revert',
+    REQUEST = 'request',
 }
 
-interface BodyTextRule extends TextRule {
-  matchHeader: Status;
+
+
+export enum EndOfLine {
+    LF = 'lf',
+    CRLF = 'crlf',
+    AUTO = 'auto',
 }
 
-interface MergeRule extends TextRule {
-  useOnlyMerge: Status;
+export enum Switch {
+    ON = 'on',
+    OFF = 'off'
 }
 
-interface Base {
-  header: {
+export enum ErrorMode {
+    RETURN = 'return',
+    THROW = 'throw'
+}
+
+export enum FixMode {
+    APPLY = 'apply',
+    SUGGEST = 'suggest'
+}
+
+export enum Severity {
+    ERROR = 'error',
+    WARNING = 'warn',
+}
+
+
+
+
+
+type CaseType = typeof Case[keyof typeof Case];
+type EndOfLineType = typeof EndOfLine[keyof typeof EndOfLine];
+type SwitchType = typeof Switch[keyof typeof Switch];
+type ErrorModeType = typeof ErrorMode[keyof typeof ErrorMode];
+type FixModeType = typeof FixMode[keyof typeof FixMode];
+type CommitNameType = typeof CommitName[keyof typeof CommitName];
+type SeverityType = typeof Severity[keyof typeof Severity];
+
+
+interface BlankLinesContract {
+    maxConsecutive: number;
+    trimStart: boolean;
+    trimEnd: boolean;
+}
+
+interface NormalizeContract {
+    trim: boolean;
+    removeTrailingSpaces: boolean;
+    blankLines: BlankLinesContract;
+    eol?: EndOfLineType;
+    ensureFinalNewline?: boolean;
+}
+
+interface PipelineConfig {
+    normalize: SwitchType
+    validate: SwitchType
+    fix: SwitchType
+    analyzer: 'off'
+    ai: 'off'
+}
+
+export interface AppMode{
+    onError: ErrorModeType;
+    onFix: FixModeType;
+}
+
+export interface IgnoreConfigContract{
+    types?:CommitNameType[];
+    patterns?:(string | RegExp)[];
+}
+
+
+export interface ConfigContract {
+    normalize: NormalizeContract;
+    pipeline: PipelineConfig;
+    mode: AppMode;
+    ignore?: IgnoreConfigContract;
+    severity: SeverityType;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+type OnUnknownType = 'error' | 'ignore';
+
+type WhenContract = {
+    type?: string[];
+    notType?: string[];
+    tokens?: string[];
+    mode?: 'and' | 'or';
+};
+
+type RequiredContract = {
+    when: WhenContract;
+};
+
+type RequiredFooterContract = {
+    when: Omit<WhenContract, 'tokens'>;
+};
+
+
+type BaseSourceContract =
+    | 'any'
+    | { type: 'inline'; values: string[] };
+
+type RecommendedPaths = typeof SourcePath[keyof typeof SourcePath];
+type CustomPath = { type: 'file'; path: string };
+
+type SourceContract<T extends RecommendedPaths> =
+    | BaseSourceContract
+    | { type: 'file'; path: T }
+    | CustomPath;
+
+
+type TypesSourceContract = SourceContract<SourcePath.TYPES>;
+type ScopesSourceContract = SourceContract<SourcePath.SCOPES>;
+type TokensSourceContract = SourceContract<SourcePath.TOKENS>;
+
+interface ScopeMultipleContract {
+    separator?: string
+    separatorSpacing?: Permission.ALLOW | Permission.REQUIRE | Permission.FORBID;
+    minItems?: number
+    maxItems?: number
+    trimItems?: boolean
+    disallowEmpty?: boolean
+    unique?: boolean
+}
+
+
+
+
+interface TypeContract {
+    source: TypesSourceContract;
+    case: Case.LOWER | Case.UPPER | Case.SENTENCE | Case.MATCH_SOURCE | Case.ANY;
+    onUnknown?: OnUnknownType;
+}
+
+interface ScopeContract {
+    required: boolean | RequiredContract;
+    allowEmpty?: boolean;
+    source: ScopesSourceContract;
+    onUnknown?: OnUnknownType;
+    case: CaseType;
+    multiple?: ScopeMultipleContract;
+    onMultiple: 'error' | 'first' | 'join';
+}
+
+interface SubjectContract {
     minLength: number;
-    maxLength: number;
-    emoji: Rule;
-    type: TextRule;
-    scope: TextRule;
-    colon: Rule;
-    subject: TextRule;
-    endSymbol: EndSymbolRule;
-  };
-  body: {
-    required: boolean;
+    case: Case.LOWER | Case.SENTENCE | Case.ANY;
+    trim?: boolean;
+    disallowTrailingPeriod?: boolean;
+}
+
+export interface FooterTokenContract {
+    source: TokensSourceContract;
+    case: Case.LOWER | Case.UPPER | Case.MATCH_SOURCE | Case.ANY;
+    onUnknown?: OnUnknownType;
+}
+export interface FooterValueContract {
     minLength: number;
+    case: Case.LOWER | Case.UPPER | Case.SENTENCE | Case.ANY;
+}
+
+export interface MultipleTokensContract {
+    minItems?: number
+    maxItems?: number
+}
+
+
+interface HeaderContract {
     maxLength: number;
-    eachItem: {
-      maxLength: number;
-      startDash: Rule;
-      emoji: BodyRule;
-      type: BodyTextRule;
-      scope: BodyTextRule;
-      colon: Rule;
-      text: TextRule;
-      endSymbol: EndSymbolRule;
-    };
-  };
+    format: 'type(scope): subject';
+    type: TypeContract;
+    scope: ScopeContract;
+    subject: SubjectContract;
 }
 
-export interface StandardConfig extends Base {}
-
-export interface MergeConfig extends Omit<Base, 'header'> {
-  header: Base['header'] & {
-    type: MergeRule;
-    "#PRNumber": Rule;
-  };
+interface BodyContract {
+    required: boolean | RequiredContract;
+    blankLineBefore: boolean;
+    maxLineLength: number;
+    trim?: boolean;
+    maxConsecutiveEmptyLines?: boolean;
 }
 
-export interface RequestConfig extends MergeConfig{}
+interface FooterContract {
+    required: boolean | RequiredFooterContract;
+    blankLineBefore: boolean;
+    maxLineLength: number;
+    format: 'token: value';
+    token: FooterTokenContract;
+    value: FooterValueContract;
+    multiple?: MultipleTokensContract;
+    uniqueTokens?: boolean
+}
+
+interface BreakingChangeContract {
+    header:Permission.ALLOW | Permission.FORBID | Permission.REQUIRE;
+    footer:Permission.ALLOW | Permission.FORBID | Permission.REQUIRE;
+    requireFooterDescription?: boolean;
+    requireAtLeastOne?: boolean;
+}
+
+export interface CommitContract {
+    preset?: string;
+    header: HeaderContract;
+    body: BodyContract;
+    footer: FooterContract;
+    breakingChange?: BreakingChangeContract,
+}
+
 
 interface Description {
-  description: string
-}
-
-interface Type extends Description {
-  emoji: string;
+    description: string
 }
 
 export interface TypesConfig {
-  [key:string] : Type;
+    [key: string]: Description;
 }
 
 export interface ScopesConfig {
-  [key:string] : Description;
+    [key: string]: Description;
 }
 
 export interface TokensConfig {
-  [key:string] : Description;
+    [key: string]: Description;
 }
+
+
+
+
+
+
+
+// interface LintResult {
+//     valid: boolean
+//
+//     original: string
+//     normalized?: string
+//
+//     parsed?: {
+//         header: any
+//         body: any
+//         footer: any
+//     }
+//
+//     errors: LintError[]
+//     fixes?: Fix[]
+//
+//     output: string
+// }
