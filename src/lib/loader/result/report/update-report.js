@@ -34,6 +34,33 @@ function _extractSections(content) {
 
 
 /**
+ * Formats a date as local "YYYY-MM-DD HH:mm:ss".
+ *
+ * Does not depend on the system locale.
+ *
+ * @param {Date} date
+ * @returns {string}
+ */
+function _formatUpdateTime(date) {
+  const pad = (value) => String(value).padStart(2, '0');
+
+  const day = [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate())
+  ].join('-');
+
+  const time = [
+    pad(date.getHours()),
+    pad(date.getMinutes()),
+    pad(date.getSeconds())
+  ].join(':');
+
+  return `${day} ${time}`;
+}
+
+
+/**
  * Creates or updates a Markdown report section.
  *
  * If the section already exists, the old version is deleted
@@ -63,7 +90,7 @@ function _updateReport({
     ? fs.readFileSync(reportPath, 'utf8')
     : '';
 
-  const updateTime = new Date().toLocaleString();
+  const updateTime = _formatUpdateTime(new Date());
 
   const headerLine = `💫kysaro
 ## ${reportTitle} report <span style="color: #6a737d; font-size: 12px; font-weight: bold;">&nbsp;Last update:&nbsp;${updateTime}</span>`;

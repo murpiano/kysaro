@@ -2,7 +2,7 @@
 
 exports[`_updateReport should create report file 1`] = `
 "💫kysaro
-## commits report <span style="color: #6a737d; font-size: 12px; font-weight: bold;">&nbsp;Last update:&nbsp;08.06.2026, 11:00:00</span>
+## commits report <span style="color: #6a737d; font-size: 12px; font-weight: bold;">&nbsp;Last update:&nbsp;2026-06-08 11:00:00</span>
 
 <!-- SECTION:settings ORDER:10 -->
 content
