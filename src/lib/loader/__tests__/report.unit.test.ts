@@ -8,7 +8,7 @@ beforeEach(async () => {
   jest.resetModules();
 
   jest.doMock('../result/report/json-file-load', () => ({
-    _createJsonFileUploadSection: jest.fn()
+    _createJsonFileLoadSection: jest.fn()
   }));
 
   jest.doMock('../result/report/file-validation', () => ({
@@ -51,7 +51,7 @@ describe('_createMdReport', () => {
     );
 
     expect(
-      jsonFileLoad._createJsonFileUploadSection
+      jsonFileLoad._createJsonFileLoadSection
     ).not.toHaveBeenCalled();
   });
 
@@ -85,7 +85,7 @@ describe('_createMdReport', () => {
     );
 
     expect(
-      jsonFileLoad._createJsonFileUploadSection
+      jsonFileLoad._createJsonFileLoadSection
     ).toHaveBeenCalledTimes(2);
 
     expect(
@@ -117,7 +117,7 @@ describe('_createMdReport', () => {
     );
 
     expect(
-      jsonFileLoad._createJsonFileUploadSection
+      jsonFileLoad._createJsonFileLoadSection
     ).not.toHaveBeenCalled();
   });
 

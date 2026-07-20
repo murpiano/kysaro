@@ -1,3 +1,4 @@
+const path = require('path');
 
 const {
   _normalizeFiles
@@ -55,13 +56,13 @@ describe('_normalizeFiles', () => {
 
         file: {
           name: 'commit.json',
-          defaultPath: '\\default\\commits\\settings',
-          userPath: '\\user\\commits\\settings'
+          defaultPath: path.join('/default', 'commits', 'settings'),
+          userPath: path.join('/user', 'commits', 'settings')
         },
 
         schema: {
           name: 'commit.schema.json',
-          defaultPath: '\\default\\schemas'
+          defaultPath: path.join('/default', 'schemas')
         }
       }
     ]);

@@ -11,7 +11,7 @@ const {
   _createJsonFileLoadSection
 } = require('../result/report/json-file-load');
 
-describe('_createJsonFileUploadSection', () => {
+describe('_createJsonFileLoadSection', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
