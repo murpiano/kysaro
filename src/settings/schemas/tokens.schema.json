@@ -8,8 +8,11 @@
   "patternProperties": {
     "^\\$schema$": {
       "type": "string"
+    },
+    "^preset$": {
+      "type": "string"
     }
-  }
+  },
   "additionalProperties": {
     "$ref": "#/$defs/Description"
   },
