@@ -33,5 +33,4 @@ out/
 *.sublime-workspace
 
 tests/*
-vitest.config.js
 coverage/

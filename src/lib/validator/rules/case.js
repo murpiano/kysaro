@@ -4,7 +4,7 @@ const {
     ERROR_CATEGORY
 } = require('../errors-const');
 
-const { toSentenceCase } = require('../../../utils/utils');
+const { toSentenceCase } = require('../../../all/helpers/text');
 const { CASE_TYPES } = require('../const');
 const { FIX_TYPES } = require('../../../all/const/issue');
 

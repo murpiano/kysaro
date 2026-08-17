@@ -12,14 +12,8 @@ module.exports = {
   ],
 
   transform: {
-    '^.+\\.ts$': [
-      'ts-jest',
-      {
-        isolatedModules: true
-      }
-    ]
+    '^.+\\.ts$': 'ts-jest'
   },
 
-  collectCoverage: true,
   coverageDirectory: 'coverage'
 };

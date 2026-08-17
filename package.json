@@ -4,13 +4,11 @@
   "description": "Bvtrots Developer Experience: Strict commit protocol",
   "main": "src/index.js",
   "bin": {
-    "bvtrots-init": "bin/cli.js",
-    "bvtrots-sync": "bin/sync.js"
+    "bvtrots-init": "bin/cli.js"
   },
   "files": [
     "src",
     "bin",
-    "scripts",
     "README.md"
   ],
   "types": "./src/index.d.ts",
@@ -28,18 +26,15 @@
   "scripts": {
     "start": "node src/index.js",
     "prepare": "husky",
-    "sync-docs": "node scripts/generate-whitelist.js",
-    "build:schemas": "node scripts/build-schemas.js",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:ui": "jest --coverage"
+    "test:coverage": "jest --coverage"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
     "jest": "^30.4.2",
     "ts-jest": "^29.4.11",
-    "typescript": "^5.9.3",
-    "typescript-json-schema": "^0.67.1"
+    "typescript": "^5.9.3"
   }
 }

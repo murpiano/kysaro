@@ -1,3 +1,1 @@
-node scripts/generate-whitelist.js
-git add .bvtrots-dx/whitelist.md
 npm test

@@ -6,11 +6,12 @@
 
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
 
     "allowJs": true,
     "checkJs": false,
 
-    "types": ["vitest/globals", "node"]
+    "types": ["jest", "node"]
   },
   "include": ["src", "**/*.ts"]
 }

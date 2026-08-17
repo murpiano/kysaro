@@ -1,7 +1,1 @@
-const {validateMessage} = require('./validator');
-const {createContext}   = require('../../all/commit-context');
-
-module.exports = {
-  validateMessage,
-  createContext
-}
+module.exports = require('./validator');
