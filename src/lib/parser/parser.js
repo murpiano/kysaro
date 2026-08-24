@@ -22,7 +22,6 @@
  * {
  *   header: {
  *     raw,
- *     emoji,
  *     type,
  *     scope,
  *     subject
@@ -40,29 +39,16 @@
 
 const NEWLINE = /\r?\n/u;
 
-const isEmoji = (char) => {
-    return /\p{Extended_Pictographic}/u.test(char);
-};
-
 const parseHeader = (line) => {
-    let rest = line;
-    let emoji = null;
     let type = null;
     let scope = null;
     let subject = null;
 
-    const firstChar = [...rest][0];
-
-    if (firstChar && isEmoji(firstChar)) {
-        emoji = firstChar;
-        rest = [...rest].slice(1).join('').trimStart();
-    }
-
-    const colonIndex = rest.indexOf(':');
+    const colonIndex = line.indexOf(':');
 
     if (colonIndex !== -1) {
-        const before = rest.slice(0, colonIndex).trim();
-        const after = rest.slice(colonIndex + 1).trim();
+        const before = line.slice(0, colonIndex).trim();
+        const after = line.slice(colonIndex + 1).trim();
 
         subject = after || null;
 
@@ -76,12 +62,11 @@ const parseHeader = (line) => {
             type = before || null;
         }
     } else {
-        subject = rest.trim() || null;
+        subject = line.trim() || null;
     }
 
     return {
         raw: line,
-        emoji,
         type,
         scope,
         subject
