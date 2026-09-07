@@ -1,10 +1,10 @@
 {
-  "name": "bvtrots-dx",
+  "name": "kysaro",
   "version": "1.0.0",
-  "description": "Bvtrots Developer Experience: Strict commit protocol",
+  "description": "Kysaro: strict protocol for commit, pull request and merge messages",
   "main": "src/index.js",
   "bin": {
-    "bvtrots-init": "bin/cli.js"
+    "kysaro": "bin/cli.js"
   },
   "files": [
     "src",
@@ -14,7 +14,7 @@
   "types": "./src/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bvtrots/bvtrots-dx.git"
+    "url": "git+https://github.com/bvtrots/kysaro.git"
   },
   "author": "bvtrots",
   "license": "MIT",

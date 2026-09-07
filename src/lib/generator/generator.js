@@ -5,7 +5,7 @@ const PriorityUse = {
 
 function generateMessage() {
     return `feat  (aTH ) :GENERATED MESSAGE TITLE    
-Experience pipline work my kysa package and check stages`;
+Experience pipline work my kysaro package and check stages`;
 }
 
 

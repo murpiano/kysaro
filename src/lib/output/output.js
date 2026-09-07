@@ -7,12 +7,12 @@ const INVALID_MODE = {
 }
 
 
-class KysaException extends Error {
+class KysaroException extends Error {
     constructor(result, message, code) {
         super(message);
         this.result = result;
         this.code = code;
-        this.name = "KysaException";
+        this.name = "KysaroException";
     }
 }
 
@@ -48,7 +48,7 @@ function output(rules, result) {
 
     if (!firstError) return result;
 
-    throw new KysaException(
+    throw new KysaroException(
         result,
         firstError.message,
         firstError.code

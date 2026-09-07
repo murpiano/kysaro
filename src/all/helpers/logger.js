@@ -1,5 +1,5 @@
 const chalk = require('chalk');
-const _PACK_NAME = '[bvtrots-dx]';
+const _PACK_NAME = '[kysaro]';
 const _LOGGER_ICON = {
   SUCCESS: chalk.green('✔'),
   ERROR: chalk.red('✖'),

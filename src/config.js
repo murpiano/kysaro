@@ -3,8 +3,8 @@ const path = require('path');
 const defaultSettings = require('./settings');
 
 const DIRECTORY = {
-  USER: '.bvtrots-dx',
-  USER_SETTINGS: ['.bvtrots-dx', 'settings'],
+  USER: '.kysaro',
+  USER_SETTINGS: ['.kysaro', 'settings'],
   COMMITS: 'commits',
   SCHEMAS: 'schemas'
 };

@@ -20,7 +20,7 @@ interface DeterministicFixContract {
 }
 
 
-export interface KysaContract {
+export interface KysaroContract {
     original: string;
     generated: string | null;
     status: ValidateStatusType | null;

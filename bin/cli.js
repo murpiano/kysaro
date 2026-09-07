@@ -4,7 +4,7 @@ const {pipeline} = require("../src/lib/pipeline");
 
 // const commitMsgFile = process.argv[2];
 // if (!commitMsgFile) {
-//   console.error('[bvtrots-dx] No commit message file provided');
+//   console.error('[kysaro] No commit message file provided');
 //   process.exit(1);
 // }
 // const raw = fs.readFileSync(commitMsgFile, 'utf-8').trim();

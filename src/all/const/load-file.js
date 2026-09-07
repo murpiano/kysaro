@@ -51,8 +51,8 @@ const LOAD_FILE_INFO_MESSAGE = {
 }
 
 const LOAD_FILE_RECOMMENDATION_MESSAGE = {
-  INVALID_STRATEGY: 'Restore the valid argument \'strategy\' to loadFile function or reinstall the package: npm install bvtrots-dx@latest',
-  MISSING_ARGUMENTS: 'Restore the valid argument \'name\' to loadFile function or reinstall the package: npm install bvtrots-dx@latest',
+  INVALID_STRATEGY: 'Restore the valid argument \'strategy\' to loadFile function or reinstall the package: npm install kysaro@latest',
+  MISSING_ARGUMENTS: 'Restore the valid argument \'name\' to loadFile function or reinstall the package: npm install kysaro@latest',
 }
 
 module.exports = {

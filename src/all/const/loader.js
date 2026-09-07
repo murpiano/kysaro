@@ -48,9 +48,9 @@ const LOADER_INFO_MESSAGE = {
 }
 
 const LOADER_RECOMMENDATION_MESSAGE = {
-  RESTORE_SCHEMA: 'Restore the original state of the schema or, if you haven\'t edited it, reinstall the package: npm install bvtrots-dx@latest',
-  ENSURE_SYNTAX: 'Ensure syntax errors in schema or reinstall the package: npm install bvtrots-dx@latest',
-  ENSURE_ERRORS: 'Ensure errors in settings file or reinstall the package: npm install bvtrots-dx@latest',
+  RESTORE_SCHEMA: 'Restore the original state of the schema or, if you haven\'t edited it, reinstall the package: npm install kysaro@latest',
+  ENSURE_SYNTAX: 'Ensure syntax errors in schema or reinstall the package: npm install kysaro@latest',
+  ENSURE_ERRORS: 'Ensure errors in settings file or reinstall the package: npm install kysaro@latest',
 }
 
 const LOADER_SCHEMA_VALIDATION_ERROR_KEYWORD = {
