@@ -64,7 +64,8 @@ function _formatUpdateTime(date) {
  * Creates or updates a Markdown report section.
  *
  * If the section already exists, the old version is deleted
- * and replaced with the new one.
+ * and replaced with the new one. The file is not rewritten
+ * when only the update time would change.
  *
  * @param {Object} params
  * @param {string} params.reportPath
@@ -109,6 +110,8 @@ function _updateReport({
     content = content.replace(/💫kysaro[\s\S]*?<\/span>/m, headerLine);
 
   }
+
+  const currentContent = content;
 
 
   /*
@@ -158,6 +161,17 @@ function _updateReport({
     .join('\n\n') +
     '\n';
 
+
+  /*
+  |--------------------------------------------------------------------------
+  | SKIP UNCHANGED REPORT
+  |--------------------------------------------------------------------------
+  | Only the update time would change: keep the file as is.
+  */
+
+  if (finalContent === currentContent) {
+    return;
+  }
 
   fs.mkdirSync(path.dirname(reportPath), {recursive: true});
   fs.writeFileSync(reportPath, finalContent, 'utf8');

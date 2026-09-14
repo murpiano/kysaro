@@ -94,4 +94,52 @@ describe('_updateReport', () => {
       .toContain('<!-- SECTION:settings ORDER:10 -->\nnew');
   });
 
+  describe('when report content does not change', () => {
+
+    const params = {
+      section: 'settings',
+      reportSection: 'content',
+      hideIfValid: false,
+      hasIssues: true,
+      order: 10,
+      reportTitle: 'commits'
+    };
+
+    beforeEach(() => {
+      tempDir =
+        fs.mkdtempSync(
+          path.join(os.tmpdir(), 'report-')
+        );
+
+      reportPath =
+        path.join(tempDir, 'report.md');
+
+      _updateReport({...params, reportPath});
+
+      jest.setSystemTime(
+        new Date('2026-06-09T12:30:00')
+      );
+    });
+
+    test('should keep previous update time', () => {
+      _updateReport({...params, reportPath});
+
+      const content =
+        fs.readFileSync(reportPath, 'utf8');
+
+      expect(content).toContain('2026-06-08 11:00:00');
+      expect(content).not.toContain('2026-06-09 12:30:00');
+    });
+
+    test('should update time when section content changes', () => {
+      _updateReport({...params, reportPath, reportSection: 'changed'});
+
+      const content =
+        fs.readFileSync(reportPath, 'utf8');
+
+      expect(content).toContain('2026-06-09 12:30:00');
+      expect(content).toContain('<!-- SECTION:settings ORDER:10 -->\nchanged');
+    });
+  });
+
 });
