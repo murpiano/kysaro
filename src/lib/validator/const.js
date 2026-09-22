@@ -1,44 +1,129 @@
+/**
+ * Case names from the commit settings schema.
+ */
 const CASE_TYPES = {
   LOWER: 'lower',
   UPPER: 'upper',
   SENTENCE: 'sentence',
-  AS_RULE: 'as-rule',
-  ANY: 'any',
-}
+  KEBAB: 'kebab',
+  CAMEL: 'camel',
+  PASCAL: 'pascal',
+  SNAKE: 'snake',
+  MATCH_SOURCE: 'match-source',
+  ANY: 'any'
+};
 
-const PART_NAMES = {
+const CASE_LABEL = {
+  [CASE_TYPES.LOWER]: 'lower case',
+  [CASE_TYPES.UPPER]: 'upper case',
+  [CASE_TYPES.SENTENCE]: 'sentence case',
+  [CASE_TYPES.KEBAB]: 'kebab-case',
+  [CASE_TYPES.CAMEL]: 'camelCase',
+  [CASE_TYPES.PASCAL]: 'PascalCase',
+  [CASE_TYPES.SNAKE]: 'snake_case'
+};
+
+const ON_UNKNOWN = {
+  ERROR: 'error',
+  IGNORE: 'ignore'
+};
+
+const ON_MULTIPLE = {
+  ERROR: 'error',
+  FIRST: 'first',
+  JOIN: 'join'
+};
+
+const SEPARATOR_SPACING = {
+  ALLOW: 'allow',
+  REQUIRE: 'require',
+  FORBID: 'forbid'
+};
+
+const BREAKING_MODE = {
+  ALLOW: 'allow',
+  FORBID: 'forbid',
+  REQUIRE: 'require'
+};
+
+const WHEN_MODE = {
+  AND: 'and',
+  OR: 'or'
+};
+
+const PATH = {
   HEADER: 'header',
-  BODY:'body',
-  BODY_LINE: 'body-line',
-  BODY_PARAGRAPH: 'body-paragraph',
-  FOOTER:'footer',
-  TYPE:'type',
+  TYPE: 'type',
   SCOPE: 'scope',
-  SUBJECT:'subject',
-  RAW:'raw',
-  TOKEN:'token',
-  TOKEN_VALUE:'token-value',
-}
+  SUBJECT: 'subject',
+  BODY: 'body',
+  FOOTER: 'footer',
+  BREAKING_CHANGE: 'breakingChange'
+};
 
-const PATH_PARTS = PART_NAMES;
+/**
+ * Header grammar: `type(scope)!: subject`.
+ */
+const HEADER_FORMAT = /^[^\s():!]+(\([^()]*\))?!?: \S/u;
 
-const RULE_NAME = {
-  ENUM: 'enum',
-  CASE: 'case',
-  FOOTER_TOKEN: 'footer-token',
-  LENGTH: 'length',
-  FORMAT: 'format',
-  FOOTER_FORMAT: 'footer-format',
-  REQUIRED: 'required',
-  BLANK_LINE: 'blank-line',
-  BODY_LINE_LENGTH: 'body-line-length',
-  FOOTER_LINE_LENGTH: 'footer-line-length',
-  FOOTER_TOKEN_VALUE: 'footer-token-value'
-}
+const VALIDATOR_ISSUE_CODE = {
+  HEADER_FORMAT: 'HEADER_FORMAT',
+  HEADER_TOO_LONG: 'HEADER_TOO_LONG',
+
+  TYPE_EMPTY: 'TYPE_EMPTY',
+  TYPE_UNKNOWN: 'TYPE_UNKNOWN',
+  TYPE_CASE: 'TYPE_CASE',
+
+  SCOPE_REQUIRED: 'SCOPE_REQUIRED',
+  SCOPE_EMPTY: 'SCOPE_EMPTY',
+  SCOPE_EMPTY_ITEM: 'SCOPE_EMPTY_ITEM',
+  SCOPE_TOO_MANY: 'SCOPE_TOO_MANY',
+  SCOPE_TOO_FEW: 'SCOPE_TOO_FEW',
+  SCOPE_DUPLICATE: 'SCOPE_DUPLICATE',
+  SCOPE_SEPARATOR_SPACING: 'SCOPE_SEPARATOR_SPACING',
+  SCOPE_UNKNOWN: 'SCOPE_UNKNOWN',
+  SCOPE_CASE: 'SCOPE_CASE',
+
+  SUBJECT_EMPTY: 'SUBJECT_EMPTY',
+  SUBJECT_TOO_SHORT: 'SUBJECT_TOO_SHORT',
+  SUBJECT_CASE: 'SUBJECT_CASE',
+  SUBJECT_TRAILING_PERIOD: 'SUBJECT_TRAILING_PERIOD',
+  SUBJECT_WHITESPACE: 'SUBJECT_WHITESPACE',
+
+  BODY_REQUIRED: 'BODY_REQUIRED',
+  BODY_LEADING_BLANK: 'BODY_LEADING_BLANK',
+  BODY_LINE_TOO_LONG: 'BODY_LINE_TOO_LONG',
+  BODY_WHITESPACE: 'BODY_WHITESPACE',
+  BODY_EMPTY_LINES: 'BODY_EMPTY_LINES',
+
+  FOOTER_REQUIRED: 'FOOTER_REQUIRED',
+  FOOTER_LEADING_BLANK: 'FOOTER_LEADING_BLANK',
+  FOOTER_LINE_TOO_LONG: 'FOOTER_LINE_TOO_LONG',
+  FOOTER_TOO_MANY: 'FOOTER_TOO_MANY',
+  FOOTER_TOO_FEW: 'FOOTER_TOO_FEW',
+  FOOTER_DUPLICATE_TOKEN: 'FOOTER_DUPLICATE_TOKEN',
+  FOOTER_TOKEN_UNKNOWN: 'FOOTER_TOKEN_UNKNOWN',
+  FOOTER_TOKEN_CASE: 'FOOTER_TOKEN_CASE',
+  FOOTER_VALUE_TOO_SHORT: 'FOOTER_VALUE_TOO_SHORT',
+  FOOTER_VALUE_CASE: 'FOOTER_VALUE_CASE',
+
+  BREAKING_HEADER_REQUIRED: 'BREAKING_HEADER_REQUIRED',
+  BREAKING_HEADER_FORBIDDEN: 'BREAKING_HEADER_FORBIDDEN',
+  BREAKING_FOOTER_REQUIRED: 'BREAKING_FOOTER_REQUIRED',
+  BREAKING_FOOTER_FORBIDDEN: 'BREAKING_FOOTER_FORBIDDEN',
+  BREAKING_FOOTER_DESCRIPTION: 'BREAKING_FOOTER_DESCRIPTION',
+  BREAKING_MISSING: 'BREAKING_MISSING'
+};
 
 module.exports = {
   CASE_TYPES,
-  PART_NAMES,
-  RULE_NAME,
-  PATH_PARTS
-}
+  CASE_LABEL,
+  ON_UNKNOWN,
+  ON_MULTIPLE,
+  SEPARATOR_SPACING,
+  BREAKING_MODE,
+  WHEN_MODE,
+  PATH,
+  HEADER_FORMAT,
+  VALIDATOR_ISSUE_CODE
+};

@@ -30,18 +30,21 @@
  *   body: {
  *     raw,
  *     lines,
+ *     start,
  *     blankLineBefore
  *   },
  *   footer: {
  *     raw,
  *     lines,
  *     tokens[],
+ *     start,
  *     blankLineBefore
  *   }
  * }
  *
  * `scope` is `null` when parentheses are absent and `''` when they are empty.
- * `blankLineBefore` is `null` when the section is empty.
+ * `start` is the zero-based index of the first line in the message.
+ * `start` and `blankLineBefore` are `null` when the section is empty.
  */
 
 const NEWLINE = /\r?\n/u;
@@ -206,6 +209,7 @@ const parseMessage = (rawMessage) => {
         body: {
             raw: '',
             lines: [],
+            start: null,
             blankLineBefore: null
         },
 
@@ -213,6 +217,7 @@ const parseMessage = (rawMessage) => {
             raw: '',
             lines: [],
             tokens: [],
+            start: null,
             blankLineBefore: null
         }
     };
@@ -244,6 +249,7 @@ const parseMessage = (rawMessage) => {
             raw: footerLines.join('\n'),
             lines: footerLines,
             tokens: parseFooter(footerLines),
+            start: footerStart,
             blankLineBefore: hasBlankLineBefore(lines, footerStart)
         };
     }
@@ -254,6 +260,7 @@ const parseMessage = (rawMessage) => {
         ast.body = {
             raw: bodyLines.join('\n'),
             lines: bodyLines,
+            start: bodyStart,
             blankLineBefore: hasBlankLineBefore(lines, bodyStart)
         };
     }

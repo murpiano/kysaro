@@ -1,79 +1,67 @@
-const {normalizeConfig} = require('./normalize-config');
+const {validateHeader} = require('./rules/header');
+const {validateBody} = require('./rules/body');
+const {validateFooter} = require('./rules/footer');
+const {validateBreakingChange} = require('./rules/breaking-change');
 
-const {validateHeader} = require('./validate/header');
-const {validateBody} = require('./validate/body');
-const {validateFooter} = require('./validate/footer');
+/**
+ * Validates parsed message against commit settings.
+ *
+ * @param {Object} ast Parsed message.
+ * @param {Object} commitSettings Settings of the current message kind (`commit.json`).
+ * @param {{types?:string[]|null, scopes?:string[]|null, tokens?:string[]|null}} [sources={}]
+ *   Allowed values. `null` means any value is allowed.
+ * @returns {{issues:Object[], deterministicFixes:Object[]}}
+ */
+function validateMessage(ast, commitSettings = {}, sources = {}) {
+  const sections = [
+    validateHeader(ast, commitSettings.header, sources),
+    validateBody(ast, commitSettings.body),
+    validateFooter(ast, commitSettings.footer, sources),
+    validateBreakingChange(ast, commitSettings.breakingChange)
+  ];
 
-
-function validateMessage(parsed, context) {
-    const ast = parsed.ast
-    const issues = [];
-    const deterministicFixes = [];
-
-    const rules = normalizeConfig(context);
-
-    const validatedSections = [
-        validateHeader(ast.header, rules.header),
-        // validateBody(ast.body, rules.body),
-        // validateFooter(ast.footer, rules.footer)
-    ]
-
-    validatedSections.forEach(section => {
-        const {
-            issues: sectionIssues,
-            deterministicFixes: sectionDeterministicFixes
-        } = section;
-        issues.push(...sectionIssues);
-        deterministicFixes.push(...sectionDeterministicFixes);
-    })
-
-    return {
-        issues,
-        deterministicFixes
-    };
+  return {
+    issues: sections.flatMap(section => section.issues),
+    deterministicFixes: sections.flatMap(section => section.deterministicFixes)
+  };
 }
 
+/**
+ * Pipeline stage: adds validator issues and fix candidates to the result.
+ *
+ * @param {Object} result Pipeline result with `parsed` set.
+ * @param {Object} context Commit context.
+ * @returns {Object}
+ */
 function applyValidator(result, context) {
-    const rules = context.config.main.validator;
+  const rules = context.settings.main.validator || {};
 
+  if (rules.enabled === false || !result.parsed) {
+    return result;
+  }
 
-    if (rules.enabled === false) return result;
+  const {issues, deterministicFixes} = validateMessage(
+    result.parsed.ast,
+    context.settings.commitSettings,
+    context.sources
+  );
 
-    const validatorSeverity = rules.severity;
+  return {
+    ...result,
 
+    issues: [
+      ...result.issues,
+      ...issues.map(issue => ({...issue, severity: rules.severity || 'error'}))
+    ],
 
-    const {
-        issues,
-        deterministicFixes
-    } = validateMessage(
-        result.parsed,
-        context
-    );
-
-
-    const normalizedIssues = issues.map(issue => ({
-        ...issue,
-        severity: validatorSeverity
-    }));
-
-    console.log(issues)
-    console.log(deterministicFixes)
-
-    return {
-        ...result,
-
-        issues: [
-            ...result.issues,
-            ...normalizedIssues
-        ],
-
-        deterministicFixes: [
-            ...result.deterministicFixes,
-            ...deterministicFixes
-        ]
-    };
+    deterministicFixes: [
+      ...result.deterministicFixes,
+      ...deterministicFixes
+    ]
+  };
 }
 
 module.exports = {
-    applyValidator
+  validateMessage,
+  applyValidator
 };

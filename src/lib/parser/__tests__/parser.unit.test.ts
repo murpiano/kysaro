@@ -81,8 +81,8 @@ describe('parseMessage', () => {
     test('should return empty body and footer for header only', () => {
       const {ast} = parseMessage('fix: a');
 
-      expect(ast.body).toEqual({raw: '', lines: [], blankLineBefore: null});
-      expect(ast.footer).toEqual({raw: '', lines: [], tokens: [], blankLineBefore: null});
+      expect(ast.body).toEqual({raw: '', lines: [], start: null, blankLineBefore: null});
+      expect(ast.footer).toEqual({raw: '', lines: [], tokens: [], start: null, blankLineBefore: null});
     });
 
     test('should ignore trailing newline', () => {
@@ -164,6 +164,13 @@ describe('parseMessage', () => {
 
       expect(ast.body.blankLineBefore).toBe(true);
       expect(ast.footer.blankLineBefore).toBe(true);
+    });
+
+    test('should record section start lines', () => {
+      const {ast} = parseMessage('feat: x\n\nBody\n\nRefs: #1');
+
+      expect(ast.body.start).toBe(2);
+      expect(ast.footer.start).toBe(4);
     });
 
     test('should detect body glued to header', () => {

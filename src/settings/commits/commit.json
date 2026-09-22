@@ -11,8 +11,8 @@
       "case": "lower"
     },
     "scope": {
-      "required":false,
-      "source":"any",
+      "required": false,
+      "source": "any",
       "case": "lower",
       "multiple": {
         "maxItems": 1
@@ -21,7 +21,8 @@
     },
     "subject": {
       "minLength": 5,
-      "case": "sentence"
+      "case": "sentence",
+      "disallowTrailingPeriod": true
     }
   },
   "body": {
@@ -46,6 +47,6 @@
   "breakingChange": {
     "header": "allow",
     "footer": "allow",
-    "requireAtLeastOne":true
+    "requireAtLeastOne": false
   }
 }

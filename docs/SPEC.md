@@ -59,7 +59,7 @@ flowchart TD
 | normalizer | `src/lib/normalizer` | реализован, тестов нет |
 | parser | `src/lib/parser` | реализован, покрыт тестами. Разбирает `!` в заголовке, footer `token: value` и `token #value`, многострочные значения footer, отмечает пустые строки перед body и footer |
 | ignore | `src/lib/ignore` | реализован, но читает `context.config` вместо `context.settings` |
-| validator | `src/lib/validator` | в новом контракте только `format` и enum для `type`. Остальные правила в старом контракте `{errors}` |
+| validator | `src/lib/validator` | реализован, покрыт тестами. Правила `header`, `body`, `footer`, `breakingChange` в контракте `Issue` |
 | analyzer | `src/lib/analyzer` | заглушка |
 | fixer | `src/lib/fixer` | заглушка. Старая рабочая реализация — в истории git, см. раздел 6.3 |
 | output | `src/lib/output` | реализован |
@@ -201,6 +201,26 @@ TODO в схеме `main.schema.json`:
 
 Открытый вопрос: у `type` источник задаётся через `value` (`fromFiles`/`inline`), у `scope` и `footer.token` — через `source`. Нужно привести к одному виду.
 
+Правила источников (`type.value`, `scope.source`, `footer.token.source`):
+
+- ключи файлов из `fromFiles` и значения `inline` объединяются;
+- файл ищется среди ресурсов по имени без расширения (`../resources/types.json` → `types`);
+- пустой итоговый список равен `any`;
+- наличие значения в источнике проверяется без учёта регистра, регистр проверяет правило `case`.
+
+Регистр (`case`):
+
+| Значение | Идентификаторы (`type`, `scope`, `footer.token`) | Текст (`subject`, `footer.value`) |
+|---|---|---|
+| `lower` | всё значение в нижнем регистре | первая буква строчная |
+| `upper` | всё значение в верхнем регистре | всё значение в верхнем регистре |
+| `sentence` | первая буква заглавная, остальные строчные | первая буква заглавная, остальное как есть |
+| `kebab`, `camel`, `pascal`, `snake` | по шаблону | — |
+| `match-source` | как записано в источнике | — |
+| `any` | без проверки | без проверки |
+
+Несколько scope (`type(ui,api): …`): значение делится по `multiple.separator` (по умолчанию `,`). Если значений больше `multiple.maxItems` (по умолчанию 1 без блока `multiple`): `error` — ошибка, `first` — проверяется первое, `join` — проверяется вся строка как одно значение.
+
 Поведение type:
 
 | Сообщение | Условие | Результат |
@@ -259,6 +279,8 @@ TODO в схеме `main.schema.json`:
 
 Если `requireAtLeastOne: true`, то `header` или `footer` не может быть `forbid` (реализовано в схеме через `if`/`then`).
 
+`require` — маркер обязателен в каждом сообщении, `forbid` — запрещён, `allow` — без проверки. `requireAtLeastOne: true` — каждое сообщение должно иметь `!` или `BREAKING CHANGE`. По умолчанию `false`. `BREAKING-CHANGE` — синоним `BREAKING CHANGE`.
+
 ### 3.5. merge.json и request.json
 
 Статус: файлы и схемы ещё в формате старого протокола (`use`, `index`, `spaceAfter`). Нужно перевести на формат `commit.json`.
@@ -294,6 +316,20 @@ TODO в схеме `main.schema.json`:
 - **length** — `header.maxLength`, `header.minLength`, `body.maxLength`, длина `subject`.
 - **semantic** — `subject` не в повелительном наклонении, `subject` заканчивается точкой, пустой `subject`, неправильный формат breaking change, неправильный формат ссылок на issues.
 - **structure** — отсутствует обязательная часть сообщения.
+
+Коды ошибок валидатора (`src/lib/validator/const.js`):
+
+| Раздел | Коды |
+|---|---|
+| header | `HEADER_FORMAT`, `HEADER_TOO_LONG` |
+| type | `TYPE_EMPTY`, `TYPE_UNKNOWN`, `TYPE_CASE` |
+| scope | `SCOPE_REQUIRED`, `SCOPE_EMPTY`, `SCOPE_EMPTY_ITEM`, `SCOPE_TOO_MANY`, `SCOPE_TOO_FEW`, `SCOPE_DUPLICATE`, `SCOPE_SEPARATOR_SPACING`, `SCOPE_UNKNOWN`, `SCOPE_CASE` |
+| subject | `SUBJECT_EMPTY`, `SUBJECT_TOO_SHORT`, `SUBJECT_CASE`, `SUBJECT_TRAILING_PERIOD`, `SUBJECT_WHITESPACE` |
+| body | `BODY_REQUIRED`, `BODY_LEADING_BLANK`, `BODY_LINE_TOO_LONG`, `BODY_WHITESPACE`, `BODY_EMPTY_LINES` |
+| footer | `FOOTER_REQUIRED`, `FOOTER_LEADING_BLANK`, `FOOTER_LINE_TOO_LONG`, `FOOTER_TOO_MANY`, `FOOTER_TOO_FEW`, `FOOTER_DUPLICATE_TOKEN`, `FOOTER_TOKEN_UNKNOWN`, `FOOTER_TOKEN_CASE`, `FOOTER_VALUE_TOO_SHORT`, `FOOTER_VALUE_CASE` |
+| breakingChange | `BREAKING_HEADER_REQUIRED`, `BREAKING_HEADER_FORBIDDEN`, `BREAKING_FOOTER_REQUIRED`, `BREAKING_FOOTER_FORBIDDEN`, `BREAKING_FOOTER_DESCRIPTION`, `BREAKING_MISSING` |
+
+Номера строк в `meta.line` и в тексте ошибок считаются от начала сообщения, с 1.
 
 Порядок применения детерминированных исправлений:
 

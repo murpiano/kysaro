@@ -392,7 +392,9 @@
           "type": "boolean"
         },
         "^maxConsecutiveEmptyLines$": {
-          "type": "boolean"
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum number of empty lines in a row inside the body."
         }
       },
       "additionalProperties": false,
