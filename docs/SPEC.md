@@ -57,7 +57,7 @@ flowchart TD
 | loader | `src/lib/loader`, `src/lib/load-file` | реализован, покрыт тестами |
 | generator | `src/lib/generator` | заглушка с захардкоженным сообщением |
 | normalizer | `src/lib/normalizer` | реализован, тестов нет |
-| parser | `src/lib/parser` | реализован, есть тесты. Известные ошибки (`test.todo`): теряется `!` в заголовке, footer вида `Closes #42` попадает в body, пустые строки-разделители попадают в body |
+| parser | `src/lib/parser` | реализован, покрыт тестами. Разбирает `!` в заголовке, footer `token: value` и `token #value`, многострочные значения footer, отмечает пустые строки перед body и footer |
 | ignore | `src/lib/ignore` | реализован, но читает `context.config` вместо `context.settings` |
 | validator | `src/lib/validator` | в новом контракте только `format` и enum для `type`. Остальные правила в старом контракте `{errors}` |
 | analyzer | `src/lib/analyzer` | заглушка |

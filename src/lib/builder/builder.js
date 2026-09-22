@@ -1,14 +1,14 @@
-
 const buildHeader = (headerAst) => {
-  const { type, scope, subject } = headerAst;
+  const {type, scope, breaking, subject} = headerAst;
+  const scopePart = scope === null || scope === undefined ? '' : `(${scope})`;
+  const breakingPart = breaking ? '!' : '';
 
-  return scope
-    ? `${type}(${scope}): ${subject}`
-    : `${type}: ${subject}`;
+  return `${type}${scopePart}${breakingPart}: ${subject}`;
 };
 
+const buildFooterToken = (token) => `${token.key}${token.separator || ': '}${token.value}`;
+
 const buildMessage = (ast) => {
-// console.log(ast)
   const parts = [];
 
   // header
@@ -19,17 +19,14 @@ const buildMessage = (ast) => {
     parts.push('');
     parts.push(ast.body.lines.join('\n'));
   }
+
   // footer
   if (ast.footer?.tokens?.length > 0) {
     parts.push('');
-    parts.push(
-      ast.footer.tokens
-      .map((t) => `${t.key}: ${t.value}`)
-          .join('\n')
-    );
+    parts.push(ast.footer.tokens.map(buildFooterToken).join('\n'));
   }
 
   return parts.join('\n');
 };
 
-module.exports = { buildHeader, buildMessage };
+module.exports = {buildHeader, buildFooterToken, buildMessage};
