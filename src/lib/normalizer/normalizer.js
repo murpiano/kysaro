@@ -1,3 +1,8 @@
+/**
+ * Git scissors line. `git commit -v` puts the diff below it.
+ */
+const SCISSORS = /^# -+ >8 -+$/u;
+
 function applyNormalizer(result, context) {
     const rules = context.settings.main.normalizer;
 
@@ -39,11 +44,17 @@ function applyNormalizer(result, context) {
     /*
      * ---------------------------------------------------------
      * REMOVE COMMENTS
-     * git-style comment lines
+     * git-style comment lines and everything below the scissors line
      * ---------------------------------------------------------
      */
 
     if (rules.removeComments) {
+        const scissorsIndex = lines.findIndex(line => SCISSORS.test(line));
+
+        if (scissorsIndex !== -1) {
+            lines = lines.slice(0, scissorsIndex);
+        }
+
         lines = lines.map(line => {
             return line.trimStart().startsWith('#')
                 ? ''

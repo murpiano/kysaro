@@ -56,7 +56,7 @@ flowchart TD
 |---|---|---|
 | loader | `src/lib/loader`, `src/lib/load-file` | реализован, покрыт тестами |
 | generator | `src/lib/generator` | заглушка с захардкоженным сообщением |
-| normalizer | `src/lib/normalizer` | реализован, тестов нет |
+| normalizer | `src/lib/normalizer` | реализован, покрыт тестами. При `removeComments` отрезает всё ниже scissors-строки `git commit -v` |
 | parser | `src/lib/parser` | реализован, покрыт тестами. Разбирает `!` в заголовке, footer `token: value` и `token #value`, многострочные значения footer, отмечает пустые строки перед body и footer |
 | ignore | `src/lib/ignore` | реализован, но читает `context.config` вместо `context.settings` |
 | validator | `src/lib/validator` | реализован, покрыт тестами. Правила `header`, `body`, `footer`, `breakingChange` в контракте `Issue` |
