@@ -22,7 +22,9 @@ function _createGroupFiles(group, names, configuration, options) {
     file: {
       name: `${name}.json`,
       defaultPath: joinIfExists(settingsDir.default, group, filesOptions.specialDir.default),
-      userPath: joinIfExists(settingsDir.user, group, filesOptions.specialDir.user)
+      userPath: settingsDir.user
+        ? joinIfExists(settingsDir.user, group, filesOptions.specialDir.user)
+        : null
     },
 
     schema: {

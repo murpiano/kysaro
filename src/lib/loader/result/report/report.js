@@ -41,7 +41,7 @@ function _normalizeEntityState(state, groupName, entity) {
 function _createMdReport(state, files, normalizedOptions) {
   const {report} = normalizedOptions.result;
 
-  if (!report?.enabled) {
+  if (!report?.enabled || !report.dir) {
     return;
   }
 

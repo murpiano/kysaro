@@ -1,5 +1,4 @@
 const {LOAD_FILE_LOAD_STRATEGY} = require("../../all/const/load-file");
-const {reportDir} = require("../../config");
 const {_CLI_MODE} = require("./result/cli");
 const {_STATE_KEY} = require("./const");
 const normalizeInputFiles = require("./normalize-input-files");
@@ -82,7 +81,7 @@ const _DEFAULT_LOADER_OPTIONS = {
   result: {
     report: {
       enabled: true,
-      dir: reportDir
+      dir: null
     },
 
     cli: {
@@ -104,7 +103,8 @@ const _DEFAULT_LOADER_OPTIONS = {
  * - generate report
  * - print CLI output
  *
- * @param {Object} configuration Loader configuration.
+ * @param {Object} configuration Loader configuration. `reportDir` sets the
+ *   default report directory; reports are skipped without it.
  * @param {Object} [userLoaderOptions={}] User options.
  * @returns {{
  *   ok:boolean,
@@ -113,7 +113,8 @@ const _DEFAULT_LOADER_OPTIONS = {
  * }}
  */
 function _runLoader(configuration, userLoaderOptions = {}) {
-  const options = _deepMerge(_DEFAULT_LOADER_OPTIONS, userLoaderOptions);
+  const configurationOptions = {result: {report: {dir: configuration?.reportDir || null}}};
+  const options = _deepMerge(_deepMerge(_DEFAULT_LOADER_OPTIONS, configurationOptions), userLoaderOptions);
   const normalizedFiles = normalizeInputFiles._normalizeFiles(configuration, options);
   const state = loadSettingsModule._loadSettings(normalizedFiles, options);
 

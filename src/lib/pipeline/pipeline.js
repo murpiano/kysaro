@@ -8,7 +8,7 @@ const {applyAnalyzer} = require("../analyzer");
 const {applyFixer} = require("../fixer");
 const {ISSUE_MESSAGE, ISSUE_CODE, ISSUE_SEVERITY, ISSUE_SOURCE, VALIDATE_STATUS} = require("../../all/const/issue");
 const {createCommitContext} = require("../../all/commit-context/commit-context");
-const defaultConfig = require("../../config");
+const {createConfiguration} = require("../../config");
 const {resolveCommitType} = require("../../all/resolve-commit-type");
 const {getSettings} = require("./settings");
 
@@ -56,7 +56,7 @@ function markIgnored(result) {
 }
 
 
-function pipeline(raw = '', manualCommitType = null, configuration = defaultConfig) {
+function pipeline(raw = '', manualCommitType = null, configuration = createConfiguration()) {
   const commitType = resolveCommitType(manualCommitType);
   const settings = getSettings(configuration, commitType);
   let result = createInitialResult(raw);
