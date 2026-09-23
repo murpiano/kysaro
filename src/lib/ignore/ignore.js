@@ -1,59 +1,61 @@
 const {COMMIT_TYPE} = require("../../all/const/const");
 
-const IGNORE_KIND_MAP = {
-    commit: COMMIT_TYPE.COMMIT,
-    merge: COMMIT_TYPE.MERGE,
-    request: COMMIT_TYPE.REQUEST
+const IGNORE_KIND = {
+    MERGE: 'merge',
+    REVERT: 'revert'
 };
 
+/**
+ * Default headers git writes for merge and revert commits.
+ */
+const MERGE_HEADER = /^Merge (branch|branches|remote-tracking branch|pull request|tag|commit) /u;
+const REVERT_HEADER = /^Revert "/u;
+
+const KIND_MATCHERS = {
+    [IGNORE_KIND.MERGE]: (header, commitType) => commitType === COMMIT_TYPE.MERGE || MERGE_HEADER.test(header),
+    [IGNORE_KIND.REVERT]: header => REVERT_HEADER.test(header)
+};
+
+function getHeader(message) {
+    return String(message || '').split(/\r?\n/u)[0];
+}
+
+/**
+ * A pattern matches when the header starts with it, ignoring case.
+ */
+function matchPattern(header, pattern) {
+    if (typeof pattern !== 'string' || pattern === '') {
+        return false;
+    }
+
+    return header.toLowerCase().startsWith(pattern.toLowerCase());
+}
+
+/**
+ * Checks `ignore.kinds` and `ignore.patterns` of main settings.
+ *
+ * @param {Object} result Pipeline result.
+ * @param {Object} context Commit context.
+ * @returns {boolean}
+ */
 function isIgnored(result, context) {
-    const ignore = context.config.main?.ignore || {};
-    const commitType = context.runtime.commitType;
+    const ignore = context.settings.main?.ignore || {};
+    const header = getHeader(result.final);
 
-    const message = result.final;
+    const ignoredByKind = (ignore.kinds || []).some(kind => {
+        const matcher = KIND_MATCHERS[String(kind).toLowerCase()];
 
-    const ignoredKinds = ignore.kinds || [];
-
-    const ignoredByKind = ignoredKinds.some(kind => {
-        if (typeof kind !== 'string') {
-            return false;
-        }
-
-        return (
-            IGNORE_KIND_MAP[kind.toLowerCase()] ===
-            commitType
-        );
+        return matcher ? matcher(header, context.commitType) : false;
     });
 
     if (ignoredByKind) {
         return true;
     }
 
-    const patterns = ignore.patterns || [];
-
-    return patterns.some(pattern =>
-        matchPattern(message, pattern)
-    );
-}
-
-function matchPattern(message, pattern) {
-    if (!pattern) {
-        return false;
-    }
-
-    if (pattern instanceof RegExp) {
-        return pattern.test(message);
-    }
-
-    if (typeof pattern === 'string') {
-        return message
-            .toLowerCase()
-            .includes(pattern.toLowerCase());
-    }
-
-    return false;
+    return (ignore.patterns || []).some(pattern => matchPattern(header, pattern));
 }
 
 module.exports = {
-    isIgnored
+    isIgnored,
+    IGNORE_KIND
 };

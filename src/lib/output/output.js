@@ -38,7 +38,7 @@ function output(rules, result) {
         status
     };
 
-    const isThrow = rules.invalid === INVALID_MODE.THROW;
+    const isThrow = rules?.invalid === INVALID_MODE.THROW;
 
     if (!isThrow) return result;
 
@@ -56,5 +56,7 @@ function output(rules, result) {
 }
 
 module.exports = {
-    output
+    output,
+    KysaroException,
+    INVALID_MODE
 }

@@ -1,7 +1,7 @@
 {
   "$schema": "../schemas/main.schema.json",
   "generator": {
-    "enabled":false,
+    "enabled": false,
     "priorityUse": "input"
   },
   "normalizer": {
@@ -36,12 +36,13 @@
   "fixer": {
     "enabled": false,
     "mode": "apply",
-  "confidenceThreshold": 1
+    "confidenceThreshold": 1
   },
   "output": {
     "invalid": "return"
   },
   "ignore": {
-    "kinds": ["merge"]
+    "kinds": ["merge", "revert"],
+    "patterns": ["fixup! ", "squash! ", "amend! "]
   }
 }

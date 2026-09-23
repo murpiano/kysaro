@@ -55,16 +55,18 @@ flowchart TD
 | Этап | Модуль | Статус (2026-09-21) |
 |---|---|---|
 | loader | `src/lib/loader`, `src/lib/load-file` | реализован, покрыт тестами |
-| generator | `src/lib/generator` | заглушка с захардкоженным сообщением |
+| generator | `src/lib/generator` | заглушка с захардкоженным сообщением, в pipeline не подключён |
 | normalizer | `src/lib/normalizer` | реализован, покрыт тестами. При `removeComments` отрезает всё ниже scissors-строки `git commit -v` |
 | parser | `src/lib/parser` | реализован, покрыт тестами. Разбирает `!` в заголовке, footer `token: value` и `token #value`, многострочные значения footer, отмечает пустые строки перед body и footer |
-| ignore | `src/lib/ignore` | реализован, но читает `context.config` вместо `context.settings` |
+| ignore | `src/lib/ignore` | реализован, покрыт тестами |
 | validator | `src/lib/validator` | реализован, покрыт тестами. Правила `header`, `body`, `footer`, `breakingChange` в контракте `Issue` |
-| analyzer | `src/lib/analyzer` | заглушка |
-| fixer | `src/lib/fixer` | заглушка. Старая рабочая реализация — в истории git, см. раздел 6.3 |
+| analyzer | `src/lib/analyzer` | заглушка, в pipeline не подключён |
+| fixer | `src/lib/fixer` | заглушка, в pipeline не подключён. Старая рабочая реализация — в истории git, см. раздел 6.3 |
 | output | `src/lib/output` | реализован |
 
-Этапы в `src/lib/pipeline/pipeline.js` включаются по одному, по мере готовности.
+Этапы в `src/lib/pipeline/pipeline.js` включаются по одному, по мере готовности. Сейчас работают: `normalizer` → `parser` → `ignore` → `validator` → `output`. Настройки `generator`, `analyzer` и `fixer` загружаются и проверяются схемой, но не влияют на результат.
+
+Если настройки не загрузились (ошибка в настройках по умолчанию или схемах), pipeline возвращает `invalid` с ошибкой `CONFIGURATION_ERROR`.
 
 ## 3. Конфигурация
 
@@ -82,7 +84,9 @@ flowchart TD
 
 Настройки по умолчанию лежат в пакете: `src/settings/`. Стратегия загрузки настроек — `USER_FIRST`: файл пользователя, иначе файл по умолчанию. Схемы берутся только из пакета (`DEFAULT_ONLY`).
 
-Loader пишет отчёты о загрузке в `.kysaro/<группа>.md` (`main.md`, `commits.md`).
+Loader пишет отчёты о загрузке в `.kysaro/<группа>.md` (`main.md`, `commits.md`). Настройки пользователя читаются, только если есть каталог `.kysaro/settings`. Отчёты пишутся, только если есть каталог `.kysaro`. Без них используются настройки по умолчанию, без предупреждений.
+
+Пока применяются только правила `commit.json`, для всех видов сообщений. `merge.json` и `request.json` загружаются, но не используются (см. 3.5).
 
 Тип сообщения определяется так (`src/all/resolve-commit-type.js`):
 
@@ -128,8 +132,8 @@ Loader пишет отчёты о загрузке в `.kysaro/<группа>.md
 | `fixer.mode` | `apply`, `suggest` | `apply` | Применять исправления или только предлагать |
 | `fixer.confidenceThreshold` | число | `1` | Порог уверенности для применения исправлений |
 | `output.invalid` | `return`, `throw` | `return` | Что делать при ошибках: вернуть результат или бросить `KysaroException` |
-| `ignore?.kinds?` | `merge`, `revert` | `["merge"]` | Игнорируемые виды сообщений |
-| `ignore?.patterns?` | `string[]` | — | Игнорируемые паттерны |
+| `ignore?.kinds?` | `merge`, `revert` | `["merge", "revert"]` | Игнорируемые виды сообщений |
+| `ignore?.patterns?` | `string[]` | `["fixup! ", "squash! ", "amend! "]` | Игнорируемые паттерны |
 
 Поведение generator:
 
@@ -141,6 +145,10 @@ Loader пишет отчёты о загрузке в `.kysaro/<группа>.md
 | что угодно | `generated` | сгенерированное сообщение |
 
 Поведение ignore: игнорируемое сообщение получает статус `ignored`. `ignored` ≠ `valid`.
+
+- `merge` — merge-коммит (есть `MERGE_HEAD`) или заголовок, который git пишет для merge: `Merge branch …`, `Merge pull request …`, `Merge remote-tracking branch …`, `Merge tag …`;
+- `revert` — заголовок, который пишет `git revert`: `Revert "…"`;
+- `patterns` — заголовок начинается с паттерна, без учёта регистра.
 
 TODO в схеме `main.schema.json`:
 
