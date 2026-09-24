@@ -1,38 +1,65 @@
 {
   "name": "kysaro",
   "version": "1.0.0",
-  "description": "Kysaro: strict protocol for commit, pull request and merge messages",
-  "main": "src/index.js",
-  "bin": {
-    "kysaro": "bin/cli.js"
-  },
-  "files": [
-    "src",
-    "bin",
-    "README.md"
+  "description": "Strict commit message linter: Conventional Commits rules in JSON with schemas, IDE autocomplete and a commit-msg hook",
+  "keywords": [
+    "commit",
+    "commit-message",
+    "commitlint",
+    "conventional-commits",
+    "git",
+    "git-hooks",
+    "husky",
+    "lint",
+    "linter",
+    "validation"
   ],
-  "types": "./src/index.d.ts",
+  "homepage": "https://github.com/bvtrots/kysaro#readme",
+  "bugs": {
+    "url": "https://github.com/bvtrots/kysaro/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bvtrots/kysaro.git"
   },
-  "author": "bvtrots",
   "license": "MIT",
-  "dependencies": {
-    "ajv": "^8.18.0",
-    "chalk": "^4.1.2",
-    "husky": "^9.0.0"
+  "author": "Bogdan Trotsenko (https://github.com/bvtrots)",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "kysaro": "bin/cli.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "!src/**/__tests__"
+  ],
+  "engines": {
+    "node": ">=20"
   },
   "scripts": {
     "start": "node scripts/playground.js",
     "prepare": "husky",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "prepublishOnly": "npm test"
+  },
+  "dependencies": {
+    "ajv": "^8.18.0",
+    "chalk": "^4.1.2"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
+    "husky": "^9.0.0",
     "jest": "^30.4.2",
     "ts-jest": "^29.4.11",
     "typescript": "^5.9.3"
