@@ -1,10 +1,8 @@
 {
   "$schema": "../../../src/settings/schemas/main.schema.json",
-  "title": "Файл конфигурации этапов пайплайна.",
- "description": "Доступен автокомплит. Для дополнительной информации наведите мышку на конкретное свойство.",
   "generator": {
-    "enabled":true,
-    "priorityUse": "generated"
+    "enabled": false,
+    "priorityUse": "input"
   },
   "normalizer": {
     "enabled": true,
@@ -21,18 +19,18 @@
   },
   "validator": {
     "enabled": true,
-    "severity": "warning"
+    "severity": "error"
   },
   "analyzer": {
     "enabled": false,
     "correction": {
-      "enabled": true,
+      "enabled": false,
       "ai": {
         "enabled": false
       }
     },
     "semantic": {
-      "enabled": true
+      "enabled": false
     }
   },
   "fixer": {
@@ -42,5 +40,16 @@
   },
   "output": {
     "invalid": "return"
+  },
+  "ignore": {
+    "kinds": [
+      "merge",
+      "revert"
+    ],
+    "patterns": [
+      "fixup! ",
+      "squash! ",
+      "amend! "
+    ]
   }
 }

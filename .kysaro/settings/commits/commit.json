@@ -12,7 +12,9 @@
     },
     "scope": {
       "required": false,
-      "source": "any",
+      "source": {
+        "fromFiles": ["../resources/scopes.json"]
+      },
       "case": "lower",
       "multiple": {
         "maxItems": 1
