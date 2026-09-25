@@ -1,6 +1,6 @@
 {
   "name": "kysaro",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Strict commit message linter: Conventional Commits rules in JSON with schemas, IDE autocomplete and a commit-msg hook",
   "keywords": [
     "commit",
