@@ -1,7 +1,7 @@
 # kysaro
 
 [![npm](https://img.shields.io/npm/v/kysaro)](https://www.npmjs.com/package/kysaro)
-[![CI](https://github.com/bvtrots/kysaro/actions/workflows/ci.yml/badge.svg)](https://github.com/bvtrots/kysaro/actions/workflows/ci.yml)
+[![CI](https://github.com/murpiano/kysaro/actions/workflows/ci.yml/badge.svg)](https://github.com/murpiano/kysaro/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 Strict commit message linter. Kysaro checks every commit message before it reaches the history and blocks the commit when the message breaks the rules.

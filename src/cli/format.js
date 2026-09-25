@@ -96,7 +96,7 @@ function formatResult(result) {
   }
 
   if (isInvalid) {
-    lines.push('', chalk.gray('  Rules: https://github.com/bvtrots/kysaro#rules'));
+    lines.push('', chalk.gray('  Rules: https://github.com/murpiano/kysaro#rules'));
   }
 
   return lines.join('\n') + '\n';

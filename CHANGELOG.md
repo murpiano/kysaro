@@ -26,4 +26,4 @@ First public release.
 - Pull request and merge commit rules (`request.json`, `merge.json`).
 - The `fixer`, `analyzer` and `generator` stages.
 
-[0.1.0]: https://github.com/bvtrots/kysaro/releases/tag/v0.1.0
+[0.1.0]: https://github.com/murpiano/kysaro/releases/tag/v0.1.0

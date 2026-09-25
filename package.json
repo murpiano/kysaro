@@ -14,16 +14,16 @@
     "linter",
     "validation"
   ],
-  "homepage": "https://github.com/bvtrots/kysaro#readme",
+  "homepage": "https://github.com/murpiano/kysaro#readme",
   "bugs": {
-    "url": "https://github.com/bvtrots/kysaro/issues"
+    "url": "https://github.com/murpiano/kysaro/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bvtrots/kysaro.git"
+    "url": "git+https://github.com/murpiano/kysaro.git"
   },
   "license": "MIT",
-  "author": "Bogdan Trotsenko (https://github.com/bvtrots)",
+  "author": "Bogdan Trotsenko (https://github.com/murpiano)",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "exports": {
