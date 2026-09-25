@@ -42,6 +42,27 @@ function _createResult({name, strategy}) {
 
 
 /**
+ * A missing user file is a normal case: the default file is used.
+ * Such issue stays in the report without severity, so it does not
+ * produce a warning. Broken user files keep their severity.
+ *
+ * @param {Object} issue
+ * @returns {Object}
+ */
+function _toUserNotice(issue) {
+
+  if (issue.code !== LOAD_FILE_ISSUE_CODE.USER_FILE_NOT_FOUND) {
+    return issue;
+  }
+
+  return {
+    ...issue,
+    severity: null
+  };
+}
+
+
+/**
  * Resolves file path from base directory and file name.
  *
  * @param {string|null} basePath
@@ -306,7 +327,7 @@ function _loadFile(
       return _applyLoaded(result, userLoaded, userFilePath);
     }
 
-    result.issues.push(...(userLoaded.issues || []));
+    result.issues.push(...(userLoaded.issues || []).map(_toUserNotice));
   }
 
   /*

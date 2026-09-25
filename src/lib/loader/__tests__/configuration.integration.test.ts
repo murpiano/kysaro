@@ -46,4 +46,24 @@ describe('createConfiguration', () => {
 
     log.mockRestore();
   });
+
+  test('should not warn about user files that are absent', () => {
+    const log = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const mainDir = path.join(cwd, '.kysaro', 'settings', 'main');
+    const main = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../../settings/main/main.json'), 'utf8'));
+
+    delete main.$schema;
+    main.validator.severity = 'warning';
+    fs.mkdirSync(mainDir, {recursive: true});
+    fs.writeFileSync(path.join(mainDir, 'main.json'), JSON.stringify(main));
+
+    const loaded = runLoader(createConfiguration(cwd));
+
+    expect(loaded.ok).toBe(true);
+    expect(loaded.settings.main.main.validator.severity).toBe('warning');
+    expect(loaded.reports.issues.filter((issue: any) => issue.severity)).toEqual([]);
+    expect(log).not.toHaveBeenCalled();
+
+    log.mockRestore();
+  });
 });
