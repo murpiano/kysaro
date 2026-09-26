@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in this file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] - 2026-09-26
+
+### Changed
+
+- Build provenance points to the current repository history. The history of 0.1.0 was rewritten after its release.
+- The release workflow skips versions that are already on npm and releases that already exist.
+- CI skips the commit message check after a force-push.
+
 ## [0.1.0] - 2026-09-25
 
 First public release.
@@ -26,4 +34,5 @@ First public release.
 - Pull request and merge commit rules (`request.json`, `merge.json`).
 - The `fixer`, `analyzer` and `generator` stages.
 
+[0.1.1]: https://github.com/murpiano/kysaro/releases/tag/v0.1.1
 [0.1.0]: https://github.com/murpiano/kysaro/releases/tag/v0.1.0
