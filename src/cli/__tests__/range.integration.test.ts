@@ -57,7 +57,7 @@ describe('kysaro --range', () => {
     git('init', '-q', '-b', 'main');
     git('config', 'user.email', 'test@example.com');
     git('config', 'user.name', 'Test');
-    commit('chore: Initial commit');
+    commit('chore: initial commit');
   });
 
   afterEach(() => {
@@ -66,16 +66,16 @@ describe('kysaro --range', () => {
   });
 
   test('should pass a range of valid commits', async () => {
-    commit('feat: Add colors');
-    commit('fix(ui): Repair palette');
+    commit('feat: add colors');
+    commit('fix(ui): repair palette');
 
     await expect(check('HEAD~2..HEAD')).resolves.toEqual({code: EXIT_CODE.OK, output: ''});
   });
 
   test('should report every invalid commit with its sha', async () => {
     commit('added stuff');
-    commit('feat: Add colors');
-    commit('fix: repair');
+    commit('feat: add colors');
+    commit('fix: Repair palette');
 
     const sha = git('rev-parse', '--short=7', 'HEAD~2');
     const {code, output} = await check('HEAD~3..HEAD');
@@ -86,8 +86,8 @@ describe('kysaro --range', () => {
   });
 
   test('should reject fixup commits', async () => {
-    commit('feat: Add colors');
-    commit('fixup! feat: Add colors');
+    commit('feat: add colors');
+    commit('fixup! feat: add colors');
 
     const {code, output} = await check('HEAD~2..HEAD');
 
@@ -97,7 +97,7 @@ describe('kysaro --range', () => {
 
   test('should check merge commits with merge rules', async () => {
     git('checkout', '-q', '-b', 'feature');
-    commit('feat: Add colors');
+    commit('feat: add colors');
     git('checkout', '-q', 'main');
     git('merge', '-q', '--no-ff', '--no-verify', '-m', "Merge branch 'feature'", 'feature');
 
@@ -107,7 +107,7 @@ describe('kysaro --range', () => {
     expect(invalid.output).toContain('Header must match');
 
     git('reset', '-q', '--hard', 'HEAD~1');
-    git('merge', '-q', '--no-ff', '--no-verify', '-m', `feat: Add colors (#1)\n\n${MERGE_BODY}`, 'feature');
+    git('merge', '-q', '--no-ff', '--no-verify', '-m', `feat: add colors (#1)\n\n${MERGE_BODY}`, 'feature');
 
     await expect(check('HEAD~1..HEAD')).resolves.toEqual({code: EXIT_CODE.OK, output: ''});
   });
@@ -180,15 +180,15 @@ describe('kysaro ci', () => {
   });
 
   test('should check pull request title, description and commits', async () => {
-    const base = commit('chore: Initial commit');
-    commit('feat(ui): Add palette');
-    const head = commit('feat(ui): Add theme switch');
+    const base = commit('chore: initial commit');
+    commit('feat(ui): add palette');
+    const head = commit('feat(ui): add theme switch');
 
     const pullRequest = (title: string, body: string) => ({
       pull_request: {number: 7, title, body, base: {sha: base}, head: {sha: head}}
     });
 
-    await expect(ci('pull_request', pullRequest('feat(ui): Add themes', DESCRIPTION)))
+    await expect(ci('pull_request', pullRequest('feat(ui): add themes', DESCRIPTION)))
       .resolves.toEqual({code: EXIT_CODE.OK, output: ''});
 
     const invalid = await ci('pull_request', pullRequest('Add themes (#7)', 'short'));
@@ -199,11 +199,11 @@ describe('kysaro ci', () => {
   });
 
   test('should check commits of a pull request', async () => {
-    const base = commit('chore: Initial commit');
+    const base = commit('chore: initial commit');
     const head = commit('wip');
 
     const {code, output} = await ci('pull_request', {
-      pull_request: {number: 8, title: 'feat(ui): Add themes', body: DESCRIPTION, base: {sha: base}, head: {sha: head}}
+      pull_request: {number: 8, title: 'feat(ui): add themes', body: DESCRIPTION, base: {sha: base}, head: {sha: head}}
     });
 
     expect(code).toBe(EXIT_CODE.INVALID);
@@ -212,7 +212,7 @@ describe('kysaro ci', () => {
 
   test('should check commits of a push to an existing branch', async () => {
     const before = commit('broken old commit');
-    const after = commit('feat: Add colors');
+    const after = commit('feat: add colors');
 
     await expect(ci('push', {ref: 'refs/heads/main', before, after}))
       .resolves.toEqual({code: EXIT_CODE.OK, output: ''});
@@ -222,7 +222,7 @@ describe('kysaro ci', () => {
     commit('broken commit already on main');
     git('update-ref', 'refs/remotes/origin/main', 'HEAD');
     git('checkout', '-q', '-b', 'feature');
-    commit('feat: Add colors');
+    commit('feat: add colors');
     const after = commit('bad');
     git('update-ref', 'refs/remotes/origin/feature', 'HEAD');
 

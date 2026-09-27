@@ -53,7 +53,7 @@ describe('lint', () => {
     lint(message, {type: COMMIT_TYPE.COMMIT, cwd, ...options});
 
   test('should accept a valid message with package defaults', () => {
-    const result = check('feat(cli): Add init command\n\nExplain the change.\n\nRefs: #1\n');
+    const result = check('feat(cli): add init command\n\nExplain the change.\n\nRefs: #1\n');
 
     expect(result.status).toBe('valid');
     expect(result.issues).toEqual([]);
@@ -68,10 +68,10 @@ describe('lint', () => {
   });
 
   test('should validate the normalized message', () => {
-    const result = check('\n\nfeat: Add colors   \n# comment\n\n\n');
+    const result = check('\n\nfeat: add colors   \n# comment\n\n\n');
 
     expect(result.status).toBe('valid');
-    expect(result.final).toBe('feat: Add colors\n');
+    expect(result.final).toBe('feat: add colors\n');
   });
 
   test('should reject an empty message', () => {
@@ -82,8 +82,8 @@ describe('lint', () => {
   });
 
   test.each([
-    ['Revert "feat: Add colors"'],
-    ['fixup! feat: Add colors']
+    ['Revert "feat: add colors"'],
+    ['fixup! feat: add colors']
   ])('should ignore "%s"', (message) => {
     const result = check(message);
 
@@ -99,7 +99,7 @@ describe('lint', () => {
   });
 
   test('should apply merge.json to merge commits', () => {
-    const header = 'feat(cli): Add init command (#12)';
+    const header = 'feat(cli): add init command (#12)';
 
     expect(check(header, {type: COMMIT_TYPE.MERGE}).issues.map((issue: any) => issue.code)).toEqual(['BODY_REQUIRED']);
 
@@ -112,11 +112,11 @@ describe('lint', () => {
 
   test('should apply request.json to pull requests', () => {
     const description = 'This pull request adds the init command. It installs the hook and copies settings.';
-    const result = check(`feat(cli): Add init command (#12)\n\n${description}`, {type: COMMIT_TYPE.REQUEST});
+    const result = check(`feat(cli): add init command (#12)\n\n${description}`, {type: COMMIT_TYPE.REQUEST});
 
     expect(result.rules).toBe('request');
     expect(result.issues.map((issue: any) => issue.code)).toEqual(['HEADER_REFERENCE_FORBIDDEN']);
-    expect(check('feat(cli): Add init command\n\nToo short', {type: COMMIT_TYPE.REQUEST}).issues.map((issue: any) => issue.code))
+    expect(check('feat(cli): add init command\n\nToo short', {type: COMMIT_TYPE.REQUEST}).issues.map((issue: any) => issue.code))
       .toEqual(['BODY_TOO_SHORT']);
   });
 
@@ -135,7 +135,7 @@ describe('lint', () => {
       data.header.scope.required = true;
     });
 
-    const result = check('feat: Add colors');
+    const result = check('feat: add colors');
 
     expect(result.issues.map((issue: any) => issue.code)).toEqual(['SCOPE_REQUIRED']);
   });
@@ -146,7 +146,7 @@ describe('lint', () => {
       data.validator.severity = 'warning';
     });
 
-    const result = check('feat: add colors');
+    const result = check('feat: Add colors');
 
     expect(result.status).toBe('valid');
     expect(result.issues).toEqual([expect.objectContaining({code: 'SUBJECT_CASE', severity: 'warning'})]);
@@ -165,7 +165,7 @@ describe('lint', () => {
     copySettings(cwd);
     fs.writeFileSync(path.join(cwd, '.kysaro', 'settings', 'commits', 'commit.json'), '{ broken');
 
-    const result = check('feat: Add colors');
+    const result = check('feat: add colors');
 
     expect(result.status).toBe('valid');
   });

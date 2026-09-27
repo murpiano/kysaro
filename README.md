@@ -12,16 +12,16 @@ Strict commit message linter. Kysaro checks every commit message before it reach
 - Clear output with line numbers and a suggested header.
 
 ```text
-$ git commit -m "feat(UI): add dark theme."
+$ git commit -m "feat(UI): Add dark theme."
 [kysaro] ✖ Commit message is invalid
 
-  feat(UI): add dark theme.
+  feat(UI): Add dark theme.
 
   ✖ Scope "UI" must be in lower case  header.scope
-  ✖ Subject must start with an uppercase letter  header.subject
+  ✖ Subject must start with a lowercase letter  header.subject
   ✖ Subject must not end with a period  header.subject
 
-  Suggested header: feat(ui): Add dark theme
+  Suggested header: feat(ui): add dark theme
 ```
 
 ## Requirements
@@ -71,7 +71,7 @@ The merge button on GitHub does not run git hooks. To make it follow the rules:
 The default preset follows Conventional Commits with a few strict additions:
 
 ```text
-type(scope)!: Subject in sentence case
+type(scope)!: subject in lower case
 
 Optional body. Separated from the header by a blank line.
 Lines are at most 72 characters.
@@ -86,7 +86,7 @@ Refs: #42
 | type | one of `feat`, `fix`, `refactor`, `style`, `build`, `chore`, `docs`, `test`, `perf`, `ci`, `revert`, `merge`; lower case |
 | scope | optional, any value, lower case, one scope |
 | `!` | optional breaking change marker before `:` |
-| subject | at least 5 characters, starts with an uppercase letter, no trailing period |
+| subject | at least 5 characters, starts with a lowercase letter, no trailing period |
 | body | optional, blank line before it, lines up to 72 characters |
 | footer | optional, blank line before it, `Token: value` or `Token #value`, lines up to 72 characters |
 
@@ -144,6 +144,16 @@ Kysaro reads `.kysaro/settings` in the project root. A missing file falls back t
 Each file links its JSON Schema through `$schema`, so VS Code, WebStorm and other editors show descriptions, allowed values and errors inline.
 
 ### Common changes
+
+Start the subject with an uppercase letter, the default of 0.2 and earlier, in `commit.json`, `merge.json` and `request.json`:
+
+```json
+"subject": {
+  "minLength": 5,
+  "case": "sentence",
+  "disallowTrailingPeriod": true
+}
+```
 
 Require a scope from a fixed list, `commit.json`:
 
@@ -260,14 +270,14 @@ Run it on `push` and on `pull_request` with the types `opened`, `edited`, `synch
 ```js
 const {lint, createLinter, COMMIT_TYPE} = require('kysaro');
 
-const result = lint('feat(ui): Add dark theme', {cwd: process.cwd()});
+const result = lint('feat(ui): add dark theme', {cwd: process.cwd()});
 
 result.status;  // 'valid' | 'invalid' | 'ignored'
 result.rules;   // 'commit' | 'merge' | 'request'
 result.issues;  // [{code, message, severity, category, path, meta}]
 
 const check = createLinter();  // loads settings once
-check('feat: Add x (#12)\n\nDescription…', COMMIT_TYPE.MERGE);
+check('feat: add x (#12)\n\nDescription…', COMMIT_TYPE.MERGE);
 ```
 
 `parseMessage(message)` returns the message AST without validation. TypeScript declarations are included.

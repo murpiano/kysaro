@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Breaking changes
+
+- The default preset follows Conventional Commits in the subject case: the subject starts with a lowercase letter (`feat: add dark theme`), in commits, merge commits and pull requests. Settings copied by `kysaro init` keep `"case": "sentence"`; to keep the old rule without them, set `header.subject.case` to `sentence`.
+
 ## [0.2.0] - 2026-09-27
 
 ### Breaking changes

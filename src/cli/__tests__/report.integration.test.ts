@@ -48,7 +48,7 @@ describe('check report', () => {
     expect(report).toContain('Checked: 2026-09-27T10:00:00.000Z');
     expect(report).toContain('Kind: commit · Rules: package default `commit.json`');
     expect(report).toContain('| 1 | header.scope | Scope "UI" must be in lower case | `SCOPE_CASE` |');
-    expect(report).toContain('### Suggested message\n\n```text\nfeat(ui): Add colors\n\nBody text\n```');
+    expect(report).toContain('### Suggested message\n\n```text\nfeat(ui): add colors\n\nBody text\n```');
     expect(report).toContain('git commit -e -F .git/COMMIT_EDITMSG');
   });
 
@@ -69,7 +69,7 @@ describe('check report', () => {
     expect(streams.stderr.output).toContain(`Report with fixes: ${path.join('.kysaro', 'report.md')}`);
     expect(fs.readFileSync(path.join(cwd, '.kysaro', 'report.md'), 'utf8')).toContain('`HEADER_FORMAT`');
 
-    await run(['-m', 'feat: Add colors', '--type', 'commit'], io());
+    await run(['-m', 'feat: add colors', '--type', 'commit'], io());
 
     expect(fs.readFileSync(path.join(cwd, '.kysaro', 'report.md'), 'utf8')).toContain('1 message(s) checked, no errors');
   });

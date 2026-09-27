@@ -60,7 +60,7 @@ describe('kysaro CLI', () => {
   describe('check', () => {
 
     test('should exit 0 silently for a valid message file', async () => {
-      fs.writeFileSync(path.join(cwd, 'COMMIT_EDITMSG'), 'feat(cli): Add init command\n');
+      fs.writeFileSync(path.join(cwd, 'COMMIT_EDITMSG'), 'feat(cli): add init command\n');
       const io = createIo(cwd);
 
       await expect(run(['COMMIT_EDITMSG', '--type', 'commit'], io)).resolves.toBe(EXIT_CODE.OK);
@@ -74,7 +74,7 @@ describe('kysaro CLI', () => {
       expect(io.stderr.output).toContain('Commit message is invalid');
       expect(io.stderr.output).toContain('Scope "UI" must be in lower case');
       expect(io.stderr.output).toContain('Subject must not end with a period');
-      expect(io.stderr.output).toContain('Suggested header: feat(ui): Add colors');
+      expect(io.stderr.output).toContain('Suggested header: feat(ui): add colors');
     });
 
     test('should read the message from stdin', async () => {
@@ -107,7 +107,7 @@ describe('kysaro CLI', () => {
 
     test('should exit 2 for unknown options and types', async () => {
       await expect(run(['--nope'], createIo(cwd))).resolves.toBe(EXIT_CODE.ERROR);
-      await expect(run(['-m', 'feat: Add x', '--type', 'pr'], createIo(cwd))).resolves.toBe(EXIT_CODE.ERROR);
+      await expect(run(['-m', 'feat: add x', '--type', 'pr'], createIo(cwd))).resolves.toBe(EXIT_CODE.ERROR);
     });
 
     test('should print help and version', async () => {
@@ -204,7 +204,7 @@ describe('kysaro CLI', () => {
       expect(fs.readFileSync(path.join(cwd, '.gitignore'), 'utf8')).toBe('.kysaro/*.md\n');
 
       const io = createIo(cwd);
-      await expect(run(['-m', 'feat: Add colors', '--type', 'commit'], io)).resolves.toBe(EXIT_CODE.OK);
+      await expect(run(['-m', 'feat: add colors', '--type', 'commit'], io)).resolves.toBe(EXIT_CODE.OK);
       expect(log).not.toHaveBeenCalled();
     });
   });

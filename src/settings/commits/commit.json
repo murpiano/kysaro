@@ -24,7 +24,7 @@
     },
     "subject": {
       "minLength": 5,
-      "case": "sentence",
+      "case": "lower",
       "disallowTrailingPeriod": true
     }
   },
