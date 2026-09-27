@@ -2,8 +2,8 @@ name: CI
 
 on:
   push:
-    branches: [main]
   pull_request:
+    types: [opened, edited, synchronize, reopened]
 
 jobs:
   test:
@@ -31,8 +31,8 @@ jobs:
       - name: Run all tests
         run: npm test
 
-  commits:
-    name: Commit messages
+  kysaro:
+    name: kysaro
     runs-on: ubuntu-latest
 
     steps:
@@ -50,22 +50,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Check commit messages with kysaro
-        env:
-          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
-          HEAD: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-        run: |
-          if [ -z "$BASE" ] || ! git cat-file -e "$BASE^{commit}" 2> /dev/null; then
-            echo "No base commit to compare with (new branch or force-push), skipping"
-            exit 0
-          fi
-
-          status=0
-          for sha in $(git rev-list --no-merges "$BASE..$HEAD"); do
-            git log -1 --format=%B "$sha" > "$RUNNER_TEMP/message"
-            if ! node bin/cli.js --type commit "$RUNNER_TEMP/message"; then
-              echo "::error::Commit $sha has an invalid message"
-              status=1
-            fi
-          done
-          exit $status
+      - name: Check messages with kysaro
+        run: node bin/cli.js ci
