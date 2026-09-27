@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented in this file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Breaking changes
+
+- Merge commits are checked by `merge.json` instead of being skipped. The default git message `Merge branch 'x'` is rejected. To skip merge commits as before, set `ignore.kinds` to `["merge", "revert"]` in `main.json`.
+- `merge.json` and `request.json` use the `commit.json` format. Files in the old format fall back to the package defaults with a warning; run `npx kysaro init --force` to replace them.
+- `kysaro init` sets up everything at once; `--settings` is no longer needed.
+
+### Added
+
+- `kysaro ci` checks, in GitHub Actions, the title, description and commits of every pull request and the commits of every push to any branch.
+- `kysaro --range <base>..<head>` checks every commit of a range. Merge commits are checked by `merge.json`; `fixup!`, `squash!` and `amend!` commits fail.
+- `.kysaro/report.md` with the problems, a suggested message and the commands to fix it after every check; the same report in the GitHub job summary.
+- `kysaro init` creates `.github/workflows/kysaro.yml`.
+- `header.reference` allows, requires or forbids the ` (#123)` suffix that GitHub adds on merge and squash.
+- `body.minLength`; `maxLineLength: 0` turns the line length check off.
+- `createLinter()` loads settings once for many checks; results report `kind` and `rules`.
+
 ## [0.1.1] - 2026-09-26
 
 ### Changed
