@@ -15,8 +15,10 @@ const {getSettings} = require("./settings");
 const FALLBACK_OUTPUT = {invalid: 'return'};
 
 
-function createInitialResult(raw) {
+function createInitialResult(raw, kind) {
   return ({
+    kind,
+    rules: null,
     original: raw,
     generated: null,
     status: null,
@@ -92,14 +94,16 @@ function markIgnored(result) {
  */
 function pipeline(raw = '', manualCommitType = null, configuration = createConfiguration(), loaderOptions = {}) {
   const commitType = resolveCommitType(manualCommitType);
-  const {settings, issues: loaderIssues} = getSettings(configuration, loaderOptions);
-  let result = createInitialResult(raw);
+  const {settings, issues: loaderIssues} = getSettings(configuration, commitType, loaderOptions);
+  let result = createInitialResult(raw, commitType);
 
   if (!settings) {
     return output(FALLBACK_OUTPUT, withConfigurationError(result, loaderIssues));
   }
 
   const context = createCommitContext(settings, commitType);
+
+  result = {...result, rules: settings.rules};
 
   result = applyNormalizer(result, context);
 

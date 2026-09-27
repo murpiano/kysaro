@@ -98,6 +98,28 @@ describe('lint', () => {
     expect(result.issues.map((issue: any) => issue.code)).toContain('HEADER_FORMAT');
   });
 
+  test('should apply merge.json to merge commits', () => {
+    const header = 'feat(cli): Add init command (#12)';
+
+    expect(check(header, {type: COMMIT_TYPE.MERGE}).issues.map((issue: any) => issue.code)).toEqual(['BODY_REQUIRED']);
+
+    const result = check(`${header}\n\n${'Adds the init command that installs the hook. '.repeat(2)}`, {type: COMMIT_TYPE.MERGE});
+
+    expect(result.status).toBe('valid');
+    expect(result.rules).toBe('merge');
+    expect(result.kind).toBe(COMMIT_TYPE.MERGE);
+  });
+
+  test('should apply request.json to pull requests', () => {
+    const description = 'This pull request adds the init command. It installs the hook and copies settings.';
+    const result = check(`feat(cli): Add init command (#12)\n\n${description}`, {type: COMMIT_TYPE.REQUEST});
+
+    expect(result.rules).toBe('request');
+    expect(result.issues.map((issue: any) => issue.code)).toEqual(['HEADER_REFERENCE_FORBIDDEN']);
+    expect(check('feat(cli): Add init command\n\nToo short', {type: COMMIT_TYPE.REQUEST}).issues.map((issue: any) => issue.code))
+      .toEqual(['BODY_TOO_SHORT']);
+  });
+
   test('should ignore merge commits when merge is in ignore.kinds', () => {
     copySettings(cwd);
     editSettings(cwd, 'main/main.json', data => {

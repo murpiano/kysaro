@@ -86,6 +86,10 @@ export interface ParsedMessage {
 }
 
 export interface KysaroContract {
+    /** Message kind the rules were chosen for. */
+    kind: CommitKindType;
+    /** Applied settings file: `commit`, `merge` or `request`; `null` when settings failed to load. */
+    rules: 'commit' | 'merge' | 'request' | null;
     original: string;
     generated: string | null;
     status: ValidateStatusType | null;
