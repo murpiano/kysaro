@@ -165,6 +165,34 @@ describe('kysaro CLI', () => {
       expect(fs.readFileSync(hook, 'utf8')).toContain('kysaro');
     });
 
+    test('should set up everything in one run', async () => {
+      git('init', '-q');
+
+      const io = createIo(cwd);
+      await expect(run(['init'], io)).resolves.toBe(EXIT_CODE.OK);
+
+      expect(fs.existsSync(path.join(cwd, '.git', 'hooks', 'commit-msg'))).toBe(true);
+      expect(fs.existsSync(path.join(cwd, '.kysaro', 'settings', 'commits', 'merge.json'))).toBe(true);
+      expect(fs.readFileSync(path.join(cwd, '.github', 'workflows', 'kysaro.yml'), 'utf8')).toContain('npx kysaro ci');
+      expect(fs.readFileSync(path.join(cwd, '.gitignore'), 'utf8')).toBe('.kysaro/*.md\n');
+    });
+
+    test('should keep an existing workflow without --force', async () => {
+      git('init', '-q');
+      const workflow = path.join(cwd, '.github', 'workflows', 'kysaro.yml');
+      fs.mkdirSync(path.dirname(workflow), {recursive: true});
+      fs.writeFileSync(workflow, 'custom');
+
+      const io = createIo(cwd);
+      await run(['init'], io);
+
+      expect(fs.readFileSync(workflow, 'utf8')).toBe('custom');
+      expect(io.stdout.output).toContain('Kept existing .github/workflows/kysaro.yml');
+
+      await run(['init', '--force'], createIo(cwd));
+      expect(fs.readFileSync(workflow, 'utf8')).toContain('npx kysaro ci');
+    });
+
     test('should copy settings that the loader accepts', async () => {
       git('init', '-q');
 

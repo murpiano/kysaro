@@ -30,13 +30,12 @@ const HELP = `Usage:
   kysaro < message.txt       Check a message from stdin
   kysaro --range <a>..<b>    Check every commit of a range
   kysaro ci                  Check the pull request and pushed commits in GitHub Actions
-  kysaro init                Install the commit-msg hook
-  kysaro init --settings     Also copy default settings to .kysaro/settings
+  kysaro init                Set up the hook, settings, CI workflow and .gitignore
 
 Options:
   -m, --message <text>       Message to check
       --type <kind>          Message kind: commit, merge, request (detected by default)
-      --force                init: overwrite existing hook and settings
+      --force                init: overwrite existing hook, settings and workflow
   -h, --help                 Show help
   -v, --version              Show version
 
@@ -215,7 +214,7 @@ function runRange(args, io) {
 }
 
 function runInit(args, io) {
-  init({cwd: io.cwd, settings: Boolean(args.values.settings), force: Boolean(args.values.force)})
+  init({cwd: io.cwd, force: Boolean(args.values.force)})
     .forEach(line => io.stdout.write(`[kysaro] ${line}\n`));
 
   return EXIT_CODE.OK;

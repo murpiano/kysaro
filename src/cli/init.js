@@ -16,6 +16,9 @@ const SCHEMAS_PATH = '../../../node_modules/kysaro/src/settings/schemas';
 
 const SETTINGS_GROUPS = ['main', 'commits', 'resources'];
 
+const WORKFLOW_PATH = path.join('.github', 'workflows', 'kysaro.yml');
+const WORKFLOW_TEMPLATE = path.join(__dirname, 'templates', 'kysaro.yml');
+
 class InitError extends Error {
   constructor(message) {
     super(message);
@@ -103,46 +106,74 @@ function copySettings(root, force) {
       });
   });
 
-  const gitignore = path.join(root, '.gitignore');
-  const current = fs.existsSync(gitignore) ? fs.readFileSync(gitignore, 'utf8') : '';
-
-  if (!current.split(/\r?\n/u).includes(REPORTS_IGNORE)) {
-    const separator = current && !current.endsWith('\n') ? '\n' : '';
-    fs.writeFileSync(gitignore, `${current}${separator}${REPORTS_IGNORE}\n`);
-    messages.push(`Added ${REPORTS_IGNORE} to .gitignore`);
-  }
-
   return messages;
 }
 
 /**
- * `kysaro init`: installs the hook and optionally copies settings.
+ * Ignores check and settings reports in git.
+ */
+function ignoreReports(root) {
+  const gitignore = path.join(root, '.gitignore');
+  const current = fs.existsSync(gitignore) ? fs.readFileSync(gitignore, 'utf8') : '';
+
+  if (current.split(/\r?\n/u).includes(REPORTS_IGNORE)) {
+    return [];
+  }
+
+  const separator = current && !current.endsWith('\n') ? '\n' : '';
+  fs.writeFileSync(gitignore, `${current}${separator}${REPORTS_IGNORE}\n`);
+
+  return [`Added ${REPORTS_IGNORE} to .gitignore`];
+}
+
+/**
+ * Creates the GitHub Actions workflow that runs `kysaro ci`.
+ */
+function installWorkflow(root, force) {
+  const target = path.join(root, WORKFLOW_PATH);
+  const relative = path.relative(root, target);
+
+  if (fs.existsSync(target) && !force) {
+    return `Kept existing ${relative}`;
+  }
+
+  fs.mkdirSync(path.dirname(target), {recursive: true});
+  fs.copyFileSync(WORKFLOW_TEMPLATE, target);
+
+  return `Created ${relative}`;
+}
+
+/**
+ * `kysaro init`: connects kysaro to the repository in one step.
+ *
+ * Installs the commit-msg hook, copies default settings, creates the
+ * GitHub Actions workflow and ignores reports in git. Existing files
+ * are kept unless `force` is set.
  *
  * @param {Object} params
  * @param {string} params.cwd
- * @param {boolean} [params.settings=false] Copy default settings.
  * @param {boolean} [params.force=false] Overwrite existing files.
  * @returns {string[]} Messages for the user.
  * @throws {InitError}
  */
-function init({cwd, settings = false, force = false}) {
+function init({cwd, force = false}) {
   const root = git(['rev-parse', '--show-toplevel'], cwd);
 
   if (!root) {
     throw new InitError('Not a git repository. Run "git init" first');
   }
 
-  const messages = [installHook(root, force)];
-
-  if (settings) {
-    messages.push(...copySettings(root, force));
-  }
-
-  return messages;
+  return [
+    installHook(root, force),
+    ...copySettings(root, force),
+    installWorkflow(root, force),
+    ...ignoreReports(root)
+  ];
 }
 
 module.exports = {
   init,
+  WORKFLOW_PATH,
   InitError,
   HOOK_COMMAND
 };
