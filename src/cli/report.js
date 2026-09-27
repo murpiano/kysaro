@@ -24,6 +24,12 @@ const STATUS_ICON = {
   [VALIDATE_STATUS.IGNORED]: '➖'
 };
 
+const KIND_LABEL = {
+  [COMMIT_TYPE.COMMIT]: 'commit',
+  [COMMIT_TYPE.MERGE]: 'merge commit',
+  [COMMIT_TYPE.REQUEST]: 'pull request'
+};
+
 const escapeCell = value => String(value ?? '').replace(/\|/gu, '\\|').replace(/\n/gu, ' ');
 
 function issueLine(issue) {
@@ -96,7 +102,7 @@ function entrySection(entry, mode, cwd) {
   const lines = [
     `## ${STATUS_ICON[result.status] || '⚠'} ${label} — ${result.status}`,
     '',
-    `Kind: \`${result.kind || '—'}\` · Rules: ${rulesFile(result, cwd)}`,
+    `Kind: ${KIND_LABEL[result.kind] || '—'} · Rules: ${rulesFile(result, cwd)}`,
     '',
     '```text',
     String(result.final || result.original || '').replace(/\n$/u, ''),

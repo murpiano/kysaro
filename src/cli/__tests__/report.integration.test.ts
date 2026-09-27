@@ -46,7 +46,7 @@ describe('check report', () => {
 
     expect(report).toContain('✖ 1 of 1 message(s) are invalid');
     expect(report).toContain('Checked: 2026-09-27T10:00:00.000Z');
-    expect(report).toContain('Rules: package default `commit.json`');
+    expect(report).toContain('Kind: commit · Rules: package default `commit.json`');
     expect(report).toContain('| 1 | header.scope | Scope "UI" must be in lower case | `SCOPE_CASE` |');
     expect(report).toContain('### Suggested message\n\n```text\nfeat(ui): Add colors\n\nBody text\n```');
     expect(report).toContain('git commit -e -F .git/COMMIT_EDITMSG');
