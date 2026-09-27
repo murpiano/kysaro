@@ -77,12 +77,44 @@ flowchart TD
 | `kysaro <file>` | проверить файл сообщения (хук `commit-msg` передаёт путь в `$1`) |
 | `kysaro -m <message>` | проверить текст |
 | `kysaro < file` | проверить stdin |
-| `kysaro init` | установить хук `commit-msg`: в `.husky/commit-msg`, если есть `.husky`, иначе в каталог хуков git |
-| `kysaro init --settings` | также скопировать настройки по умолчанию в `.kysaro/settings` и добавить `.kysaro/*.md` в `.gitignore` |
+| `kysaro --range <base>..<head>` | проверить каждый коммит диапазона |
+| `kysaro ci` | проверить всё в GitHub Actions (см. ниже) |
+| `kysaro init` | подключить kysaro к репозиторию (см. ниже) |
 
-`--type commit|merge|request` задаёт вид сообщения вместо автоопределения. `--force` разрешает `init` перезаписать чужой хук и существующие настройки.
+`--type commit|merge|request` задаёт вид сообщения вместо автоопределения. `--force` разрешает `init` перезаписать существующие файлы.
 
-Коды выхода: `0` — `valid` или `ignored`, `1` — `invalid`, `2` — ошибка аргументов или настроек. Проблемы пишутся в stderr. Для валидного сообщения без предупреждений вывода нет. Если validator предложил исправления заголовка, CLI показывает исправленный заголовок, но файл сообщения не меняет.
+`kysaro init` за один запуск:
+
+1. ставит хук `commit-msg`: в `.husky/commit-msg`, если есть `.husky`, иначе в каталог хуков git;
+2. копирует настройки по умолчанию в `.kysaro/settings` со ссылками `$schema` на схемы пакета;
+3. создаёт workflow `.github/workflows/kysaro.yml`, который запускает `npx kysaro ci`;
+4. добавляет `.kysaro/*.md` в `.gitignore`.
+
+Существующие файлы не перезаписываются без `--force`. Флаг `--settings` оставлен для совместимости и ничего не меняет.
+
+`kysaro ci` читает окружение GitHub Actions:
+
+- событие `pull_request`: title и description PR проверяются по `request.json`, коммиты `base..head` — как в `--range`;
+- событие `push`: коммиты `before..after`. Для новой ветки (`before` пустой или отсутствует в истории) проверяются коммиты, которых нет в других ветках `origin`.
+
+Проверка диапазона (`--range` и `ci`):
+
+- коммит с двумя и более родителями проверяется по `merge.json`, остальные — по `commit.json`;
+- `fixup!`, `squash!`, `amend!` — ошибка `COMMIT_NOT_SQUASHED`: такие коммиты схлопываются до merge. В хуке `commit-msg` они по-прежнему пропускаются;
+- `ignore.kinds` и остальные `ignore.patterns` действуют как в хуке.
+
+Коды выхода: `0` — `valid` или `ignored`, `1` — `invalid`, `2` — ошибка аргументов или настроек. Проблемы пишутся в stderr. Для валидного сообщения без предупреждений вывода нет. CLI показывает исправленный заголовок, но файл сообщения не меняет.
+
+### 2.4. Отчёт проверки
+
+Если есть каталог `.kysaro`, каждая проверка перезаписывает `.kysaro/report.md`: статус, вид сообщения, файл правил, текст сообщения, таблица проблем (строка, раздел, сообщение, код), исправленный заголовок и команды для исправления. Для диапазона отчёт содержит все невалидные коммиты. В GitHub Actions тот же текст дописывается в `$GITHUB_STEP_SUMMARY`. CLI при ошибке печатает путь к отчёту.
+
+Команды для исправления в отчёте:
+
+- хук `commit-msg`: git сохранил сообщение в `.git/COMMIT_EDITMSG`, исправить — `git commit -e -F .git/COMMIT_EDITMSG`;
+- merge с дефолтным `Merge branch …`: `git commit -e` во время merge или `git pull --rebase` вместо merge;
+- последний коммит: `git commit --amend`; более ранние — `git rebase -i` с `reword`;
+- PR: изменить title или description, проверка перезапустится.
 
 ## 3. Конфигурация
 
@@ -92,8 +124,8 @@ flowchart TD
 |---|---|
 | `.kysaro/settings/main/main.json` | этапы pipeline |
 | `.kysaro/settings/commits/commit.json` | правила обычного коммита |
-| `.kysaro/settings/commits/merge.json` | правила merge-коммита |
-| `.kysaro/settings/commits/request.json` | правила pull request |
+| `.kysaro/settings/commits/merge.json` | правила merge-коммита (локальный `git merge` и кнопка merge на GitHub) |
+| `.kysaro/settings/commits/request.json` | правила title и description pull request |
 | `.kysaro/settings/resources/types.json` | допустимые `type` |
 | `.kysaro/settings/resources/scopes.json` | допустимые `scope` |
 | `.kysaro/settings/resources/tokens.json` | допустимые токены footer |
@@ -148,7 +180,7 @@ Loader пишет отчёты о загрузке в `.kysaro/<группа>.md
 | `fixer.mode` | `apply`, `suggest` | `apply` | Применять исправления или только предлагать |
 | `fixer.confidenceThreshold` | число | `1` | Порог уверенности для применения исправлений |
 | `output.invalid` | `return`, `throw` | `return` | Что делать при ошибках: вернуть результат или бросить `KysaroException` |
-| `ignore?.kinds?` | `merge`, `revert` | `["merge", "revert"]` | Игнорируемые виды сообщений |
+| `ignore?.kinds?` | `merge`, `revert` | `["revert"]` | Игнорируемые виды сообщений |
 | `ignore?.patterns?` | `string[]` | `["fixup! ", "squash! ", "amend! "]` | Игнорируемые паттерны |
 
 Поведение generator:
@@ -194,6 +226,7 @@ TODO в схеме `main.schema.json`:
 | `type.value` | `any` или `{fromFiles: ["types.json"], inline: string[]}` | Источник допустимых значений |
 | `type.case` | `lower`, `upper`, `sentence`, `match-source`, `any` | Регистр |
 | `type.onUnknown?` | `error`, `ignore` | Действие при неизвестном значении |
+| `reference?` | `allow`, `require`, `forbid` | Суффикс ` (#123)` в конце заголовка, который GitHub добавляет при merge и squash. Не входит в subject, входит в `maxLength` |
 | `scope.required` | `true`, `false`, `when` | Обязательность, см. `when` ниже |
 | `scope.allowEmpty?` | `true`, `false` | Разрешить пустой scope `type(): …` |
 | `scope.source` | `any`, файл `scopes.json`, inline-список | Допустимые значения |
@@ -270,8 +303,9 @@ TODO в схеме `main.schema.json`:
 | Параметр | Значения | Описание |
 |---|---|---|
 | `required` | `true`, `false`, `when` | Обязательность |
+| `minLength?` | число | Минимальная длина body без пробелов по краям |
 | `blankLineBefore` | `true`, `false` | Пустая строка перед body |
-| `maxLineLength` | `72` | Максимальная длина строки |
+| `maxLineLength` | `72` | Максимальная длина строки, `0` — без проверки |
 | `trim?` | `true`, `false` | Убрать пробелы по краям |
 | `maxConsecutiveEmptyLines?` | `1` | Максимум пустых строк подряд |
 
@@ -281,7 +315,7 @@ TODO в схеме `main.schema.json`:
 |---|---|---|
 | `required` | `true`, `false`, `when` без `tokens` | Обязательность |
 | `blankLineBefore` | `true`, `false` | Пустая строка перед footer |
-| `maxLineLength` | `72` | Максимальная длина строки |
+| `maxLineLength` | `72` | Максимальная длина строки, `0` — без проверки |
 | `format` | `token: value` | Формат строки footer |
 | `token.source` | `any`, файл `tokens.json`, inline-список | Допустимые токены |
 | `token.case` | `lower`, `upper`, `match-source`, `any` | Регистр токена |
@@ -307,15 +341,28 @@ TODO в схеме `main.schema.json`:
 
 ### 3.5. merge.json и request.json
 
-Статус: файлы и схемы ещё в формате старого протокола (`use`, `index`, `spaceAfter`). Нужно перевести на формат `commit.json`. До перевода pipeline применяет к любому сообщению правила `commit.json`, а merge-коммиты пропускает через `ignore.kinds`.
+Формат и схема те же, что у `commit.json`. Схемы `merge.schema.json` и `request.schema.json` генерирует `scripts/build-schemas.js` из `commit.schema.json`; тест проверяет, что они совпадают.
 
-Требования старого протокола, без эмодзи. Пересмотреть при переводе:
+Сообщение PR для проверки: `<title>\n\n<description>`.
 
-- Merge-коммит: заголовок `merge(scope): subject #<номер PR>`, максимум 80 символов. Body обязателен, минимум 50 символов, свободный формат.
-- Pull request: заголовок в формате merge-коммита, но без `#<номер>` (GitHub добавляет его сам), максимум 72 символа. Описание обязательно, минимум 50 символов, оно становится body merge-коммита.
-- Нарушение правил PR должно валить проверку в GitHub Actions и блокировать merge.
+Отличия настроек по умолчанию:
 
-Кнопка merge на GitHub не запускает локальные хуки. Поэтому merge-коммиты и PR проверяются только в CI.
+| | `commit.json` | `request.json` | `merge.json` |
+|---|---|---|---|
+| `header.maxLength` | 72 | 72 | 80 |
+| `header.reference` | `allow` | `forbid` | `allow` |
+| `body.required` | `false` | `true` | `true` |
+| `body.minLength` | — | 50 | 50 |
+| `body.maxLineLength` | 72 | 0 (без проверки, Markdown) | 0 |
+| `footer.maxLineLength` | 72 | 0 | 0 |
+
+Дефолтное сообщение git `Merge branch 'x'` не проходит проверку `merge.json`.
+
+Кнопка merge на GitHub не запускает хуки. Контроль:
+
+- `kysaro ci` проверяет PR, статус нужно сделать обязательным (branch protection → required status check `kysaro`);
+- настройка репо «Default commit message → Pull request title and description» делает merge-коммит из проверенных title и description;
+- push в любую ветку, включая итоговый merge-коммит в `main`, проверяет `kysaro ci`.
 
 ### 3.6. Ресурсы
 
@@ -349,8 +396,10 @@ TODO в схеме `main.schema.json`:
 | type | `TYPE_EMPTY`, `TYPE_UNKNOWN`, `TYPE_CASE` |
 | scope | `SCOPE_REQUIRED`, `SCOPE_EMPTY`, `SCOPE_EMPTY_ITEM`, `SCOPE_TOO_MANY`, `SCOPE_TOO_FEW`, `SCOPE_DUPLICATE`, `SCOPE_SEPARATOR_SPACING`, `SCOPE_UNKNOWN`, `SCOPE_CASE` |
 | subject | `SUBJECT_EMPTY`, `SUBJECT_TOO_SHORT`, `SUBJECT_CASE`, `SUBJECT_TRAILING_PERIOD`, `SUBJECT_WHITESPACE` |
-| body | `BODY_REQUIRED`, `BODY_LEADING_BLANK`, `BODY_LINE_TOO_LONG`, `BODY_WHITESPACE`, `BODY_EMPTY_LINES` |
+| body | `BODY_REQUIRED`, `BODY_TOO_SHORT`, `BODY_LEADING_BLANK`, `BODY_LINE_TOO_LONG`, `BODY_WHITESPACE`, `BODY_EMPTY_LINES` |
 | footer | `FOOTER_REQUIRED`, `FOOTER_LEADING_BLANK`, `FOOTER_LINE_TOO_LONG`, `FOOTER_TOO_MANY`, `FOOTER_TOO_FEW`, `FOOTER_DUPLICATE_TOKEN`, `FOOTER_TOKEN_UNKNOWN`, `FOOTER_TOKEN_CASE`, `FOOTER_VALUE_TOO_SHORT`, `FOOTER_VALUE_CASE` |
+| reference | `HEADER_REFERENCE_REQUIRED`, `HEADER_REFERENCE_FORBIDDEN` |
+| range | `COMMIT_NOT_SQUASHED` |
 | breakingChange | `BREAKING_HEADER_REQUIRED`, `BREAKING_HEADER_FORBIDDEN`, `BREAKING_FOOTER_REQUIRED`, `BREAKING_FOOTER_FORBIDDEN`, `BREAKING_FOOTER_DESCRIPTION`, `BREAKING_MISSING` |
 
 Номера строк в `meta.line` и в тексте ошибок считаются от начала сообщения, с 1.
