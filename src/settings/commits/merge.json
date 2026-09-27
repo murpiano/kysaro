@@ -1,82 +1,56 @@
 {
   "$schema": "../schemas/merge.schema.json",
+  "preset": "Conventional Commits",
   "header": {
-    "minLength": 20,
     "maxLength": 80,
+    "format": "type(scope): subject",
+    "reference": "allow",
     "type": {
-      "use": "required",
-      "useOnlyMerge": "required",
-      "case": "lower",
-      "spaceAfter": "required",
-      "index": 1
+      "value": {
+        "fromFiles": [
+          "../resources/types.json"
+        ]
+      },
+      "case": "lower"
     },
     "scope": {
-      "use": "required",
+      "required": false,
+      "source": "any",
       "case": "lower",
-      "spaceAfter": "required",
-      "index": 2
-    },
-    "colon": {
-      "use": "required",
-      "spaceAfter": "required",
-      "index": 3
+      "multiple": {
+        "maxItems": 1
+      },
+      "onMultiple": "join"
     },
     "subject": {
-      "use": "required",
-      "case": "lower",
-      "spaceAfter": "forbidden",
-      "index": 4
-    },
-    "#PRNumber": {
-      "use": "required",
-      "spaceAfter": "forbidden",
-      "index": 5
-    },
-    "endSymbol": {
-      "use": "forbidden",
-      "typeSymbol": "."
+      "minLength": 5,
+      "case": "sentence",
+      "disallowTrailingPeriod": true
     }
   },
   "body": {
     "required": true,
     "minLength": 50,
-    "maxLength": 200,
-    "eachItem": {
-      "maxLength": 200,
-      "startDash": {
-        "use": "optional",
-        "spaceAfter": "required",
-        "index": 0
-      },
-      "type": {
-        "use": "optional",
-        "case": "lower",
-        "matchHeader": "required",
-        "spaceAfter": "required",
-        "index": 1
-      },
-      "scope": {
-        "use": "optional",
-        "case": "lower",
-        "matchHeader": "required",
-        "spaceAfter": "required",
-        "index": 1
-      },
-      "colon": {
-        "use": "optional",
-        "spaceAfter": "required",
-        "index": 1
-      },
-      "text": {
-        "use": "required",
-        "case": "lower",
-        "spaceAfter": "forbidden",
-        "index": 1
-      },
-      "endSymbol": {
-        "use": "required",
-        "typeSymbol": "."
-      }
+    "blankLineBefore": true,
+    "maxLineLength": 0
+  },
+  "footer": {
+    "required": false,
+    "blankLineBefore": true,
+    "maxLineLength": 0,
+    "format": "token: value",
+    "token": {
+      "source": "any",
+      "case": "match-source"
+    },
+    "value": {
+      "minLength": 1,
+      "case": "any"
     }
+  },
+  "breakingChange": {
+    "header": "allow",
+    "footer": "allow",
+    "requireAtLeastOne": false
   }
 }

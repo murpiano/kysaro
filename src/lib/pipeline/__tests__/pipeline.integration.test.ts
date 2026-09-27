@@ -82,7 +82,6 @@ describe('lint', () => {
   });
 
   test.each([
-    ["Merge branch 'main' into feature"],
     ['Revert "feat: Add colors"'],
     ['fixup! feat: Add colors']
   ])('should ignore "%s"', (message) => {
@@ -92,7 +91,19 @@ describe('lint', () => {
     expect(result.ignored).toBe(true);
   });
 
-  test('should ignore any header of a merge commit', () => {
+  test('should reject the default git merge message', () => {
+    const result = check("Merge branch 'main' into feature", {type: COMMIT_TYPE.MERGE});
+
+    expect(result.status).toBe('invalid');
+    expect(result.issues.map((issue: any) => issue.code)).toContain('HEADER_FORMAT');
+  });
+
+  test('should ignore merge commits when merge is in ignore.kinds', () => {
+    copySettings(cwd);
+    editSettings(cwd, 'main/main.json', data => {
+      data.ignore.kinds = ['merge'];
+    });
+
     expect(check('whatever', {type: COMMIT_TYPE.MERGE}).status).toBe('ignored');
   });
 

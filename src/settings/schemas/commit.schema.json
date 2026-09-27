@@ -36,10 +36,16 @@
       "type": "object",
       "patternProperties": {
         "^maxLength$": {
-          "type": "number"
+          "type": "number",
+          "description": "Maximum length of the whole header, including the reference suffix."
         },
         "^format$": {
           "type": "string"
+        },
+        "^reference$": {
+          "type": "string",
+          "enum": ["allow", "require", "forbid"],
+          "description": "Reference suffix \" (#123)\" at the end of the header. GitHub adds it on merge and squash. allow — optional, require — mandatory, forbid — not allowed. The suffix is not part of the subject."
         },
         "^type$": {
           "$ref": "#/$defs/TypeContract"
@@ -382,11 +388,18 @@
             }
           ]
         },
+        "^minLength$": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum length of the body without surrounding whitespace."
+        },
         "^blankLineBefore$": {
           "type": "boolean"
         },
         "^maxLineLength$": {
-          "type": "number"
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum line length. 0 disables the check."
         },
         "^trim$": {
           "type": "boolean"
@@ -430,7 +443,9 @@
           "type": "boolean"
         },
         "^maxLineLength$": {
-          "type": "number"
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum line length. 0 disables the check."
         },
         "^format$": {
           "type": "string"

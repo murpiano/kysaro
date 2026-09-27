@@ -84,11 +84,11 @@ describe('kysaro CLI', () => {
       expect(io.stderr.output).toContain('Header must match');
     });
 
-    test('should ignore merge commits', async () => {
+    test('should reject the default merge message', async () => {
       const io = createIo(cwd);
 
-      await expect(run(['-m', 'anything', '--type', 'merge'], io)).resolves.toBe(EXIT_CODE.OK);
-      expect(io.stderr.output).toBe('');
+      await expect(run(['-m', "Merge branch 'feature'", '--type', 'merge'], io)).resolves.toBe(EXIT_CODE.INVALID);
+      expect(io.stderr.output).toContain('Header must match');
     });
 
     test('should exit 2 for a missing file', async () => {

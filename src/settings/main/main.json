@@ -42,7 +42,7 @@
     "invalid": "return"
   },
   "ignore": {
-    "kinds": ["merge", "revert"],
+    "kinds": ["revert"],
     "patterns": ["fixup! ", "squash! ", "amend! "]
   }
 }

@@ -46,6 +46,7 @@
   },
   "scripts": {
     "start": "node scripts/playground.js",
+    "build:schemas": "node scripts/build-schemas.js",
     "prepare": "husky",
     "test": "jest",
     "test:watch": "jest --watch",

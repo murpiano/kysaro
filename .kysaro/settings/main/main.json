@@ -43,7 +43,6 @@
   },
   "ignore": {
     "kinds": [
-      "merge",
       "revert"
     ],
     "patterns": [

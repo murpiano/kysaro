@@ -4,9 +4,12 @@
   "header": {
     "maxLength": 72,
     "format": "type(scope): subject",
+    "reference": "allow",
     "type": {
       "value": {
-        "fromFiles": ["../resources/types.json"]
+        "fromFiles": [
+          "../resources/types.json"
+        ]
       },
       "case": "lower"
     },
