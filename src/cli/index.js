@@ -9,6 +9,7 @@ const {formatResult} = require('./format');
 const {init, InitError} = require('./init');
 const {checkRange} = require('./range');
 const {runCi, CiError} = require('./ci');
+const {buildReport, writeReport, REPORT_MODE} = require('./report');
 const {version} = require('../../package.json');
 
 const EXIT_CODE = {
@@ -106,14 +107,31 @@ function resolveType(type) {
   return TYPE_OPTION[type];
 }
 
+/**
+ * Writes the Markdown report and prints its path when there are errors.
+ */
+function saveReport(entries, mode, io) {
+  const reportPath = writeReport(buildReport(entries, {mode, cwd: io.cwd}), {cwd: io.cwd, env: io.env});
+  const hasErrors = entries.some(({result}) => result.status === VALIDATE_STATUS.INVALID);
+
+  if (reportPath && hasErrors) {
+    io.stderr.write(`[kysaro] Report with fixes: ${path.relative(io.cwd, reportPath)}\n`);
+  }
+}
+
 async function check(args, io) {
   const message = await readMessage(args, io);
   const result = lint(message, {type: resolveType(args.values.type), cwd: io.cwd});
   const text = formatResult(result);
+  const mode = args.values.message === undefined && args.positionals.length === 1
+    ? REPORT_MODE.HOOK
+    : REPORT_MODE.MESSAGE;
 
   if (text) {
     io.stderr.write(text);
   }
+
+  saveReport([{label: 'Commit message', result}], mode, io);
 
   if (result.status !== VALIDATE_STATUS.INVALID) {
     return EXIT_CODE.OK;
@@ -139,7 +157,7 @@ const hasConfigurationError = result =>
 function reportRange(checked, io, extra = []) {
   const entries = [
     ...extra,
-    ...checked.map(({sha, result}) => ({label: commitLabel(sha), result}))
+    ...checked.map(({sha, result}) => ({label: commitLabel(sha), sha, result, mode: REPORT_MODE.RANGE}))
   ];
 
   entries.forEach(({label, result}) => {
@@ -161,6 +179,8 @@ function reportRange(checked, io, extra = []) {
     io.stderr.write(`[kysaro] ${invalidCommits.length} of ${checked.length} commit(s) are invalid\n`);
   }
 
+  saveReport(entries, REPORT_MODE.RANGE, io);
+
   return invalid.length ? EXIT_CODE.INVALID : EXIT_CODE.OK;
 }
 
@@ -173,7 +193,7 @@ function runCiCommand(io) {
   });
 
   const extra = pullRequest
-    ? [{label: `Pull request #${pullRequest.number}`, result: pullRequest.result}]
+    ? [{label: `Pull request #${pullRequest.number}`, result: pullRequest.result, mode: REPORT_MODE.PULL_REQUEST}]
     : [];
 
   return reportRange(commits, io, extra);
