@@ -13,6 +13,11 @@ describe('buildHeader', () => {
       .toBe('fix: Fix it');
   });
 
+  test('should append pull request reference', () => {
+    expect(buildHeader({type: 'feat', scope: null, breaking: false, subject: 'Add x', reference: '12'}))
+      .toBe('feat: Add x (#12)');
+  });
+
   test('should keep empty parentheses for empty scope', () => {
     expect(buildHeader({type: 'fix', scope: '', breaking: false, subject: 'Fix it'}))
       .toBe('fix(): Fix it');

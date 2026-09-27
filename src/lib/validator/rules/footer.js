@@ -80,7 +80,7 @@ function validateCount(footer, settings, collect) {
 function validateLines(footer, settings, collect) {
   const max = settings.maxLineLength;
 
-  if (typeof max !== 'number') {
+  if (typeof max !== 'number' || max <= 0) {
     return;
   }
 

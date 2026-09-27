@@ -8,6 +8,7 @@ const {
   ON_MULTIPLE,
   ON_UNKNOWN,
   PATH,
+  REFERENCE_MODE,
   SEPARATOR_SPACING,
   VALIDATOR_ISSUE_CODE: CODE
 } = require('../const');
@@ -81,6 +82,37 @@ function validateMaxLength(header, settings, collect) {
     path: [PATH.HEADER],
     meta: {length: header.raw.length, max}
   });
+}
+
+function validateReference(header, settings, collect) {
+  const mode = settings.reference;
+
+  if (mode === REFERENCE_MODE.REQUIRE && !header.reference) {
+    collect.issue({
+      code: CODE.HEADER_REFERENCE_REQUIRED,
+      message: 'Header must end with a pull request reference, e.g. " (#123)"',
+      category: ISSUE_CATEGORY.STRUCTURE,
+      path: [PATH.HEADER]
+    });
+  }
+
+  if (mode === REFERENCE_MODE.FORBID && header.reference) {
+    collect.issue({
+      code: CODE.HEADER_REFERENCE_FORBIDDEN,
+      message: `Header must not end with " (#${header.reference})". GitHub adds the reference itself`,
+      category: ISSUE_CATEGORY.STRUCTURE,
+      path: [PATH.HEADER],
+      meta: {reference: header.reference}
+    });
+
+    collect.fix({
+      type: DETERMINISTIC_FIX_TYPE.REMOVE,
+      path: [PATH.HEADER],
+      from: header.raw,
+      to: buildHeader({...header, reference: null}),
+      rule: CODE.HEADER_REFERENCE_FORBIDDEN
+    });
+  }
 }
 
 function validateType(header, settings = {}, allowed, collect) {
@@ -411,6 +443,7 @@ function validateHeader(ast, settings = {}, sources = {}) {
 
   validateFormat(header, settings, collect);
   validateMaxLength(header, settings, collect);
+  validateReference(header, settings, collect);
 
   if (header.type !== null || header.scope !== null) {
     validateType(header, settings.type, sources.types ?? null, collect);

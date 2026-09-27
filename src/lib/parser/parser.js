@@ -25,7 +25,8 @@
  *     type,
  *     scope,
  *     breaking,
- *     subject
+ *     subject,
+ *     reference
  *   },
  *   body: {
  *     raw,
@@ -43,6 +44,8 @@
  * }
  *
  * `scope` is `null` when parentheses are absent and `''` when they are empty.
+ * `reference` is the pull request number from the ` (#123)` suffix; the
+ * suffix is not part of `subject`.
  * `start` is the zero-based index of the first line in the message.
  * `start` and `blankLineBefore` are `null` when the section is empty.
  */
@@ -57,6 +60,11 @@ const FOOTER_TOKEN = /^(BREAKING CHANGE|[A-Za-z][\w-]*)(: | #)(.*)$/u;
 
 const BREAKING_TOKENS = ['BREAKING CHANGE', 'BREAKING-CHANGE'];
 
+/**
+ * Pull request reference GitHub appends on merge and squash: ` (#123)`.
+ */
+const HEADER_REFERENCE = /\s\(#(\d+)\)$/u;
+
 const isBlank = (line) => line.trim() === '';
 
 const parseHeader = (line) => {
@@ -65,7 +73,8 @@ const parseHeader = (line) => {
         type: null,
         scope: null,
         breaking: false,
-        subject: null
+        subject: null,
+        reference: null
     };
 
     const colonIndex = line.indexOf(':');
@@ -76,7 +85,13 @@ const parseHeader = (line) => {
     }
 
     let before = line.slice(0, colonIndex).trim();
-    const after = line.slice(colonIndex + 1).trim();
+    let after = line.slice(colonIndex + 1).trim();
+    const reference = HEADER_REFERENCE.exec(after);
+
+    if (reference) {
+        header.reference = reference[1];
+        after = after.slice(0, reference.index).trim();
+    }
 
     header.subject = after || null;
 

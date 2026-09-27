@@ -38,7 +38,9 @@ function suggestHeader(result) {
   result.deterministicFixes.forEach(fix => {
     const key = pathKey(fix.path);
 
-    if (key === 'header.type') {
+    if (key === 'header' && fix.rule === 'HEADER_REFERENCE_FORBIDDEN') {
+      next.reference = null;
+    } else if (key === 'header.type') {
       next.type = fix.to;
     } else if (key === 'header.scope' && next.scope !== null) {
       next.scope = next.scope.split(fix.from).join(fix.to);

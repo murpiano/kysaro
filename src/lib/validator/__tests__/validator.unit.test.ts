@@ -68,6 +68,32 @@ describe('validateMessage', () => {
     });
   });
 
+  describe('reference', () => {
+
+    const reference = (mode: string) => ({header: {reference: mode}});
+
+    test('should accept reference suffix when allowed', () => {
+      expect(codes('feat(cli): Add init command (#12)', reference('allow'))).toEqual([]);
+    });
+
+    test('should check subject without the suffix', () => {
+      expect(codes('feat: Add (#12)', reference('allow'))).toEqual(['SUBJECT_TOO_SHORT']);
+    });
+
+    test('should require reference', () => {
+      expect(codes('feat: Add colors', reference('require'))).toEqual(['HEADER_REFERENCE_REQUIRED']);
+    });
+
+    test('should forbid reference and suggest header without it', () => {
+      const {issues, deterministicFixes} = validateMessage(
+        parseMessage('feat: Add colors (#12)').ast, settings(reference('forbid')), {types: TYPES}
+      );
+
+      expect(issues.map((issue: any) => issue.code)).toEqual(['HEADER_REFERENCE_FORBIDDEN']);
+      expect(deterministicFixes).toContainEqual(expect.objectContaining({to: 'feat: Add colors'}));
+    });
+  });
+
   describe('type', () => {
 
     test('should accept known type', () => {
@@ -257,6 +283,22 @@ describe('validateMessage', () => {
 
     test('should require body', () => {
       expect(codes('feat: Add colors', {body: {required: true}})).toEqual(['BODY_REQUIRED']);
+    });
+
+    test('should require minimum body length', () => {
+      expect(codes('feat: Add colors\n\nToo short', {body: {minLength: 50}})).toEqual(['BODY_TOO_SHORT']);
+      expect(codes(`feat: Add colors\n\n${'x'.repeat(50)}`, {body: {minLength: 50, maxLineLength: 72}})).toEqual([]);
+    });
+
+    test('should report missing body once when minLength is set', () => {
+      expect(codes('feat: Add colors', {body: {required: true, minLength: 50}})).toEqual(['BODY_REQUIRED']);
+    });
+
+    test('should skip line length check when maxLineLength is 0', () => {
+      expect(codes(`feat: Add colors\n\n${'x'.repeat(200)}\n\nRefs: ${'y'.repeat(200)}`, {
+        body: {maxLineLength: 0},
+        footer: {maxLineLength: 0}
+      })).toEqual([]);
     });
 
     test('should limit consecutive empty lines', () => {

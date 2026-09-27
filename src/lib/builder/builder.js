@@ -1,9 +1,10 @@
 const buildHeader = (headerAst) => {
-  const {type, scope, breaking, subject} = headerAst;
+  const {type, scope, breaking, subject, reference} = headerAst;
   const scopePart = scope === null || scope === undefined ? '' : `(${scope})`;
   const breakingPart = breaking ? '!' : '';
+  const referencePart = reference ? ` (#${reference})` : '';
 
-  return `${type}${scopePart}${breakingPart}: ${subject}`;
+  return `${type}${scopePart}${breakingPart}: ${subject}${referencePart}`;
 };
 
 const buildFooterToken = (token) => `${token.key}${token.separator || ': '}${token.value}`;

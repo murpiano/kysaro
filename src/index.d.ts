@@ -61,6 +61,8 @@ export interface MessageAst {
         scope: string | null;
         breaking: boolean;
         subject: string | null;
+        /** Pull request number from the ` (#123)` suffix. */
+        reference: string | null;
     };
     body: {
         raw: string;

@@ -16,7 +16,8 @@ describe('parseMessage', () => {
         type: 'feat',
         scope: 'cli',
         breaking: false,
-        subject: 'add colors'
+        subject: 'add colors',
+        reference: null
       });
     });
 
@@ -65,6 +66,20 @@ describe('parseMessage', () => {
         breaking: true,
         subject: 'drop v1 endpoints'
       }));
+    });
+
+    test('should extract pull request reference from header', () => {
+      const {ast} = parseMessage('feat(cli): Add init command (#12)');
+
+      expect(ast.header.subject).toBe('Add init command');
+      expect(ast.header.reference).toBe('12');
+    });
+
+    test('should not treat reference in the middle as suffix', () => {
+      const {ast} = parseMessage('fix: Revert (#12) partially');
+
+      expect(ast.header.subject).toBe('Revert (#12) partially');
+      expect(ast.header.reference).toBeNull();
     });
 
     test('should extract breaking change flag without scope', () => {

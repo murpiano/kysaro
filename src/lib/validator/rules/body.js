@@ -17,7 +17,7 @@ function validateLines(body, settings, collect) {
   body.lines.forEach((line, index) => {
     const line1 = lineNumber(body, index);
 
-    if (typeof max === 'number' && line.length > max) {
+    if (typeof max === 'number' && max > 0 && line.length > max) {
       collect.issue({
         code: CODE.BODY_LINE_TOO_LONG,
         message: `Body line ${line1} is ${line.length} characters long, maximum is ${max}`,
@@ -82,6 +82,18 @@ function validateBody(ast, settings = {}) {
       category: ISSUE_CATEGORY.FORMAT,
       path: BODY_PATH,
       meta: {line: lineNumber(body, 0)}
+    });
+  }
+
+  const length = body.raw.trim().length;
+
+  if (typeof settings.minLength === 'number' && length < settings.minLength) {
+    collect.issue({
+      code: CODE.BODY_TOO_SHORT,
+      message: `Body is ${length} characters long, minimum is ${settings.minLength}`,
+      category: ISSUE_CATEGORY.LENGTH,
+      path: BODY_PATH,
+      meta: {length, min: settings.minLength}
     });
   }
 
