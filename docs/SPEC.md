@@ -52,7 +52,7 @@ flowchart TD
 
 Порядок этапов: `generator` → `normalizer` → `parser` → `ignore` → `validator` → `analyzer` → `fixer` → `output`. Каждый этап получает общий `result` (см. раздел 5) и возвращает новый.
 
-| Этап | Модуль | Статус (2026-09-25, v0.1.0) |
+| Этап | Модуль | Статус (2026-09-27, v0.2.0) |
 |---|---|---|
 | loader | `src/lib/loader`, `src/lib/load-file` | реализован, покрыт тестами |
 | generator | `src/lib/generator` | заглушка с захардкоженным сообщением, в pipeline не подключён |
@@ -486,7 +486,6 @@ class KysaroException extends Error {
 
 ### 6.2. Планируемая разработка
 
-1. Правила pull request и merge-коммитов: перевести `merge.json` и `request.json` на формат `commit.json` (раздел 3.5).
 2. Подключить `fixer`: применять `DeterministicFix` к сообщению (режимы `apply` и `suggest`).
 3. Подключить `analyzer`: подсказки для опечаток в `type`, `scope`, токенах footer.
 4. Валидация конфига на дублирование полей.
