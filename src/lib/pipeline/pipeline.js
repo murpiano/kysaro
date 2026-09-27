@@ -7,7 +7,7 @@ const {ISSUE_MESSAGE, ISSUE_CODE, ISSUE_SEVERITY, ISSUE_SOURCE, ISSUE_CATEGORY} 
 const {createCommitContext} = require("../../all/commit-context/commit-context");
 const {createConfiguration} = require("../../config");
 const {resolveCommitType} = require("../../all/resolve-commit-type");
-const {getSettings} = require("./settings");
+const {loadSettings, selectSettings} = require("./settings");
 
 /**
  * Output settings used when settings could not be loaded.
@@ -79,22 +79,8 @@ function markIgnored(result) {
 }
 
 
-/**
- * Runs a message through the pipeline:
- * normalizer → parser → ignore → validator → output.
- *
- * `generator`, `analyzer` and `fixer` are not connected yet.
- *
- * @param {string} [raw=''] Message to check.
- * @param {string|null} [manualCommitType=null] Message kind from `COMMIT_TYPE`; detected when `null`.
- * @param {Object} [configuration] Loader configuration, see `createConfiguration`.
- * @param {Object} [loaderOptions={}] Loader options (reports, CLI output).
- * @returns {Object} KysaroResult.
- * @throws {KysaroException} When `output.invalid` is `throw` and the message is invalid.
- */
-function pipeline(raw = '', manualCommitType = null, configuration = createConfiguration(), loaderOptions = {}) {
-  const commitType = resolveCommitType(manualCommitType);
-  const {settings, issues: loaderIssues} = getSettings(configuration, commitType, loaderOptions);
+function runStages(raw, commitType, state) {
+  const {settings, issues: loaderIssues} = selectSettings(state, commitType);
   let result = createInitialResult(raw, commitType);
 
   if (!settings) {
@@ -123,4 +109,37 @@ function pipeline(raw = '', manualCommitType = null, configuration = createConfi
 }
 
 
-module.exports = {pipeline};
+/**
+ * Loads settings once and returns a function that checks messages.
+ * Use it to check many messages, e.g. every commit of a range.
+ *
+ * @param {Object} [configuration] Loader configuration, see `createConfiguration`.
+ * @param {Object} [loaderOptions={}] Loader options (reports, CLI output).
+ * @returns {function(string=, (string|null)=): Object} `(raw, manualCommitType) => KysaroResult`.
+ */
+function createPipeline(configuration = createConfiguration(), loaderOptions = {}) {
+  const state = loadSettings(configuration, loaderOptions);
+
+  return (raw = '', manualCommitType = null) => runStages(raw, resolveCommitType(manualCommitType), state);
+}
+
+
+/**
+ * Runs a message through the pipeline:
+ * normalizer → parser → ignore → validator → output.
+ *
+ * `generator`, `analyzer` and `fixer` are not connected yet.
+ *
+ * @param {string} [raw=''] Message to check.
+ * @param {string|null} [manualCommitType=null] Message kind from `COMMIT_TYPE`; detected when `null`.
+ * @param {Object} [configuration] Loader configuration, see `createConfiguration`.
+ * @param {Object} [loaderOptions={}] Loader options (reports, CLI output).
+ * @returns {Object} KysaroResult.
+ * @throws {KysaroException} When `output.invalid` is `throw` and the message is invalid.
+ */
+function pipeline(raw = '', manualCommitType = null, configuration = createConfiguration(), loaderOptions = {}) {
+  return createPipeline(configuration, loaderOptions)(raw, manualCommitType);
+}
+
+
+module.exports = {pipeline, createPipeline};

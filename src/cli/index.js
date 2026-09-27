@@ -2,11 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const {parseArgs} = require('util');
 
-const {lint} = require('../index');
+const {lint, createLinter} = require('../index');
 const {COMMIT_TYPE, VALIDATE_STATUS} = require('../all/const/const');
 const {ISSUE_CODE} = require('../all/const/issue');
 const {formatResult} = require('./format');
 const {init, InitError} = require('./init');
+const {checkRange} = require('./range');
 const {version} = require('../../package.json');
 
 const EXIT_CODE = {
@@ -25,6 +26,7 @@ const HELP = `Usage:
   kysaro <file>              Check a commit message file (commit-msg hook)
   kysaro -m <message>        Check a message
   kysaro < message.txt       Check a message from stdin
+  kysaro --range <a>..<b>    Check every commit of a range
   kysaro init                Install the commit-msg hook
   kysaro init --settings     Also copy default settings to .kysaro/settings
 
@@ -40,6 +42,7 @@ Exit codes: 0 valid or ignored, 1 invalid, 2 usage or settings error.
 
 const OPTIONS = {
   message: {type: 'string', short: 'm'},
+  range: {type: 'string'},
   type: {type: 'string'},
   settings: {type: 'boolean'},
   force: {type: 'boolean'},
@@ -119,6 +122,46 @@ async function check(args, io) {
     : EXIT_CODE.INVALID;
 }
 
+/**
+ * Prints results of range checks and returns the exit code.
+ */
+function reportRange(checked, io) {
+  checked.forEach(({sha, result}) => {
+    const text = formatResult(result, {sha});
+
+    if (text) {
+      io.stderr.write(text + '\n');
+    }
+  });
+
+  const invalid = checked.filter(({result}) => result.status === VALIDATE_STATUS.INVALID);
+
+  if (checked.some(({result}) => result.issues.some(issue => issue.code === ISSUE_CODE.CONFIGURATION_ERROR))) {
+    return EXIT_CODE.ERROR;
+  }
+
+  io.stderr.write(invalid.length
+    ? `[kysaro] ${invalid.length} of ${checked.length} commit(s) are invalid\n`
+    : '');
+
+  return invalid.length ? EXIT_CODE.INVALID : EXIT_CODE.OK;
+}
+
+function runRange(args, io) {
+  const linter = createLinter({cwd: io.cwd});
+  const checked = checkRange({
+    revisions: [args.values.range],
+    cwd: io.cwd,
+    check: (message, kind) => linter(message, kind)
+  });
+
+  if (checked === null) {
+    throw new UsageError(`Invalid revision range: ${args.values.range}`);
+  }
+
+  return reportRange(checked, io);
+}
+
 function runInit(args, io) {
   init({cwd: io.cwd, settings: Boolean(args.values.settings), force: Boolean(args.values.force)})
     .forEach(line => io.stdout.write(`[kysaro] ${line}\n`));
@@ -159,6 +202,10 @@ async function run(argv, io = {}) {
       return runInit({...args, positionals: args.positionals.slice(1)}, streams);
     }
 
+    if (args.values.range !== undefined) {
+      return runRange(args, streams);
+    }
+
     return await check(args, streams);
   } catch (error) {
     if (error instanceof UsageError || error instanceof InitError || error.code?.startsWith?.('ERR_PARSE_ARGS')) {
@@ -172,5 +219,7 @@ async function run(argv, io = {}) {
 
 module.exports = {
   run,
+  reportRange,
+  UsageError,
   EXIT_CODE
 };

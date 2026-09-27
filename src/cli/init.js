@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const {execFileSync} = require('child_process');
 
 const defaultSettings = require('../settings');
 const {DIRECTORY} = require('../config');
+const {git} = require('./git');
 
 const HOOK_COMMAND = 'npx --no -- kysaro "$1"';
 const HOOK_MARKER = 'kysaro';
@@ -23,18 +23,6 @@ class InitError extends Error {
   }
 }
 
-function git(args, cwd) {
-  try {
-    return execFileSync('git', args, {
-      cwd,
-      env: process.env,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore']
-    }).trim();
-  } catch {
-    return null;
-  }
-}
 
 function writeHookFile(hookPath, content, force) {
   if (fs.existsSync(hookPath)) {

@@ -142,6 +142,19 @@ export interface LintOptions {
 export declare function lint(message: string, options?: LintOptions): KysaroContract;
 
 /**
+ * Loads project settings once and returns a function that checks messages.
+ */
+export declare function createLinter(options?: Omit<LintOptions, 'type'>): (message: string, type?: CommitKindType | null) => KysaroContract;
+
+/**
+ * Loads settings once for an explicit loader configuration.
+ */
+export declare function createPipeline(
+    configuration?: LoaderConfiguration,
+    loaderOptions?: LoaderOptions
+): (raw?: string, manualCommitType?: CommitKindType | null) => KysaroContract;
+
+/**
  * Runs the pipeline with an explicit loader configuration.
  */
 export declare function pipeline(

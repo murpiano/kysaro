@@ -68,9 +68,11 @@ function formatIssue(issue) {
  * Valid and ignored messages without issues print nothing.
  *
  * @param {Object} result KysaroResult.
+ * @param {Object} [options]
+ * @param {string|null} [options.sha=null] Commit being checked in a range.
  * @returns {string}
  */
-function formatResult(result) {
+function formatResult(result, {sha = null} = {}) {
   const issues = result.issues.filter(issue => issue.severity);
 
   if (result.status === VALIDATE_STATUS.IGNORED || !issues.length) {
@@ -80,10 +82,11 @@ function formatResult(result) {
   const isInvalid = result.status === VALIDATE_STATUS.INVALID;
   const header = String(result.final || '').split('\n')[0];
   const lines = [];
+  const subject = sha ? `Commit ${sha.slice(0, 7)}` : 'Commit message';
 
   lines.push(isInvalid
-    ? chalk.red.bold(`${NAME} ✖ Commit message is invalid`)
-    : chalk.yellow.bold(`${NAME} ⚠ Commit message has warnings`));
+    ? chalk.red.bold(`${NAME} ✖ ${subject} is invalid`)
+    : chalk.yellow.bold(`${NAME} ⚠ ${subject} has warnings`));
 
   if (header) {
     lines.push('', `  ${chalk.white(header)}`);
