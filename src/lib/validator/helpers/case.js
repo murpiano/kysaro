@@ -16,11 +16,13 @@ const IDENTIFIER_CASE = {
 
 /**
  * Case checks for text: subject, footer value.
- * `lower` and `sentence` check the first letter only.
+ * `lower` and `sentence` check the first letter only. A first word with
+ * another capital letter is a name (`API`, `README`, `GitHub`, `iOS`) and
+ * keeps its spelling.
  */
 const TEXT_CASE = {
-  [CASE_TYPES.LOWER]: value => firstChar(value) === firstChar(value).toLowerCase(),
-  [CASE_TYPES.SENTENCE]: value => firstChar(value) === firstChar(value).toUpperCase(),
+  [CASE_TYPES.LOWER]: value => firstChar(value) === firstChar(value).toLowerCase() || isName(value),
+  [CASE_TYPES.SENTENCE]: value => firstChar(value) === firstChar(value).toUpperCase() || isName(value),
   [CASE_TYPES.UPPER]: value => value === value.toUpperCase()
 };
 
@@ -38,6 +40,12 @@ const TEXT_CONVERT = {
 
 function firstChar(value) {
   return Array.from(value)[0] || '';
+}
+
+function isName(value) {
+  const [word] = value.split(/\s/u);
+
+  return /\p{Lu}/u.test(word.slice(firstChar(word).length));
 }
 
 function toSentence(value) {

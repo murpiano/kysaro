@@ -8,6 +8,10 @@ All notable changes to this project are documented in this file. The format foll
 
 - The default preset follows Conventional Commits in the subject case: the subject starts with a lowercase letter (`feat: add dark theme`), in commits, merge commits and pull requests. Settings copied by `kysaro init` keep `"case": "sentence"`; to keep the old rule without them, set `header.subject.case` to `sentence`.
 
+### Fixed
+
+- `lower` and `sentence` subject case accept a first word with more capitals, like `API`, `GitHub` or `iOS`, and no longer suggest `aPI`.
+
 ## [0.2.0] - 2026-09-27
 
 ### Breaking changes

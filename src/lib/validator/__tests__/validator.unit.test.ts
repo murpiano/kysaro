@@ -246,6 +246,18 @@ describe('validateMessage', () => {
       expect(codes('chore: run tests on Node.js 24 LTS')).toEqual([]);
     });
 
+    test.each([
+      'feat: API for users',
+      'docs: README badges',
+      'chore: GitHub Actions cache'
+    ])('should keep a first word with more capitals: %s', (message) => {
+      expect(codes(message)).toEqual([]);
+    });
+
+    test('should keep a name in sentence case', () => {
+      expect(codes('feat: iOS widgets', subject({case: 'sentence'}))).toEqual([]);
+    });
+
     test('should require sentence case when configured', () => {
       expect(codes('feat: Add API colors', subject({case: 'sentence'}))).toEqual([]);
       expect(codes('feat: add colors', subject({case: 'sentence'}))).toEqual(['SUBJECT_CASE']);

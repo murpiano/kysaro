@@ -86,7 +86,7 @@ Refs: #42
 | type | one of `feat`, `fix`, `refactor`, `style`, `build`, `chore`, `docs`, `test`, `perf`, `ci`, `revert`, `merge`; lower case |
 | scope | optional, any value, lower case, one scope |
 | `!` | optional breaking change marker before `:` |
-| subject | at least 5 characters, starts with a lowercase letter, no trailing period |
+| subject | at least 5 characters, starts with a lowercase letter, no trailing period; a first word with more capitals, like `API` or `GitHub`, keeps its spelling |
 | body | optional, blank line before it, lines up to 72 characters |
 | footer | optional, blank line before it, `Token: value` or `Token #value`, lines up to 72 characters |
 
@@ -227,9 +227,9 @@ An empty list allows any value. Values are found ignoring case; the `case` optio
 
 | Value | type, scope, footer token | subject, footer value |
 |---|---|---|
-| `lower` | whole value in lower case | first letter lower case |
+| `lower` | whole value in lower case | first letter lower case, unless the first word has more capitals (`API`, `GitHub`) |
 | `upper` | whole value in upper case | whole value in upper case |
-| `sentence` | first letter upper case, rest lower case | first letter upper case, rest as is |
+| `sentence` | first letter upper case, rest lower case | first letter upper case, rest as is, unless the first word has more capitals (`iOS`) |
 | `kebab`, `camel`, `pascal`, `snake` | matches the pattern | — |
 | `match-source` | spelled as in the source | — |
 | `any` | not checked | not checked |
