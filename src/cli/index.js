@@ -8,6 +8,7 @@ const {ISSUE_CODE} = require('../all/const/issue');
 const {formatResult} = require('./format');
 const {init, InitError} = require('./init');
 const {checkRange} = require('./range');
+const {runCi, CiError} = require('./ci');
 const {version} = require('../../package.json');
 
 const EXIT_CODE = {
@@ -27,6 +28,7 @@ const HELP = `Usage:
   kysaro -m <message>        Check a message
   kysaro < message.txt       Check a message from stdin
   kysaro --range <a>..<b>    Check every commit of a range
+  kysaro ci                  Check the pull request and pushed commits in GitHub Actions
   kysaro init                Install the commit-msg hook
   kysaro init --settings     Also copy default settings to .kysaro/settings
 
@@ -122,29 +124,59 @@ async function check(args, io) {
     : EXIT_CODE.INVALID;
 }
 
+const commitLabel = sha => `Commit ${sha.slice(0, 7)}`;
+
+const hasConfigurationError = result =>
+  result.issues.some(issue => issue.code === ISSUE_CODE.CONFIGURATION_ERROR);
+
 /**
  * Prints results of range checks and returns the exit code.
+ *
+ * @param {{sha:string, result:Object}[]} checked
+ * @param {Object} io
+ * @param {{label:string, result:Object}[]} [extra=[]] Other checked messages, e.g. a pull request.
  */
-function reportRange(checked, io) {
-  checked.forEach(({sha, result}) => {
-    const text = formatResult(result, {sha});
+function reportRange(checked, io, extra = []) {
+  const entries = [
+    ...extra,
+    ...checked.map(({sha, result}) => ({label: commitLabel(sha), result}))
+  ];
+
+  entries.forEach(({label, result}) => {
+    const text = formatResult(result, {label});
 
     if (text) {
       io.stderr.write(text + '\n');
     }
   });
 
-  const invalid = checked.filter(({result}) => result.status === VALIDATE_STATUS.INVALID);
-
-  if (checked.some(({result}) => result.issues.some(issue => issue.code === ISSUE_CODE.CONFIGURATION_ERROR))) {
+  if (entries.some(({result}) => hasConfigurationError(result))) {
     return EXIT_CODE.ERROR;
   }
 
-  io.stderr.write(invalid.length
-    ? `[kysaro] ${invalid.length} of ${checked.length} commit(s) are invalid\n`
-    : '');
+  const invalidCommits = checked.filter(({result}) => result.status === VALIDATE_STATUS.INVALID);
+  const invalid = entries.filter(({result}) => result.status === VALIDATE_STATUS.INVALID);
+
+  if (invalidCommits.length) {
+    io.stderr.write(`[kysaro] ${invalidCommits.length} of ${checked.length} commit(s) are invalid\n`);
+  }
 
   return invalid.length ? EXIT_CODE.INVALID : EXIT_CODE.OK;
+}
+
+function runCiCommand(io) {
+  const linter = createLinter({cwd: io.cwd});
+  const {pullRequest, commits} = runCi({
+    cwd: io.cwd,
+    env: io.env,
+    check: (message, kind) => linter(message, kind)
+  });
+
+  const extra = pullRequest
+    ? [{label: `Pull request #${pullRequest.number}`, result: pullRequest.result}]
+    : [];
+
+  return reportRange(commits, io, extra);
 }
 
 function runRange(args, io) {
@@ -182,6 +214,7 @@ async function run(argv, io = {}) {
     stdin: process.stdin,
     stdout: process.stdout,
     stderr: process.stderr,
+    env: process.env,
     ...io
   };
 
@@ -202,13 +235,17 @@ async function run(argv, io = {}) {
       return runInit({...args, positionals: args.positionals.slice(1)}, streams);
     }
 
+    if (args.positionals[0] === 'ci') {
+      return runCiCommand(streams);
+    }
+
     if (args.values.range !== undefined) {
       return runRange(args, streams);
     }
 
     return await check(args, streams);
   } catch (error) {
-    if (error instanceof UsageError || error instanceof InitError || error.code?.startsWith?.('ERR_PARSE_ARGS')) {
+    if (error instanceof UsageError || error instanceof InitError || error instanceof CiError || error.code?.startsWith?.('ERR_PARSE_ARGS')) {
       streams.stderr.write(`[kysaro] ${error.message}\n`);
       return EXIT_CODE.ERROR;
     }

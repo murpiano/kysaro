@@ -69,10 +69,10 @@ function formatIssue(issue) {
  *
  * @param {Object} result KysaroResult.
  * @param {Object} [options]
- * @param {string|null} [options.sha=null] Commit being checked in a range.
+ * @param {string} [options.label='Commit message'] What was checked, e.g. `Commit 1a2b3c4`.
  * @returns {string}
  */
-function formatResult(result, {sha = null} = {}) {
+function formatResult(result, {label = 'Commit message'} = {}) {
   const issues = result.issues.filter(issue => issue.severity);
 
   if (result.status === VALIDATE_STATUS.IGNORED || !issues.length) {
@@ -82,11 +82,9 @@ function formatResult(result, {sha = null} = {}) {
   const isInvalid = result.status === VALIDATE_STATUS.INVALID;
   const header = String(result.final || '').split('\n')[0];
   const lines = [];
-  const subject = sha ? `Commit ${sha.slice(0, 7)}` : 'Commit message';
-
   lines.push(isInvalid
-    ? chalk.red.bold(`${NAME} ✖ ${subject} is invalid`)
-    : chalk.yellow.bold(`${NAME} ⚠ ${subject} has warnings`));
+    ? chalk.red.bold(`${NAME} ✖ ${label} is invalid`)
+    : chalk.yellow.bold(`${NAME} ⚠ ${label} has warnings`));
 
   if (header) {
     lines.push('', `  ${chalk.white(header)}`);
