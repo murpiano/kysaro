@@ -35,21 +35,36 @@ npm install --save-dev kysaro
 npx kysaro init
 ```
 
-`kysaro init` installs a `commit-msg` hook. If the project uses [husky](https://typicode.github.io/husky/) (has a `.husky` directory), the hook goes to `.husky/commit-msg`, otherwise to `.git/hooks/commit-msg`. The hook runs:
+That is the whole setup. `kysaro init`:
 
-```sh
-npx --no -- kysaro "$1"
-```
+1. installs the `commit-msg` hook: `.husky/commit-msg` when the project uses [husky](https://typicode.github.io/husky/), otherwise `.git/hooks/commit-msg`;
+2. copies the rules into `.kysaro/settings`: one JSON file per message kind;
+3. creates `.github/workflows/kysaro.yml`, which runs `npx kysaro ci` on every push and pull request;
+4. adds `.kysaro/*.md` (reports) to `.gitignore`.
 
-Hooks in `.git/hooks` are not shared through the repository. Use husky when the whole team needs the hook.
+Commit `.kysaro/settings` and the workflow so the whole team shares the rules. Existing files are kept; `--force` overwrites them. Hooks in `.git/hooks` are not shared through the repository, so use husky when every developer needs the hook.
 
-To customize the rules, copy the default settings into the project:
+### What is checked
 
-```sh
-npx kysaro init --settings
-```
+| Where | What | Rules |
+|---|---|---|
+| `git commit` | commit message | `commit.json` |
+| `git merge`, `git pull` with a merge | merge commit message | `merge.json` |
+| push to any branch (CI) | every pushed commit, merge commits included | `commit.json`, `merge.json` |
+| pull request (CI) | title and description | `request.json` |
+| pull request (CI) | every commit of the pull request | `commit.json`, `merge.json` |
 
-This creates `.kysaro/settings` and adds `.kysaro/*.md` (settings reports) to `.gitignore`. Commit `.kysaro/settings` so the whole team shares the rules.
+`fixup!`, `squash!` and `amend!` commits are allowed locally for `git rebase --autosquash`, but fail in CI: squash them before merge. `git revert` messages are skipped.
+
+Every check writes `.kysaro/report.md` with the problems, a suggested message and the commands to fix it. In GitHub Actions the report goes to the job summary.
+
+### GitHub settings
+
+The merge button on GitHub does not run git hooks. To make it follow the rules:
+
+1. **Settings → General → Pull Requests:** allow merge commits and set "Default commit message" to "Pull request title and description". The merge commit then consists of the checked title and description. Do the same for squash merging if you use it.
+2. **Settings → Branches:** protect `main` and require the `kysaro` status check. A pull request with an invalid title, description or commit cannot be merged.
+3. Run `git config pull.rebase true`, so that `git pull` does not create merge commits.
 
 ## Message format
 
@@ -75,7 +90,16 @@ Refs: #42
 | body | optional, blank line before it, lines up to 72 characters |
 | footer | optional, blank line before it, `Token: value` or `Token #value`, lines up to 72 characters |
 
-Merge commits, `git revert` messages (`Revert "…"`) and `fixup!`, `squash!`, `amend!` commits are skipped.
+Pull requests and merge commits use the same header rules. The differences:
+
+| | commit | pull request | merge commit |
+|---|---|---|---|
+| header length | 72 | 72 | 80 |
+| ` (#123)` at the end | allowed | forbidden, GitHub adds it | allowed |
+| body | optional | required, at least 50 characters | required, at least 50 characters |
+| body line length | 72 | not checked (Markdown) | not checked |
+
+A pull request is checked as `<title>`, a blank line and `<description>`. The default git message `Merge branch 'feature'` is rejected: write a real message with `git commit -e` during the merge.
 
 ## CLI
 
@@ -83,13 +107,14 @@ Merge commits, `git revert` messages (`Revert "…"`) and `fixup!`, `squash!`, `
 kysaro <file>              Check a commit message file (commit-msg hook)
 kysaro -m <message>        Check a message
 kysaro < message.txt       Check a message from stdin
-kysaro init                Install the commit-msg hook
-kysaro init --settings     Also copy default settings to .kysaro/settings
+kysaro --range <a>..<b>    Check every commit of a range
+kysaro ci                  Check the pull request and pushed commits in GitHub Actions
+kysaro init                Set up the hook, settings, CI workflow and .gitignore
 
 Options:
   -m, --message <text>       Message to check
       --type <kind>          Message kind: commit, merge, request (detected by default)
-      --force                init: overwrite existing hook and settings
+      --force                init: overwrite existing hook, settings and workflow
   -h, --help                 Show help
   -v, --version              Show version
 ```
@@ -110,6 +135,8 @@ Kysaro reads `.kysaro/settings` in the project root. A missing file falls back t
 |---|---|
 | `.kysaro/settings/main/main.json` | pipeline stages, severity, ignored messages |
 | `.kysaro/settings/commits/commit.json` | commit message rules |
+| `.kysaro/settings/commits/merge.json` | merge commit rules |
+| `.kysaro/settings/commits/request.json` | pull request title and description rules |
 | `.kysaro/settings/resources/types.json` | allowed types |
 | `.kysaro/settings/resources/scopes.json` | allowed scopes |
 | `.kysaro/settings/resources/tokens.json` | allowed footer tokens |
@@ -203,46 +230,44 @@ The full reference of every option, in Russian, is in [docs/SPEC.md](docs/SPEC.m
 
 | Section | Issue codes |
 |---|---|
-| header | `HEADER_FORMAT`, `HEADER_TOO_LONG` |
+| header | `HEADER_FORMAT`, `HEADER_TOO_LONG`, `HEADER_REFERENCE_REQUIRED`, `HEADER_REFERENCE_FORBIDDEN` |
 | type | `TYPE_EMPTY`, `TYPE_UNKNOWN`, `TYPE_CASE` |
 | scope | `SCOPE_REQUIRED`, `SCOPE_EMPTY`, `SCOPE_EMPTY_ITEM`, `SCOPE_TOO_MANY`, `SCOPE_TOO_FEW`, `SCOPE_DUPLICATE`, `SCOPE_SEPARATOR_SPACING`, `SCOPE_UNKNOWN`, `SCOPE_CASE` |
 | subject | `SUBJECT_EMPTY`, `SUBJECT_TOO_SHORT`, `SUBJECT_CASE`, `SUBJECT_TRAILING_PERIOD`, `SUBJECT_WHITESPACE` |
-| body | `BODY_REQUIRED`, `BODY_LEADING_BLANK`, `BODY_LINE_TOO_LONG`, `BODY_WHITESPACE`, `BODY_EMPTY_LINES` |
+| body | `BODY_REQUIRED`, `BODY_TOO_SHORT`, `BODY_LEADING_BLANK`, `BODY_LINE_TOO_LONG`, `BODY_WHITESPACE`, `BODY_EMPTY_LINES` |
 | footer | `FOOTER_REQUIRED`, `FOOTER_LEADING_BLANK`, `FOOTER_LINE_TOO_LONG`, `FOOTER_TOO_MANY`, `FOOTER_TOO_FEW`, `FOOTER_DUPLICATE_TOKEN`, `FOOTER_TOKEN_UNKNOWN`, `FOOTER_TOKEN_CASE`, `FOOTER_VALUE_TOO_SHORT`, `FOOTER_VALUE_CASE` |
 | breaking change | `BREAKING_HEADER_REQUIRED`, `BREAKING_HEADER_FORBIDDEN`, `BREAKING_FOOTER_REQUIRED`, `BREAKING_FOOTER_FORBIDDEN`, `BREAKING_FOOTER_DESCRIPTION`, `BREAKING_MISSING` |
-| message | `MESSAGE_IS_EMPTY`, `CONFIGURATION_ERROR` |
+| message | `MESSAGE_IS_EMPTY`, `CONFIGURATION_ERROR`, `COMMIT_NOT_SQUASHED` |
 
 Before validation the message is cleaned the way git cleans it: comment lines, the `git commit -v` diff below the scissors line, extra blank lines and spaces around lines are removed. The message file itself is not changed.
 
 ## Continuous integration
 
-Merges through the GitHub button do not run local hooks. To check the commits of every push and pull request, add a step to a workflow:
+`kysaro init` creates the workflow. To add the check to an existing workflow, you need a full clone and one command:
 
 ```yaml
 - uses: actions/checkout@v7
   with:
     fetch-depth: 0
 - run: npm ci
-- name: Check commit messages
-  env:
-    BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
-  run: |
-    for sha in $(git rev-list --no-merges "$BASE..HEAD"); do
-      git log -1 --format=%B "$sha" | npx kysaro --type commit
-    done
+- run: npx kysaro ci
 ```
 
-The step fails on the first invalid message. On the first push of a new branch `github.event.before` is all zeros, so run it for pull requests or skip that case, as the [CI of this repository](.github/workflows/ci.yml) does.
+Run it on `push` and on `pull_request` with the types `opened`, `edited`, `synchronize` and `reopened`, so that editing the title or description runs the check again. Outside GitHub Actions use `kysaro --range <base>..<head>`.
 
 ## Node.js API
 
 ```js
-const {lint} = require('kysaro');
+const {lint, createLinter, COMMIT_TYPE} = require('kysaro');
 
 const result = lint('feat(ui): Add dark theme', {cwd: process.cwd()});
 
 result.status;  // 'valid' | 'invalid' | 'ignored'
+result.rules;   // 'commit' | 'merge' | 'request'
 result.issues;  // [{code, message, severity, category, path, meta}]
+
+const check = createLinter();  // loads settings once
+check('feat: Add x (#12)\n\nDescription…', COMMIT_TYPE.MERGE);
 ```
 
 `parseMessage(message)` returns the message AST without validation. TypeScript declarations are included.
@@ -251,7 +276,6 @@ result.issues;  // [{code, message, severity, category, path, meta}]
 
 Settings for these stages exist in `main.json`, but the stages are not connected yet:
 
-- pull request title and description rules (`request.json`) and merge commit rules (`merge.json`);
 - `fixer` — apply suggested fixes to the message;
 - `analyzer` — typo suggestions for types and scopes, message quality checks;
 - `generator` — message generation.
