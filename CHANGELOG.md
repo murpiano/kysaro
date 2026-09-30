@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file. The format foll
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-30
+
+### Fixed
+
+- Default settings distributed by `kysaro init` now correctly use lowercase subject case (Conventional Commits standard).
+
+## [0.2.0] - 2026-09-27
+
 ### Changed
 
 - Repository history was rewritten to a single author identity, and the project moved to a repository created on the same date as its first commit. Build provenance points to this repository.
@@ -66,6 +74,7 @@ First public release.
 - Pull request and merge commit rules (`request.json`, `merge.json`).
 - The `fixer`, `analyzer` and `generator` stages.
 
+[0.2.1]: https://github.com/murpiano/kysaro/releases/tag/v0.2.1
 [0.2.0]: https://github.com/murpiano/kysaro/releases/tag/v0.2.0
 [0.1.1]: https://github.com/murpiano/kysaro/releases/tag/v0.1.1
 [0.1.0]: https://github.com/murpiano/kysaro/releases/tag/v0.1.0
