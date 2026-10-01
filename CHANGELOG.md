@@ -4,6 +4,8 @@ All notable changes to this project are documented in this file. The format foll
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-01
+
 ### Changed
 
 - The `commit-msg` hook prints two lines: the message is invalid, and the path of `.kysaro/report.md`. Every problem, the suggested message and the fix commands stay in the report. `kysaro ci` and `kysaro --range` still print every problem, because a log is all they have.
@@ -79,6 +81,7 @@ First public release.
 - Pull request and merge commit rules (`request.json`, `merge.json`).
 - The `fixer`, `analyzer` and `generator` stages.
 
+[0.3.0]: https://github.com/murpiano/kysaro/releases/tag/v0.3.0
 [0.2.1]: https://github.com/murpiano/kysaro/releases/tag/v0.2.1
 [0.2.0]: https://github.com/murpiano/kysaro/releases/tag/v0.2.0
 [0.1.1]: https://github.com/murpiano/kysaro/releases/tag/v0.1.1
