@@ -4,6 +4,11 @@ All notable changes to this project are documented in this file. The format foll
 
 ## [Unreleased]
 
+### Changed
+
+- The `commit-msg` hook prints two lines: the message is invalid, and the path of `.kysaro/report.md`. Every problem, the suggested message and the fix commands stay in the report. `kysaro ci` and `kysaro --range` still print every problem, because a log is all they have.
+- The report points at the part of the header that has the problem with a `^^^` line under it, and ends with the kind of the message and the settings file the rules came from. The check time and the count of checked messages are gone from a report of a single message.
+
 ## [0.2.1] - 2026-09-30
 
 ### Fixed

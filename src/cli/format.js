@@ -70,9 +70,10 @@ function formatIssue(issue) {
  * @param {Object} result KysaroResult.
  * @param {Object} [options]
  * @param {string} [options.label='Commit message'] What was checked, e.g. `Commit 1a2b3c4`.
+ * @param {boolean} [options.brief=false] Print the first line only; the rest is in the report.
  * @returns {string}
  */
-function formatResult(result, {label = 'Commit message'} = {}) {
+function formatResult(result, {label = 'Commit message', brief = false} = {}) {
   const issues = result.issues.filter(issue => issue.severity);
 
   if (result.status === VALIDATE_STATUS.IGNORED || !issues.length) {
@@ -85,6 +86,10 @@ function formatResult(result, {label = 'Commit message'} = {}) {
   lines.push(isInvalid
     ? chalk.red.bold(`${NAME} ✖ ${label} is invalid`)
     : chalk.yellow.bold(`${NAME} ⚠ ${label} has warnings`));
+
+  if (brief) {
+    return lines.join('\n') + '\n';
+  }
 
   if (header) {
     lines.push('', `  ${chalk.white(header)}`);

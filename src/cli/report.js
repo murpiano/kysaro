@@ -64,6 +64,56 @@ function suggestedMessage(result) {
   return [header, ...lines.slice(1)].join('\n');
 }
 
+/**
+ * Where a header part sits in the raw header line.
+ *
+ * @returns {{start:number, length:number}|null} `null` when the part is absent.
+ */
+function headerMarker(header, part) {
+  if (part === 'type' && header.type) {
+    return {start: 0, length: header.type.length};
+  }
+
+  if (part === 'scope' && header.scope) {
+    const start = header.raw.indexOf(`(${header.scope})`);
+
+    return start === -1 ? null : {start: start + 1, length: header.scope.length};
+  }
+
+  if (part === 'subject' && header.subject) {
+    const start = header.raw.indexOf(': ');
+
+    return start === -1 ? null : {start: start + 2, length: header.subject.length};
+  }
+
+  return null;
+}
+
+function markerLine(markers) {
+  return markers.reduce((line, {start, length}) =>
+    start < line.length ? line : line.padEnd(start, ' ') + '^'.repeat(Math.max(length, 1)), '');
+}
+
+/**
+ * Message lines with a `^^^` line under the header parts that have problems.
+ */
+function messageLines(result, issues) {
+  const lines = String(result.final || result.original || '').replace(/\n$/u, '').split('\n');
+  const header = result.parsed?.ast?.header;
+
+  if (!header?.raw) {
+    return lines;
+  }
+
+  const markers = issues
+    .filter(issue => issue.path?.[0] === 'header' && issue.path.length > 1)
+    .map(issue => headerMarker(header, issue.path[1]))
+    .filter(Boolean)
+    .sort((first, second) => first.start - second.start);
+
+  return markers.length ? [lines[0], markerLine(markers), ...lines.slice(1)] : lines;
+}
+
 function fixInstructions(entry, mode) {
   const {result, sha} = entry;
 
@@ -102,10 +152,8 @@ function entrySection(entry, mode, cwd) {
   const lines = [
     `## ${STATUS_ICON[result.status] || '⚠'} ${label} — ${result.status}`,
     '',
-    `Kind: ${KIND_LABEL[result.kind] || '—'} · Rules: ${rulesFile(result, cwd)}`,
-    '',
     '```text',
-    String(result.final || result.original || '').replace(/\n$/u, ''),
+    ...messageLines(result, issues),
     '```'
   ];
 
@@ -122,12 +170,19 @@ function entrySection(entry, mode, cwd) {
   const suggested = suggestedMessage(result);
 
   if (suggested) {
-    lines.push('', '### Suggested message', '', '```text', suggested, '```');
+    lines.push('', '### Write it like this', '', '```text', suggested, '```');
   }
 
   if (result.status === VALIDATE_STATUS.INVALID) {
     lines.push('', '### How to fix', '', ...fixInstructions(entry, entry.mode || mode).map(line => `- ${line}`));
   }
+
+  lines.push(
+    '',
+    '---',
+    '',
+    `Kind: ${KIND_LABEL[result.kind] || '—'} · Rules: ${rulesFile(result, cwd)}`
+  );
 
   return lines.join('\n');
 }
@@ -135,32 +190,35 @@ function entrySection(entry, mode, cwd) {
 /**
  * Builds the Markdown report of a check.
  *
+ * A check of one message goes straight to that message; a check of many
+ * starts with the count of invalid ones.
+ *
  * @param {{label:string, result:Object, sha?:string, mode?:string}[]} entries Checked messages.
  *   `mode` of an entry overrides `params.mode`.
  * @param {Object} params
  * @param {string} params.mode Value of `REPORT_MODE`.
  * @param {string} params.cwd Project root.
- * @param {Date} [params.date=new Date()]
  * @returns {string}
  */
-function buildReport(entries, {mode, cwd, date = new Date()}) {
+function buildReport(entries, {mode, cwd}) {
   const invalid = entries.filter(({result}) => result.status === VALIDATE_STATUS.INVALID);
   const withIssues = entries.filter(({result}) => result.issues.some(issue => issue.severity));
   const status = invalid.length ? VALIDATE_STATUS.INVALID : VALIDATE_STATUS.VALID;
+  const lines = ['# Kysaro report'];
 
-  const lines = [
-    '# Kysaro report',
-    '',
-    `${STATUS_ICON[status]} ${invalid.length ? `${invalid.length} of ${entries.length} message(s) are invalid` : `${entries.length} message(s) checked, no errors`}`,
-    '',
-    `Checked: ${date.toISOString()}`
-  ];
+  if (entries.length > 1) {
+    lines.push('', `${STATUS_ICON[status]} ${invalid.length
+      ? `${invalid.length} of ${entries.length} message(s) are invalid`
+      : `${entries.length} message(s) checked, no errors`}`);
+  } else if (!withIssues.length) {
+    lines.push('', `${STATUS_ICON[status]} ${entries[0]?.label || 'Commit message'} — ${status}`);
+  }
 
   withIssues.forEach(entry => {
     lines.push('', entrySection(entry, mode, cwd));
   });
 
-  lines.push('', 'Rules reference: https://github.com/murpiano/kysaro#rules', '');
+  lines.push('', 'All rules: https://github.com/murpiano/kysaro#rules', '');
 
   return lines.join('\n');
 }

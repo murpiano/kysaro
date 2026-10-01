@@ -107,32 +107,36 @@ function resolveType(type) {
 }
 
 /**
- * Writes the Markdown report and prints its path when there are errors.
+ * Writes the Markdown report.
+ *
+ * @returns {string|null} Path of the report, relative to the project root.
  */
 function saveReport(entries, mode, io) {
   const reportPath = writeReport(buildReport(entries, {mode, cwd: io.cwd}), {cwd: io.cwd, env: io.env});
-  const hasErrors = entries.some(({result}) => result.status === VALIDATE_STATUS.INVALID);
 
-  if (reportPath && hasErrors) {
-    io.stderr.write(`[kysaro] Report with fixes: ${path.relative(io.cwd, reportPath)}\n`);
-  }
+  return reportPath && path.relative(io.cwd, reportPath);
 }
 
 async function check(args, io) {
   const message = await readMessage(args, io);
   const result = lint(message, {type: resolveType(args.values.type), cwd: io.cwd});
-  const text = formatResult(result);
   const mode = args.values.message === undefined && args.positionals.length === 1
     ? REPORT_MODE.HOOK
     : REPORT_MODE.MESSAGE;
+  const reportPath = saveReport([{label: 'Commit message', result}], mode, io);
+  const isInvalid = result.status === VALIDATE_STATUS.INVALID;
+  // The hook runs on every commit: one line in the terminal, the rest in the report.
+  const text = formatResult(result, {brief: Boolean(reportPath) && mode === REPORT_MODE.HOOK});
 
   if (text) {
     io.stderr.write(text);
   }
 
-  saveReport([{label: 'Commit message', result}], mode, io);
+  if (reportPath && isInvalid) {
+    io.stderr.write(`[kysaro] How to fix: ${reportPath}\n`);
+  }
 
-  if (result.status !== VALIDATE_STATUS.INVALID) {
+  if (!isInvalid) {
     return EXIT_CODE.OK;
   }
 
@@ -178,7 +182,11 @@ function reportRange(checked, io, extra = []) {
     io.stderr.write(`[kysaro] ${invalidCommits.length} of ${checked.length} commit(s) are invalid\n`);
   }
 
-  saveReport(entries, REPORT_MODE.RANGE, io);
+  const reportPath = saveReport(entries, REPORT_MODE.RANGE, io);
+
+  if (reportPath && invalid.length) {
+    io.stderr.write(`[kysaro] How to fix: ${reportPath}\n`);
+  }
 
   return invalid.length ? EXIT_CODE.INVALID : EXIT_CODE.OK;
 }
