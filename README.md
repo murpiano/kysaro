@@ -1,3 +1,5 @@
+![kysaro report](docs/screenshot.png)
+
 # kysaro
 
 [![npm](https://img.shields.io/npm/v/kysaro)](https://www.npmjs.com/package/kysaro)
