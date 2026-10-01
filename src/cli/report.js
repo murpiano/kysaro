@@ -146,11 +146,11 @@ function fixInstructions(entry, mode) {
   return ['Fix the message and check it again.'];
 }
 
-function entrySection(entry, mode, cwd) {
+function entrySection(entry, mode, cwd, level) {
   const {label, result} = entry;
   const issues = result.issues.filter(issue => issue.severity);
   const lines = [
-    `## ${STATUS_ICON[result.status] || '⚠'} ${label} — ${result.status}`,
+    `${level} ${STATUS_ICON[result.status] || '⚠'} ${label} — ${result.status}`,
     '',
     '```text',
     ...messageLines(result, issues),
@@ -170,11 +170,11 @@ function entrySection(entry, mode, cwd) {
   const suggested = suggestedMessage(result);
 
   if (suggested) {
-    lines.push('', '### Write it like this', '', '```text', suggested, '```');
+    lines.push('', `${level}# Write it like this`, '', '```text', suggested, '```');
   }
 
   if (result.status === VALIDATE_STATUS.INVALID) {
-    lines.push('', '### How to fix', '', ...fixInstructions(entry, entry.mode || mode).map(line => `- ${line}`));
+    lines.push('', `${level}# How to fix`, '', ...fixInstructions(entry, entry.mode || mode).map(line => `- ${line}`));
   }
 
   lines.push(
@@ -190,6 +190,7 @@ function entrySection(entry, mode, cwd) {
 /**
  * Builds the Markdown report of a check.
  *
+ * The verdict comes first, because the file is often read as plain text.
  * A check of one message goes straight to that message; a check of many
  * starts with the count of invalid ones.
  *
@@ -204,21 +205,22 @@ function buildReport(entries, {mode, cwd}) {
   const invalid = entries.filter(({result}) => result.status === VALIDATE_STATUS.INVALID);
   const withIssues = entries.filter(({result}) => result.issues.some(issue => issue.severity));
   const status = invalid.length ? VALIDATE_STATUS.INVALID : VALIDATE_STATUS.VALID;
-  const lines = ['# Kysaro report'];
+  const many = entries.length > 1;
+  const lines = [];
 
-  if (entries.length > 1) {
-    lines.push('', `${STATUS_ICON[status]} ${invalid.length
+  if (many) {
+    lines.push(`# ${STATUS_ICON[status]} ${invalid.length
       ? `${invalid.length} of ${entries.length} message(s) are invalid`
       : `${entries.length} message(s) checked, no errors`}`);
   } else if (!withIssues.length) {
-    lines.push('', `${STATUS_ICON[status]} ${entries[0]?.label || 'Commit message'} — ${status}`);
+    lines.push(`# ${STATUS_ICON[status]} ${entries[0]?.label || 'Commit message'} — ${status}`);
   }
 
-  withIssues.forEach(entry => {
-    lines.push('', entrySection(entry, mode, cwd));
+  withIssues.forEach((entry, index) => {
+    lines.push(...(lines.length || index ? [''] : []), entrySection(entry, mode, cwd, many ? '##' : '#'));
   });
 
-  lines.push('', 'All rules: https://github.com/murpiano/kysaro#rules', '');
+  lines.push('', '*Kysaro report · [all rules](https://github.com/murpiano/kysaro#rules)*', '');
 
   return lines.join('\n');
 }

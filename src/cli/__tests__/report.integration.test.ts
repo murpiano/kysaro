@@ -40,23 +40,26 @@ describe('check report', () => {
     const result = lint('feat(UI): add colors.\n\nBody text', {type: COMMIT_TYPE.COMMIT, cwd});
     const report = buildReport([{label: 'Commit message', result}], {mode: REPORT_MODE.HOOK, cwd});
 
-    expect(report).toContain('## ✖ Commit message — invalid');
+    expect(report.startsWith('# ✖ Commit message — invalid\n')).toBe(true);
     expect(report).toContain('| 1 | header.scope | Scope "UI" must be in lower case | `SCOPE_CASE` |');
-    expect(report).toContain('### Write it like this\n\n```text\nfeat(ui): add colors\n\nBody text\n```');
+    expect(report).toContain('## Write it like this\n\n```text\nfeat(ui): add colors\n\nBody text\n```');
     expect(report).toContain('git commit -e -F .git/COMMIT_EDITMSG');
     expect(report).toContain('Kind: commit · Rules: package default `commit.json`');
+    expect(report).toContain('*Kysaro report · [all rules](https://github.com/murpiano/kysaro#rules)*');
   });
 
-  test('should count messages only when many are checked', () => {
-    const one = lint('feat(UI): add colors', {type: COMMIT_TYPE.COMMIT, cwd});
-    const single = buildReport([{label: 'Commit message', result: one}], {mode: REPORT_MODE.HOOK, cwd});
-    const many = buildReport([
-      {label: 'Commit 1a2b3c4', result: one},
-      {label: 'Commit 5d6e7f8', result: one}
+  test('should head a report of many messages with the count', () => {
+    const result = lint('feat(UI): add colors', {type: COMMIT_TYPE.COMMIT, cwd});
+    const report = buildReport([
+      {label: 'Commit 1a2b3c4', result},
+      {label: 'Commit 5d6e7f8', result}
     ], {mode: REPORT_MODE.RANGE, cwd});
 
-    expect(single).not.toContain('message(s)');
-    expect(many).toContain('✖ 2 of 2 message(s) are invalid');
+    expect(report.startsWith('# ✖ 2 of 2 message(s) are invalid\n')).toBe(true);
+    expect(report).toContain('## ✖ Commit 1a2b3c4 — invalid');
+    expect(report).toContain('### Write it like this');
+    expect(buildReport([{label: 'Commit message', result}], {mode: REPORT_MODE.HOOK, cwd}))
+      .not.toContain('message(s)');
   });
 
   test('should point at the header part that has the problem', () => {
@@ -121,6 +124,6 @@ describe('check report', () => {
 
     await run(['-m', 'bad', '--type', 'commit'], io({GITHUB_STEP_SUMMARY: summary}));
 
-    expect(fs.readFileSync(summary, 'utf8')).toContain('# Kysaro report');
+    expect(fs.readFileSync(summary, 'utf8')).toContain('*Kysaro report ·');
   });
 });
