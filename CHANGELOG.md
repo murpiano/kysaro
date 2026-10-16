@@ -4,6 +4,10 @@ All notable changes to this project are documented in this file. The format foll
 
 ## [Unreleased]
 
+### Added
+
+- `main.json` rejects stages that cannot run: `analyzer` and `fixer` need `validator`, and `analyzer` needs `correction` or `semantic`. The error points at the `enabled` property of the stage.
+
 ## [0.3.0] - 2026-10-01
 
 ### Changed
