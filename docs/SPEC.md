@@ -200,9 +200,9 @@ Loader пишет отчёты о загрузке в `.kysaro/<группа>.md
 
 TODO в схеме `main.schema.json`:
 
-- [ ] `analyzer.enabled: true` только при `validator.enabled: true`. Сообщение: «true только при validator.enabled=true».
-- [ ] `analyzer.enabled: true` требует `correction.enabled` или `semantic.enabled` равным `true`.
-- [ ] `fixer.enabled: true` только при `validator.enabled: true`.
+- [x] `analyzer.enabled: true` только при `validator.enabled: true`. Подсказка в `description`: «true только при validator.enabled=true».
+- [x] `analyzer.enabled: true` требует `correction.enabled` или `semantic.enabled` равным `true`.
+- [x] `fixer.enabled: true` только при `validator.enabled: true`.
 - [x] `ignore` не пустой объект, `kinds` и `patterns` не пустые массивы.
 
 Описание этапов:

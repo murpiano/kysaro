@@ -236,6 +236,35 @@
             }
           }
         }
+      },
+
+      "if": {
+        "properties": {
+          "correction": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "const": false
+              }
+            }
+          },
+          "semantic": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "const": false
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "enabled": {
+            "const": false,
+            "description": "true только при correction.enabled=true или semantic.enabled=true."
+          }
+        }
       }
     },
 
@@ -337,6 +366,41 @@
           "items": {
             "type": "string",
             "minLength": 1
+          }
+        }
+      }
+    }
+  },
+
+  "if": {
+    "properties": {
+      "validator": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "const": false
+          }
+        }
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "analyzer": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "const": false,
+            "description": "true только при validator.enabled=true."
+          }
+        }
+      },
+      "fixer": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "const": false,
+            "description": "true только при validator.enabled=true."
           }
         }
       }
