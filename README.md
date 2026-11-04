@@ -4,9 +4,10 @@
 
 [![npm](https://img.shields.io/npm/v/kysaro)](https://www.npmjs.com/package/kysaro)
 [![CI](https://github.com/murpiano/kysaro/actions/workflows/ci.yml/badge.svg)](https://github.com/murpiano/kysaro/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/murpiano/kysaro)](https://github.com/murpiano/kysaro/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-Strict commit message linter. Kysaro checks every commit message before it reaches the history and blocks the commit when the message breaks the rules.
+Strict commit message linter for teams using Conventional Commits. Kysaro checks commit messages through a local hook and checks commits and pull requests in CI.
 
 - [Conventional Commits](https://www.conventionalcommits.org/) out of the box.
 - Rules live in JSON files with JSON Schemas: your IDE autocompletes every option and highlights mistakes while you edit them.
@@ -284,7 +285,7 @@ check('feat: add x (#12)\n\nDescription…', COMMIT_TYPE.MERGE);
 
 `parseMessage(message)` returns the message AST without validation. TypeScript declarations are included.
 
-## Roadmap
+## Limitations
 
 Settings for these stages exist in `main.json`, but the stages are not connected yet:
 
@@ -302,6 +303,20 @@ npm start              # run the pipeline on a sample message
 ```
 
 This repository checks its own commits with kysaro. Allowed types and scopes are in `.kysaro/settings/resources`.
+
+CI runs tests on Node.js 20, 22 and 24 and checks commit and pull request messages. See [CHANGELOG.md](CHANGELOG.md) for released changes and [docs/SPEC.md](docs/SPEC.md) for the configuration reference.
+
+### Releases
+
+After successful `CI` on a push to `main`, the release workflow creates the next GitHub Release when the repository variable `RELEASES` is `on`. It requires the `RELEASE_TOKEN` secret. Conventional Commits determine the version: `feat` increments minor, `fix` and `perf` increment patch, and breaking changes increment major. Other commit types do not trigger a release.
+
+Release notes use the committed [template](.github/release-notes.md). Preview the next release locally:
+
+```sh
+bash .github/scripts/release.sh --dry-run
+```
+
+Publishing a GitHub Release starts npm publication after verification of successful CI for the tagged commit. The package version is set to the release version in the runner; this does not create a version commit. npm publication requires `NPM_TOKEN`.
 
 ## License
 

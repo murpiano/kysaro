@@ -31,6 +31,9 @@ jobs:
       - name: Run all tests
         run: npm test
 
+      - name: Check package contents
+        run: npm pack --dry-run
+
   kysaro:
     name: kysaro
     runs-on: ubuntu-latest

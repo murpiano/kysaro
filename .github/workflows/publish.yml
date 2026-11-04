@@ -1,11 +1,12 @@
 name: Publish
 
 on:
-  push:
-    tags: ['v*']
+  release:
+    types: [published]
 
 permissions:
-  contents: write
+  contents: read
+  actions: read
   id-token: write
 
 jobs:
@@ -16,6 +17,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Verify CI for the release commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SHA=$(git rev-parse HEAD)
+          RESULT=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$SHA&event=push&branch=main&per_page=1" --jq '.workflow_runs[0].conclusion // "missing"')
+          if [ "$RESULT" != success ]; then
+            echo "::error::The release commit must have successful CI on main."
+            exit 1
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
@@ -27,16 +41,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Check that the tag matches package.json
+      - name: Set package version from the release
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          VERSION="v$(node -p "require('./package.json').version")"
-          if [ "$VERSION" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $VERSION"
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Expected a vX.Y.Z release tag."
             exit 1
           fi
+          npm version "${RELEASE_TAG#v}" --no-git-tag-version --ignore-scripts --allow-same-version
 
       - name: Run all tests
         run: npm test
+
+      - name: Check package contents
+        run: npm pack --dry-run
 
       - name: Publish package
         run: |
@@ -48,18 +67,3 @@ jobs:
           npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Create GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
-            echo "Release $GITHUB_REF_NAME already exists, skipping"
-            exit 0
-          fi
-          awk -v version="${GITHUB_REF_NAME#v}" '
-            $0 ~ "^## \\[" version "\\]" { found = 1; next }
-            found && /^## \[/ { exit }
-            found { print }
-          ' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
-          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md" --verify-tag
