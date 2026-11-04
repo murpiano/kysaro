@@ -306,3 +306,5 @@ This repository checks its own commits with kysaro. Allowed types and scopes are
 ## License
 
 [MIT](LICENSE)
+
+Copyright © 2026 [Bogdan Trotsenko](https://github.com/murpiano).
